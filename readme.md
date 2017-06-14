@@ -1,5 +1,7 @@
 # metadoc
 
+[![Build Status](https://travis-ci.org/olafurpg/metadoc.svg?branch=master)](https://travis-ci.org/olafurpg/metadoc)
+
 Experimenting with using Scalameta Semantic DB to build online code browser
 with "jump to definition" and "see usage". To run,
 
