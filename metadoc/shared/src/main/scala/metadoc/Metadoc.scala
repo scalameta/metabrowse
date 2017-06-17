@@ -14,7 +14,7 @@ object Metadoc {
   def main(args: Array[String]): Unit = {
     implicit val mirror = Mirror()
     val cp = Classpath(
-      "/Users/ollie/dev/metadoc/example/target/scala-2.12/classes")
+      PathIO.workingDirectory.resolve("../../example/target/scala-2.12/classes"))
     generateSite(cp)
   }
 

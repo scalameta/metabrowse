@@ -3,7 +3,7 @@ scalaVersion in ThisBuild := "2.12.2"
 lazy val allSettings = Seq(
   organization := "com.geirsson",
   libraryDependencies ++= Seq(
-    "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
+    "org.scalatest" %%% "scalatest" % "3.0.3" % Test,
     "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
   ),
   resolvers += Resolver.bintrayRepo("scalameta", "maven"),
