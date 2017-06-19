@@ -47,6 +47,20 @@ lazy val metadoc = crossProject
   )
   .configureAll(_.dependsOn(example % Scalameta))
   .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin))
+  .jsSettings(
+    version in webpack := "2.6.1",
+    version in installWebpackDevServer := "2.2.0",
+    useYarn := true,
+    emitSourceMaps := false, // Disabled to reduce warnings
+    webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.2",
+    npmDevDependencies in Compile ++= Seq(
+      "webpack-merge" -> "4.1.0",
+      "html-webpack-plugin" -> "2.28.0",
+      "copy-webpack-plugin" -> "4.0.1"
+    ),
+    npmDependencies in Compile += "monaco-editor" -> "0.8.3"
+  )
 lazy val metadocJVM = metadoc.jvm
 lazy val metadocJS = metadoc.js
 
