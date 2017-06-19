@@ -59,6 +59,9 @@ abstract class MonacoLanguages extends js.Object {
   def setMonarchTokensProvider(
     languageId: String,
     languageDef: MonacoLanguages.IMonarchLanguage): Monaco.IDisposable = js.native
+  def setLanguageConfiguration(
+    languageId: String,
+    configuration: MonacoLanguages.LanguageConfiguration): Monaco.IDisposable = js.native
 }
 
 object MonacoLanguages {

@@ -22,15 +22,40 @@ object MetadocApp extends js.JSApp {
     val app = dom.document.getElementById("editor")
     app.innerHTML = ""
     monaco.languages.register(ScalaLanguageExtensionPoint)
+    monaco.languages.setMonarchTokensProvider(ScalaLanguageExtensionPoint.id, ScalaLanguage.language)
+    monaco.languages.setLanguageConfiguration(ScalaLanguageExtensionPoint.id, ScalaLanguage.conf)
     monaco.editor.create(app, MonacoEditor.IEditorConstructionOptions(
       value =
-        """const f = (x) => x + 1
-          |const g = (x, y) => x * y
+        """package example
           |
-          |g(f(2), f(4)) // => 15""".stripMargin,
-      language = "javascript"
+          |import scala.scalajs.js
+          |import scala.scalajs.js.annotation._
+          |
+          |/**
+          | * An editor.
+          | *
+          | * @see https://microsoft.github.io/monaco-editor/api
+          | */
+          |object MonacoEditor {
+          |  // A list
+          |  type A[T] = List[T]
+          |
+          |  case class IEditorConstructionOptions(
+          |    @(JSExport @field) value: js.UndefOr[String]    = js.undefined,
+          |    @(JSExport @field) language: js.UndefOr[String] = js.undefined)
+          |  )
+          |
+          |  val Stuff = List("a", 'b', 3.14, 120L, 'sym)
+          |  var MutateMe: Map[String, Any] = Map.empty
+          |
+          |  def isStuff(a: Any): Boolean = a match {
+          |    case "a"            => true
+          |    case d if d == 3.14 => true
+          |    case _              => false
+          |  }
+          |}
+          |""".stripMargin,
+      language = "scala"
     ))
   }
-
-  final val ScalaLanguageExtensionPoint = MonacoLanguages.ILanguageExtensionPoint(id = "scala")
 }

@@ -57,7 +57,9 @@ lazy val metadoc = crossProject
     npmDevDependencies in Compile ++= Seq(
       "webpack-merge" -> "4.1.0",
       "html-webpack-plugin" -> "2.28.0",
-      "copy-webpack-plugin" -> "4.0.1"
+      "copy-webpack-plugin" -> "4.0.1",
+      "ts-loader" -> "2.1.0",
+      "typescript" -> "2.3.4"
     ),
     npmDependencies in Compile += "monaco-editor" -> "0.8.3"
   )
