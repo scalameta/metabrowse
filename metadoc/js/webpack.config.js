@@ -31,6 +31,7 @@ module.exports = merge(config, {
       {
         from: path.resolve(MonacoEditorBaseDir, 'vs'),
         to: 'vs',
+        ignore: [ 'basic-languages/**/*' ]
       }
     ]),
     new HtmlWebpackPlugin({
