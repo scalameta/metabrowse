@@ -55,13 +55,23 @@ lazy val metadoc = crossProject
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.2",
     npmDevDependencies in Compile ++= Seq(
-      "webpack-merge" -> "4.1.0",
-      "html-webpack-plugin" -> "2.28.0",
       "copy-webpack-plugin" -> "4.0.1",
+      "css-loader" -> "0.28.4",
+      "extract-text-webpack-plugin" -> "2.1.2",
+      "file-loader" -> "0.11.2",
+      "html-webpack-plugin" -> "2.28.0",
+      "image-webpack-loader" -> "3.3.1",
+      "node-sass" -> "4.5.3",
+      "sass-loader" -> "6.0.6",
+      "style-loader" -> "0.18.2",
       "ts-loader" -> "2.1.0",
-      "typescript" -> "2.3.4"
+      "typescript" -> "2.3.4",
+      "webpack-merge" -> "4.1.0"
     ),
-    npmDependencies in Compile += "monaco-editor" -> "0.8.3"
+    npmDependencies in Compile ++= Seq(
+      "monaco-editor" -> "0.8.3",
+      "roboto-fontface" -> "0.7.0"
+    )
   )
 lazy val metadocJVM = metadoc.jvm
 lazy val metadocJS = metadoc.js

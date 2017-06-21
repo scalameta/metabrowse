@@ -5,9 +5,6 @@ import org.scalajs.dom
 
 object MetadocApp extends js.JSApp {
   def main(): Unit = {
-    val app = dom.document.getElementById("editor")
-    app.textContent = "Loading editor ..."
-
     /*
      * Load the Monaco Editor AMD bundle dynamically since it's incompatible
      * with Webpack: https://github.com/Microsoft/monaco-editor/issues/18
@@ -24,7 +21,7 @@ object MetadocApp extends js.JSApp {
     monaco.languages.register(ScalaLanguageExtensionPoint)
     monaco.languages.setMonarchTokensProvider(ScalaLanguageExtensionPoint.id, ScalaLanguage.language)
     monaco.languages.setLanguageConfiguration(ScalaLanguageExtensionPoint.id, ScalaLanguage.conf)
-    monaco.editor.create(app, MonacoEditor.IEditorConstructionOptions(
+    val editor = monaco.editor.create(app, MonacoEditor.IEditorConstructionOptions(
       value =
         """package example
           |
@@ -57,5 +54,7 @@ object MetadocApp extends js.JSApp {
           |""".stripMargin,
       language = "scala"
     ))
+
+    dom.window.onresize = { _: dom.UIEvent => editor.layout() }
   }
 }
