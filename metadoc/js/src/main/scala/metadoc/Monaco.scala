@@ -45,11 +45,18 @@ object MonacoEditor {
     @(JSExport @field) language: js.UndefOr[String] = js.undefined
   )
 
+  case class IDimension(
+    @(JSExport @field) height: Int,
+    @(JSExport @field) width: Int
+  )
+
   @js.native
   trait IEditorOverrideServices extends js.Object
 
   @js.native
-  trait IStandaloneCodeEditor extends js.Object
+  trait IStandaloneCodeEditor extends js.Object {
+    def layout(dimension: js.UndefOr[IDimension] = js.undefined): Unit = js.native
+  }
 }
 
 @js.native
@@ -59,6 +66,9 @@ abstract class MonacoLanguages extends js.Object {
   def setMonarchTokensProvider(
     languageId: String,
     languageDef: MonacoLanguages.IMonarchLanguage): Monaco.IDisposable = js.native
+  def setLanguageConfiguration(
+    languageId: String,
+    configuration: MonacoLanguages.LanguageConfiguration): Monaco.IDisposable = js.native
 }
 
 object MonacoLanguages {
