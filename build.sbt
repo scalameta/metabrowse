@@ -1,3 +1,5 @@
+import com.trueaccord.scalapb.compiler.Version.scalapbVersion
+
 scalaVersion in ThisBuild := "2.12.2"
 
 lazy val allSettings = Seq(
@@ -32,10 +34,47 @@ lazy val allSettings = Seq(
         <name>Ólafur Páll Geirsson</name>
         <url>https://geirsson.com</url>
       </developer>
+      <developer>
+        <id>jonas</id>
+        <name>Jonas Fonseca</name>
+        <url>https://github.com/jonas</url>
+      </developer>
     </developers>
 )
 
 lazy val example = project
+
+lazy val protobufSettings = Seq(
+  PB.targets.in(Compile) := Seq(
+    scalapb.gen(
+      flatPackage = true // Don't append filename to package
+    ) -> sourceManaged.in(Compile).value
+  ),
+  libraryDependencies += "com.trueaccord.scalapb" %% "scalapb-runtime" % scalapbVersion
+)
+
+lazy val cli = project
+  .in(file("metadoc-cli"))
+  .settings(
+    allSettings,
+    protobufSettings,
+    moduleName := "metadoc-cli",
+    mainClass.in(assembly) := Some("metadoc.cli.MetadocCli"),
+    assemblyJarName.in(assembly) := "metadoc.jar",
+    libraryDependencies ++= List(
+      "org.scalameta" %% "scalameta" % "1.8.0",
+      "com.github.alexarchambault" %% "case-app" % "1.2.0-M3",
+      "com.github.pathikrit" %% "better-files" % "3.0.0"
+    ),
+    javaOptions := Nil,
+    test.in(Test) :=
+      test.in(Test).dependsOn(compile.in(example, Compile)).value,
+    buildInfoPackage := "metadoc.tests",
+    buildInfoKeys := Seq[BuildInfoKey](
+      "exampleClassDirectory" -> classDirectory.in(example, Compile).value
+    )
+  )
+  .enablePlugins(BuildInfoPlugin)
 
 lazy val metadoc = crossProject
   .in(file("metadoc"))

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package metadoc.schema;
+
+message Position {
+    string filename = 1;
+    int32 start = 2;
+    int32 end = 3;
+}
+
+message Symbol {
+    string symbol = 1;
+    Position definition = 2;
+    repeated Position references = 3;
+}
+
+message Index {
+    repeated string files = 1;
+    repeated string symbols = 2;
+}
