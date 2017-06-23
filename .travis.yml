@@ -5,7 +5,7 @@ jdk:
   - oraclejdk8
 env:
   matrix:
-    - CI_TEST: metadocJVM/test
+    - CI_TEST: test
 
 cache:
   directories:

@@ -2,7 +2,6 @@ package metadoc.cli
 
 import java.nio.file.Files
 import caseapp.RemainingArgs
-import scala.collection.JavaConverters._
 import org.scalatest.FunSuite
 import better.files._
 
