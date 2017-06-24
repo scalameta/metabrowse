@@ -4,6 +4,8 @@ script:
 jdk:
   - oraclejdk8
 env:
+  global:
+    - TRAVIS_NODE_VERSION="8"
   matrix:
     - CI_TEST: test
 
@@ -17,6 +19,8 @@ cache:
   - $HOME/.coursier
 
 before_install:
+  # Install Node.js and yarn.
+  - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 0.24.6
   - export PATH=$HOME/.yarn/bin:$PATH
 
