@@ -2,15 +2,13 @@
 
 [![Build Status](https://travis-ci.org/olafurpg/metadoc.svg?branch=master)](https://travis-ci.org/olafurpg/metadoc)
 
-Experimenting with using Scalameta Semantic DB to build online code browser
-with "jump to definition" and "see usage". To run,
+An experiment with [Scalameta Semantic API](http://scalameta.org/tutorial/#SemanticAPI)
+to build online code browser with "jump to definition" and "see usage". To run,
 
 ```
-git clone ...
+git clone https://github.com/olafurpg/metadoc.git
 cd metadoc
-sbt ~metadocJVM/test
-npm install -g browser-sync
-browser-sync start --server --files "metadoc/jvm/target/metadoc/**"
-open http://localhost:3000/metadoc/jvm/target/metadoc/example/src/main/scala/example/Example.scala.html
+npm install -g yarn
+sbt js/fastOptJS::startWebpackDevServer
+open http://localhost:8080
 ```
-
