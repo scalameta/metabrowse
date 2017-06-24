@@ -48,7 +48,7 @@ lazy val protobufSettings = Seq(
   PB.targets.in(Compile) := Seq(
     scalapb.gen(
       flatPackage = true // Don't append filename to package
-    ) -> sourceManaged.in(Compile).value
+    ) -> sourceManaged.in(Compile).value./("protobuf")
   ),
   libraryDependencies += "com.trueaccord.scalapb" %% "scalapb-runtime" % scalapbVersion
 )
