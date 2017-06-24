@@ -1,3 +1,5 @@
+import com.trueaccord.scalapb.compiler.Version.scalapbVersion
+
 scalaVersion in ThisBuild := "2.12.2"
 
 lazy val allSettings = Seq(
@@ -32,28 +34,66 @@ lazy val allSettings = Seq(
         <name>Ólafur Páll Geirsson</name>
         <url>https://geirsson.com</url>
       </developer>
+      <developer>
+        <id>jonas</id>
+        <name>Jonas Fonseca</name>
+        <url>https://github.com/jonas</url>
+      </developer>
     </developers>
 )
 
 lazy val example = project
 
-lazy val metadoc = crossProject
-  .in(file("metadoc"))
+lazy val protobufSettings = Seq(
+  PB.targets.in(Compile) := Seq(
+    scalapb.gen(
+      flatPackage = true // Don't append filename to package
+    ) -> sourceManaged.in(Compile).value./("protobuf")
+  ),
+  libraryDependencies += "com.trueaccord.scalapb" %% "scalapb-runtime" % scalapbVersion
+)
+
+lazy val cli = project
+  .in(file("metadoc-cli"))
   .settings(
     allSettings,
-    name := "metadoc",
-    moduleName := "metadoc",
-    fork in (Test, test) := true
+    protobufSettings,
+    moduleName := "metadoc-cli",
+    mainClass.in(assembly) := Some("metadoc.cli.MetadocCli"),
+    assemblyJarName.in(assembly) := "metadoc.jar",
+    libraryDependencies ++= List(
+      "org.scalameta" %% "scalameta" % "1.8.0",
+      "com.github.alexarchambault" %% "case-app" % "1.2.0-M3",
+      "com.github.pathikrit" %% "better-files" % "3.0.0"
+    ),
+    javaOptions := Nil,
+    test.in(Test) :=
+      test.in(Test).dependsOn(compile.in(example, Compile)).value,
+    buildInfoPackage := "metadoc.tests",
+    buildInfoKeys := Seq[BuildInfoKey](
+      "exampleClassDirectory" -> classDirectory.in(example, Compile).value
+    )
   )
-  .configureAll(_.dependsOn(example % Scalameta))
-  .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin))
-  .jsSettings(
+  .enablePlugins(BuildInfoPlugin)
+
+lazy val js = project
+  .in(file("metadoc-js"))
+  .settings(
+    moduleName := "metadoc-js",
     version in webpack := "2.6.1",
     version in installWebpackDevServer := "2.2.0",
     useYarn := true,
     emitSourceMaps := false, // Disabled to reduce warnings
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
-    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.2",
+    compileInputs.in(Compile, compile) :=
+      compileInputs
+        .in(Compile, compile)
+        .dependsOn(compile.in(example, Compile, compile))
+        .value,
+    libraryDependencies ++= Seq(
+      "org.scalameta" %%% "scalameta" % "1.8.0",
+      "org.scala-js" %%% "scalajs-dom" % "0.9.2"
+    ),
     npmDevDependencies in Compile ++= Seq(
       "copy-webpack-plugin" -> "4.0.1",
       "css-loader" -> "0.28.4",
@@ -73,8 +113,7 @@ lazy val metadoc = crossProject
       "roboto-fontface" -> "0.7.0"
     )
   )
-lazy val metadocJVM = metadoc.jvm
-lazy val metadocJS = metadoc.js
+  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
 
 lazy val noPublish = Seq(
   publish := {},
