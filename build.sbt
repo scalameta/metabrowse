@@ -123,6 +123,20 @@ lazy val core = crossProject
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 
+commands += Command.command("metadoc-site") { s =>
+  val cliRun = Array(
+    "cli/run",
+    "--clean-target-first",
+    "--target",
+    "target/metadoc",
+    "example/target/scala-2.12/classes"
+  ).mkString(" ")
+
+  "example/compile" ::
+    cliRun ::
+    s
+}
+
 lazy val tests = project
   .in(file("metadoc-tests"))
   .settings(
