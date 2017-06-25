@@ -50,14 +50,19 @@ lazy val protobufSettings = Seq(
       flatPackage = true // Don't append filename to package
     ) -> sourceManaged.in(Compile).value./("protobuf")
   ),
-  libraryDependencies += "com.trueaccord.scalapb" %% "scalapb-runtime" % scalapbVersion
+  PB.protoSources.in(Compile) := Seq(
+    // necessary workaround for crossProjects.
+    file("metadoc-core/shared/src/main/protobuf")
+  ),
+  libraryDependencies ++= List(
+    "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion
+  )
 )
 
 lazy val cli = project
   .in(file("metadoc-cli"))
   .settings(
     allSettings,
-    protobufSettings,
     moduleName := "metadoc-cli",
     mainClass.in(assembly) := Some("metadoc.cli.MetadocCli"),
     assemblyJarName.in(assembly) := "metadoc.jar",
@@ -74,6 +79,7 @@ lazy val cli = project
       "exampleClassDirectory" -> classDirectory.in(example, Compile).value
     )
   )
+  .dependsOn(coreJVM)
   .enablePlugins(BuildInfoPlugin)
 
 lazy val js = project
@@ -113,7 +119,17 @@ lazy val js = project
       "roboto-fontface" -> "0.7.0"
     )
   )
+  .dependsOn(coreJS)
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
+
+lazy val core = crossProject
+  .in(file("metadoc-core"))
+  .settings(
+    allSettings,
+    protobufSettings
+  )
+lazy val coreJVM = core.jvm
+lazy val coreJS = core.js
 
 lazy val noPublish = Seq(
   publish := {},
