@@ -1,11 +1,13 @@
 language: scala
 scala: 2.12.4
 jdk: oraclejdk8
+sudo: false
+dist: trusty
 
 env:
   global:
     - TRAVIS_NODE_VERSION="8"
-    - TRAVIS_YARN_VERSION="1.1.0"
+    - TRAVIS_YARN_VERSION="1.3.2"
 
 matrix:
   include:
@@ -40,6 +42,7 @@ before_install:
 before_cache:
   - du -h -d 1 $HOME/.ivy2/cache
   - du -h -d 2 $HOME/.sbt/
+  - du -h -d 1 $(yarn cache dir)
   - find $HOME/.sbt -name "*.lock" -type f -delete
   - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
   - rm -rf $HOME/.ivy2/local
