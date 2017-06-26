@@ -139,14 +139,12 @@ lazy val tests = project
   .settings(
     allSettings,
     noPublish,
-    test.in(Test) :=
-      test.in(Test).dependsOn(compile.in(example, Compile)).value,
     buildInfoPackage := "metadoc.tests",
     buildInfoKeys := Seq[BuildInfoKey](
       "exampleClassDirectory" -> classDirectory.in(example, Compile).value
     )
   )
-  .dependsOn(cli)
+  .dependsOn(cli, example)
   .enablePlugins(BuildInfoPlugin)
 
 lazy val noPublish = Seq(
