@@ -83,11 +83,6 @@ lazy val js = project
     useYarn := true,
     emitSourceMaps := false, // Disabled to reduce warnings
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
-    compileInputs.in(Compile, compile) :=
-      compileInputs
-        .in(Compile, compile)
-        .dependsOn(compile.in(example, Compile, compile))
-        .value,
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "scalameta" % "1.8.0",
       "org.scala-js" %%% "scalajs-dom" % "0.9.2"

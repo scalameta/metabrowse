@@ -9,6 +9,6 @@ to build online code browser with "jump to definition" and "see usage". To run,
 git clone https://github.com/olafurpg/metadoc.git
 cd metadoc
 npm install -g yarn
-sbt js/fastOptJS::startWebpackDevServer
+sbt metadoc-site js/fastOptJS::startWebpackDevServer
 open http://localhost:8080
 ```
