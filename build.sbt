@@ -70,17 +70,9 @@ lazy val cli = project
       "org.scalameta" %% "scalameta" % "1.8.0",
       "com.github.alexarchambault" %% "case-app" % "1.2.0-M3",
       "com.github.pathikrit" %% "better-files" % "3.0.0"
-    ),
-    javaOptions := Nil,
-    test.in(Test) :=
-      test.in(Test).dependsOn(compile.in(example, Compile)).value,
-    buildInfoPackage := "metadoc.tests",
-    buildInfoKeys := Seq[BuildInfoKey](
-      "exampleClassDirectory" -> classDirectory.in(example, Compile).value
     )
   )
   .dependsOn(coreJVM)
-  .enablePlugins(BuildInfoPlugin)
 
 lazy val js = project
   .in(file("metadoc-js"))
@@ -130,6 +122,35 @@ lazy val core = crossProject
   )
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
+
+commands += Command.command("metadoc-site") { s =>
+  val cliRun = Array(
+    "cli/run",
+    "--clean-target-first",
+    "--target",
+    "target/metadoc",
+    "example/target/scala-2.12/classes"
+  ).mkString(" ")
+
+  "example/compile" ::
+    cliRun ::
+    s
+}
+
+lazy val tests = project
+  .in(file("metadoc-tests"))
+  .settings(
+    allSettings,
+    noPublish,
+    test.in(Test) :=
+      test.in(Test).dependsOn(compile.in(example, Compile)).value,
+    buildInfoPackage := "metadoc.tests",
+    buildInfoKeys := Seq[BuildInfoKey](
+      "exampleClassDirectory" -> classDirectory.in(example, Compile).value
+    )
+  )
+  .dependsOn(cli)
+  .enablePlugins(BuildInfoPlugin)
 
 lazy val noPublish = Seq(
   publish := {},

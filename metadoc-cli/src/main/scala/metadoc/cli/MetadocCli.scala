@@ -40,14 +40,23 @@ object MetadocCli extends CaseApp[MetadocOptions] {
                start = position.start.offset,
                end = position.end.offset)
 
-  def isDefinition(name: Term.Name): Boolean = name.parent.exists {
-    case d: Defn =>
-      true
-    case p: Pat.Var.Term =>
-      // handle `val x, y = 2`
-      p.parent.exists(_.is[Defn])
-    case _ =>
-      false
+  def isDefinition(name: Tree): Boolean = name match {
+    case t: Term.Name =>
+      t.parent.exists {
+        case _: Defn         => true // class Name
+        case _: Term.Param   => true // name: T
+        case p: Pat.Var.Term => p.parent.exists(_.is[Defn]) // val name = 2
+        case _               => false
+      }
+    case t: Type.Name =>
+      t.parent.exists {
+        case _: Type.Param  => true // class Foo[Name]
+        case _: Defn.Class  => true // class Name
+        case _: Defn.Trait  => true // trait Name
+        case _: Defn.Object => true // object Name
+        case _              => false
+      }
+    case _ => false
   }
 
   def getAbsolutePath(path: String): AbsolutePath =
@@ -59,26 +68,29 @@ object MetadocCli extends CaseApp[MetadocOptions] {
       .empty[String, d.Symbol]
       .withDefault(sym => d.Symbol(symbol = sym))
 
-    def addDefinition(symbol: Symbol, position: Position): Unit = {
+    def addDefinition(name: Tree): Unit = {
+      val symbol = db.names(name.pos)
+      val position = name.pos
       val syntax = symbol.syntax
-      symbols(syntax) =
-        symbols(syntax).copy(definition = Some(metadocPosition(position)))
     }
-    def addReference(symbol: Symbol, position: Position): Unit = {
+    def add(name: Tree): Unit = db.names.get(name.pos).foreach { symbol =>
       val syntax = symbol.syntax
-      val old = symbols(syntax)
-      symbols(syntax) =
-        old.copy(references = old.references :+ metadocPosition(position))
+      if (isDefinition(name)) {
+        symbols(syntax) =
+          symbols(syntax).copy(definition = Some(metadocPosition(name.pos)))
+      } else {
+        val old = symbols(syntax)
+        symbols(syntax) =
+          old.copy(references = old.references :+ metadocPosition(name.pos))
+      }
     }
 
     db.sources.foreach { source =>
-      source.collect {
-        case name @ Term.Name(_) if db.names.contains(name.pos) =>
-          if (isDefinition(name)) addDefinition(name.symbol, name.pos)
-          else addReference(name.symbol, name.pos)
+      source.traverse {
+        case name @ (Term.Name(_) | Type.Name(_)) => add(name)
       }
     }
-    symbols.values.toSeq
+    symbols.values.iterator.filter(_.definition.isDefined).toSeq
   }
 
   def createMetadocSite(site: MetadocSite, options: MetadocOptions): Unit = {
@@ -125,6 +137,6 @@ object MetadocCli extends CaseApp[MetadocOptions] {
     val index = d.Index(files, symbols.map(_.symbol))
     val site = MetadocSite(classpath.shallow, symbols, index)
     createMetadocSite(site, options)
-    println(s"Done! Generated metadoc site in ${options.target.get}")
+    println(options.target.get)
   }
 }
