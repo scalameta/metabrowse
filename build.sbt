@@ -44,21 +44,6 @@ lazy val allSettings = Seq(
 
 lazy val example = project
 
-lazy val protobufSettings = Seq(
-  PB.targets.in(Compile) := Seq(
-    scalapb.gen(
-      flatPackage = true // Don't append filename to package
-    ) -> sourceManaged.in(Compile).value./("protobuf")
-  ),
-  PB.protoSources.in(Compile) := Seq(
-    // necessary workaround for crossProjects.
-    file("metadoc-core/shared/src/main/protobuf")
-  ),
-  libraryDependencies ++= List(
-    "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion
-  )
-)
-
 lazy val cli = project
   .in(file("metadoc-cli"))
   .settings(
@@ -115,10 +100,22 @@ lazy val js = project
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
 
 lazy val core = crossProject
+  .crossType(CrossType.Pure)
   .in(file("metadoc-core"))
   .settings(
     allSettings,
-    protobufSettings
+    PB.targets.in(Compile) := Seq(
+      scalapb.gen(
+        flatPackage = true // Don't append filename to package
+      ) -> sourceManaged.in(Compile).value./("protobuf")
+    ),
+    PB.protoSources.in(Compile) := Seq(
+      // necessary workaround for crossProjects.
+      baseDirectory.value./("../src/main/protobuf")
+    ),
+    libraryDependencies ++= List(
+      "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion
+    )
   )
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
