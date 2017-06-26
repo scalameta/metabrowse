@@ -23,7 +23,7 @@ lazy val allSettings = Seq(
   apiURL := Some(url("https://olafurpg.github.io/metadoc")),
   scmInfo := Some(
     ScmInfo(
-      url("https://github.com/scalameta/metadoc"),
+      url("https://github.com/olafurpg/metadoc"),
       "scm:git:git@github.com:olafurpg/metadoc.git"
     )
   ),
@@ -43,21 +43,6 @@ lazy val allSettings = Seq(
 )
 
 lazy val example = project
-
-lazy val protobufSettings = Seq(
-  PB.targets.in(Compile) := Seq(
-    scalapb.gen(
-      flatPackage = true // Don't append filename to package
-    ) -> sourceManaged.in(Compile).value./("protobuf")
-  ),
-  PB.protoSources.in(Compile) := Seq(
-    // necessary workaround for crossProjects.
-    file("metadoc-core/shared/src/main/protobuf")
-  ),
-  libraryDependencies ++= List(
-    "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion
-  )
-)
 
 lazy val cli = project
   .in(file("metadoc-cli"))
@@ -110,10 +95,22 @@ lazy val js = project
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
 
 lazy val core = crossProject
+  .crossType(CrossType.Pure)
   .in(file("metadoc-core"))
   .settings(
     allSettings,
-    protobufSettings
+    PB.targets.in(Compile) := Seq(
+      scalapb.gen(
+        flatPackage = true // Don't append filename to package
+      ) -> sourceManaged.in(Compile).value./("protobuf")
+    ),
+    PB.protoSources.in(Compile) := Seq(
+      // necessary workaround for crossProjects.
+      baseDirectory.value./("../src/main/protobuf")
+    ),
+    libraryDependencies ++= List(
+      "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion
+    )
   )
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
@@ -124,7 +121,7 @@ commands += Command.command("metadoc-site") { s =>
     "--clean-target-first",
     "--target",
     "target/metadoc",
-    "example/target/scala-2.12/classes"
+    classDirectory.in(example, Compile).value
   ).mkString(" ")
 
   "example/compile" ::
@@ -137,14 +134,12 @@ lazy val tests = project
   .settings(
     allSettings,
     noPublish,
-    test.in(Test) :=
-      test.in(Test).dependsOn(compile.in(example, Compile)).value,
     buildInfoPackage := "metadoc.tests",
     buildInfoKeys := Seq[BuildInfoKey](
       "exampleClassDirectory" -> classDirectory.in(example, Compile).value
     )
   )
-  .dependsOn(cli)
+  .dependsOn(cli, example)
   .enablePlugins(BuildInfoPlugin)
 
 lazy val noPublish = Seq(
