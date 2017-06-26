@@ -23,7 +23,7 @@ lazy val allSettings = Seq(
   apiURL := Some(url("https://olafurpg.github.io/metadoc")),
   scmInfo := Some(
     ScmInfo(
-      url("https://github.com/scalameta/metadoc"),
+      url("https://github.com/olafurpg/metadoc"),
       "scm:git:git@github.com:olafurpg/metadoc.git"
     )
   ),
