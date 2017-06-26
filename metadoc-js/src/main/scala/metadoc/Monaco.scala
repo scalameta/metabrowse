@@ -56,11 +56,12 @@ abstract class MonacoEditor extends js.Object {
 }
 
 object MonacoEditor {
-  case class IEditorConstructionOptions(
-    @(JSExport @field) value: js.UndefOr[String] = js.undefined,
-    @(JSExport @field) language: js.UndefOr[String] = js.undefined,
-    @(JSExport @field) readOnly: js.UndefOr[Boolean] = js.undefined
-  )
+  @ScalaJSDefined
+  trait IEditorConstructionOptions extends js.Object {
+    val value: js.UndefOr[String] = js.undefined
+    val language: js.UndefOr[String] = js.undefined
+    val readOnly: js.UndefOr[Boolean] = js.undefined
+  }
 
   case class IDimension(
     @(JSExport @field) height: Int,
