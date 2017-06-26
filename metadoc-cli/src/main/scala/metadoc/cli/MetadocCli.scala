@@ -8,9 +8,10 @@ import scala.collection.mutable
 import scala.meta._
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
-import caseapp._
+import caseapp.{Name => _, _}
 import metadoc.{schema => d}
 import better.files._
+import scala.meta.internal.ast.Helpers._
 
 @AppName("metadoc")
 @AppVersion("0.1.0-SNAPSHOT")
@@ -40,25 +41,6 @@ object MetadocCli extends CaseApp[MetadocOptions] {
                start = position.start.offset,
                end = position.end.offset)
 
-  def isDefinition(name: Tree): Boolean = name match {
-    case t: Term.Name =>
-      t.parent.exists {
-        case _: Defn         => true // class Name
-        case _: Term.Param   => true // name: T
-        case p: Pat.Var.Term => p.parent.exists(_.is[Defn]) // val name = 2
-        case _               => false
-      }
-    case t: Type.Name =>
-      t.parent.exists {
-        case _: Type.Param  => true // class Foo[Name]
-        case _: Defn.Class  => true // class Name
-        case _: Defn.Trait  => true // trait Name
-        case _: Defn.Object => true // object Name
-        case _              => false
-      }
-    case _ => false
-  }
-
   def getAbsolutePath(path: String): AbsolutePath =
     if (PathIO.isAbsolutePath(path)) AbsolutePath(path)
     else PathIO.workingDirectory.resolve(path)
@@ -68,14 +50,9 @@ object MetadocCli extends CaseApp[MetadocOptions] {
       .empty[String, d.Symbol]
       .withDefault(sym => d.Symbol(symbol = sym))
 
-    def addDefinition(name: Tree): Unit = {
-      val symbol = db.names(name.pos)
-      val position = name.pos
+    def add(name: Name): Unit = db.names.get(name.pos).foreach { symbol =>
       val syntax = symbol.syntax
-    }
-    def add(name: Tree): Unit = db.names.get(name.pos).foreach { symbol =>
-      val syntax = symbol.syntax
-      if (isDefinition(name)) {
+      if (name.isBinder) {
         symbols(syntax) =
           symbols(syntax).copy(definition = Some(metadocPosition(name.pos)))
       } else {
@@ -86,9 +63,7 @@ object MetadocCli extends CaseApp[MetadocOptions] {
     }
 
     db.sources.foreach { source =>
-      source.traverse {
-        case name @ (Term.Name(_) | Type.Name(_)) => add(name)
-      }
+      source.traverse { case name: Name => add(name) }
     }
     symbols.values.iterator.filter(_.definition.isDefined).toSeq
   }
