@@ -33,11 +33,11 @@ object MetadocApp extends js.JSApp {
     monaco.languages.setLanguageConfiguration(ScalaLanguageExtensionPoint.id, ScalaLanguage.conf)
     dom.document.getElementById("title").textContent = fileName
 
-    val editor = monaco.editor.create(app, MonacoEditor.IEditorConstructionOptions(
-      readOnly = true,
-      value = contents,
-      language = "scala"
-    ))
+    val editor = monaco.editor.create(app, new MonacoEditor.IEditorConstructionOptions {
+      override val readOnly = true
+      override val value = contents
+      override val language = "scala"
+    })
 
     dom.window.onresize = { _: dom.UIEvent => editor.layout() }
   }
