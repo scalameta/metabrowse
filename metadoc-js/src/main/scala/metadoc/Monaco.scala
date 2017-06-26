@@ -1,18 +1,10 @@
 package metadoc
 
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
 import scala.annotation.meta.field
 import org.scalajs.dom
-
-/**
- * The context provided when loading the Monaco Editor bundle with `require`.
- */
-@JSGlobal
-@js.native
-abstract class MonacoLoaderContext extends js.Object {
-  val monaco: Monaco
-}
 
 @JSGlobal
 @js.native
@@ -26,6 +18,30 @@ object Monaco {
   @JSGlobal("IDisposable")
   abstract class IDisposable extends js.Object {
     def dispose(): Unit = js.native
+  }
+
+  /**
+   * The context provided when loading the Monaco Editor bundle with `require`.
+   */
+  @ScalaJSDefined
+  abstract class LoaderContext extends js.Object {
+    val monaco: Monaco
+  }
+
+  /**
+   * Load the Monaco Editor AMD bundle using `require`.
+   *
+   * The AMD bundle is not compatible with Webpack and must be loaded
+   * dynamically at runtime to avoid errors:
+   * https://github.com/Microsoft/monaco-editor/issues/18
+   */
+  def load(): Future[Monaco] = {
+    val promise = Promise[Monaco]()
+    js.Dynamic.global.require(js.Array("vs/editor/editor.main"), { ctx: LoaderContext =>
+      println("Monaco Editor loaded")
+      promise.success(ctx.monaco)
+    }: js.ThisFunction)
+    promise.future
   }
 }
 
@@ -42,7 +58,8 @@ abstract class MonacoEditor extends js.Object {
 object MonacoEditor {
   case class IEditorConstructionOptions(
     @(JSExport @field) value: js.UndefOr[String] = js.undefined,
-    @(JSExport @field) language: js.UndefOr[String] = js.undefined
+    @(JSExport @field) language: js.UndefOr[String] = js.undefined,
+    @(JSExport @field) readOnly: js.UndefOr[Boolean] = js.undefined
   )
 
   case class IDimension(

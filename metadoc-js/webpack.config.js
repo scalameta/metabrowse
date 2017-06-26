@@ -80,5 +80,11 @@ module.exports = merge(config, {
         collapseWhitespace: true
       }
     })
-  ]
+  ],
+  devServer: {
+    contentBase: [
+      __dirname,
+      path.resolve(RootDir, '../target/metadoc')
+    ]
+  }
 });
