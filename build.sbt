@@ -126,7 +126,7 @@ commands += Command.command("metadoc-site") { s =>
     "--clean-target-first",
     "--target",
     "target/metadoc",
-    "example/target/scala-2.12/classes"
+    classDirectory.in(example, Compile).value
   ).mkString(" ")
 
   "example/compile" ::
