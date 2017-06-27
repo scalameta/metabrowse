@@ -6,6 +6,8 @@ import scala.scalajs.js.typedarray.TypedArrayBuffer
 import org.scalajs.dom
 import scala.meta._
 import metadoc.schema.Index
+import monaco.Monaco
+import monaco.editor.IEditorConstructionOptions
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,7 +37,7 @@ object MetadocApp extends js.JSApp {
     monaco.languages.registerDefinitionProvider(ScalaLanguageExtensionPoint.id, new ScalaDefinitionProvider(attrs, index))
     dom.document.getElementById("title").textContent = fileName
 
-    val editor = monaco.editor.create(app, new MonacoEditor.IEditorConstructionOptions {
+    val editor = monaco.editor.create(app, new IEditorConstructionOptions {
       override val readOnly = true
       override val value = contents
       override val language = "scala"

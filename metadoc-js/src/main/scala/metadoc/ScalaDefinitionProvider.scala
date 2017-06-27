@@ -7,11 +7,11 @@ import scala.meta._
 import metadoc.schema.{Index, Symbol}
 
 @ScalaJSDefined
-class ScalaDefinitionProvider(attrs: Attributes, index: Index) extends MonacoLanguages.DefinitionProvider {
+class ScalaDefinitionProvider(attrs: Attributes, index: Index) extends monaco.languages.DefinitionProvider {
   override def provideDefinition(
-    model: MonacoEditor.IReadOnlyModel,
-    position: Monaco.Position,
-    token: Monaco.CancellationToken): MonacoLanguages.Definition = {
+    model: monaco.editor.IReadOnlyModel,
+    position: monaco.Position,
+    token: monaco.CancellationToken): monaco.languages.Definition = {
 
     val offset = model.getOffsetAt(position)
 
@@ -32,14 +32,14 @@ class ScalaDefinitionProvider(attrs: Attributes, index: Index) extends MonacoLan
         val endPos = model.getPositionAt(definition.end)
 
         // FIXME: check definition.filename and reload
-        MonacoLanguages.Location(
-          range = new Monaco.Range(
+        monaco.languages.Location(
+          range = new monaco.Range(
             startPos.lineNumber, startPos.column,
             endPos.lineNumber, endPos.column
           ),
           uri = model.uri)
       case None =>
-        js.Array[MonacoLanguages.Location]()
+        js.Array[monaco.languages.Location]()
     }
   }
 }
