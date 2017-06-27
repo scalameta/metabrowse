@@ -2,13 +2,13 @@ package metadoc
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
+import monaco.languages._
 
 @js.native
 @JSGlobal
 object ScalaLanguage extends js.Object {
-  val language: MonacoLanguages.IMonarchLanguage = js.native
-  val conf: MonacoLanguages.LanguageConfiguration = js.native
+  val language: IMonarchLanguage = js.native
+  val conf: LanguageConfiguration = js.native
 }
 
-
-object ScalaLanguageExtensionPoint extends MonacoLanguages.ILanguageExtensionPoint(id = "scala")
+object ScalaLanguageExtensionPoint extends monaco.languages.ILanguageExtensionPoint(id = "scala")

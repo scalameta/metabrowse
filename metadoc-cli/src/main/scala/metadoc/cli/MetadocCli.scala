@@ -1,12 +1,9 @@
 package metadoc.cli
 
 import java.io.File
-import java.net.URLEncoder
 import java.nio.file.Files
-import java.nio.file.StandardOpenOption
 import scala.collection.mutable
 import scala.meta._
-import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import caseapp.{Name => _, _}
 import metadoc.{schema => d}
