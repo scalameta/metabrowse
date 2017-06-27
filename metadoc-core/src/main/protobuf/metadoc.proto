@@ -16,5 +16,5 @@ message Symbol {
 
 message Index {
     repeated string files = 1;
-    repeated string symbols = 2;
+    repeated Symbol symbols = 2;
 }

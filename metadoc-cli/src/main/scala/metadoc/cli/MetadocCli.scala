@@ -26,7 +26,6 @@ case class MetadocOptions(
 )
 
 case class MetadocSite(semanticdb: Seq[AbsolutePath],
-                       symbols: Seq[d.Symbol],
                        index: d.Index)
 
 object MetadocCli extends CaseApp[MetadocOptions] {
@@ -81,23 +80,11 @@ object MetadocCli extends CaseApp[MetadocOptions] {
       }
     }
 
-    def symbol(): Unit = {
-      val root = target.resolve("symbol")
-      root.toFile.mkdirs()
-      site.symbols.foreach { symbol =>
-        val out = root.resolve(URLEncoder.encode(symbol.symbol, "UTF-8"))
-        Files.createDirectories(out.toNIO.getParent)
-        Files.write(out.toNIO,
-                    symbol.toByteArray,
-                    StandardOpenOption.CREATE_NEW)
-      }
-    }
     def index(): Unit = {
       Files.write(target.resolve("metadoc.index").toNIO,
                   site.index.toByteArray)
     }
     semanticdb()
-    symbol()
     index()
   }
 
@@ -109,8 +96,8 @@ object MetadocCli extends CaseApp[MetadocOptions] {
     val files = db.entries.collect {
       case (Input.LabeledString(path, _), _) => path
     }
-    val index = d.Index(files, symbols.map(_.symbol))
-    val site = MetadocSite(classpath.shallow, symbols, index)
+    val index = d.Index(files, symbols)
+    val site = MetadocSite(classpath.shallow, index)
     createMetadocSite(site, options)
     println(options.target.get)
   }
