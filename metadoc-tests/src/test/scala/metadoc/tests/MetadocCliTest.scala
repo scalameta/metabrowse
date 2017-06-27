@@ -25,11 +25,5 @@ class MetadocCliTest extends FunSuite {
     assert(Files.exists(semanticdb))
     val semanticdbs = semanticdb.toFile.list()
     assert(semanticdbs.nonEmpty)
-
-    // symbol()
-    val symbol = out.resolve("symbol")
-    assert(Files.exists(symbol))
-    val symbols = symbol.toFile.list()
-    assert(symbols.nonEmpty)
   }
 }

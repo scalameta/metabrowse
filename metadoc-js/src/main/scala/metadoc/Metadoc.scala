@@ -15,22 +15,24 @@ object MetadocApp extends js.JSApp {
     for {
       monaco <- Monaco.load()
       indexBytes <- fetchBytes("metadoc.index")
-      Index(files, _) = Index.parseFrom(indexBytes)
-      bytes <- fetchBytes("semanticdb/" + files(0).replace(".scala", ".semanticdb"))
+      index = Index.parseFrom(indexBytes)
+      bytes <- fetchBytes("semanticdb/" + index.files(0).replace(".scala", ".semanticdb"))
     } {
-      Database.load(bytes).entries.collectFirst {
-        case (Input.LabeledString(fileName, contents), _) =>
-          openEditor(monaco, fileName, contents)
+      val db = Database.load(bytes)
+      db.entries.collectFirst {
+        case (Input.LabeledString(fileName, contents), attrs) =>
+          openEditor(monaco, fileName, contents, attrs, index)
       }
     }
   }
 
-  def openEditor(monaco: Monaco, fileName: String, contents: String): Unit = {
+  def openEditor(monaco: Monaco, fileName: String, contents: String, attrs: Attributes, index: Index): Unit = {
     val app = dom.document.getElementById("editor")
     app.innerHTML = ""
     monaco.languages.register(ScalaLanguageExtensionPoint)
     monaco.languages.setMonarchTokensProvider(ScalaLanguageExtensionPoint.id, ScalaLanguage.language)
     monaco.languages.setLanguageConfiguration(ScalaLanguageExtensionPoint.id, ScalaLanguage.conf)
+    monaco.languages.registerDefinitionProvider(ScalaLanguageExtensionPoint.id, new ScalaDefinitionProvider(attrs, index))
     dom.document.getElementById("title").textContent = fileName
 
     val editor = monaco.editor.create(app, new MonacoEditor.IEditorConstructionOptions {
@@ -39,7 +41,7 @@ object MetadocApp extends js.JSApp {
       override val language = "scala"
     })
 
-    dom.window.onresize = { _: dom.UIEvent => editor.layout() }
+    dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())
   }
 
   def fetchBytes(url: String): Future[Array[Byte]] = {

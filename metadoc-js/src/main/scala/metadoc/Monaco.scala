@@ -2,6 +2,7 @@ package metadoc
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
+import scala.scalajs.js.|
 import scala.scalajs.js.annotation._
 import scala.annotation.meta.field
 import org.scalajs.dom
@@ -15,10 +16,36 @@ abstract class Monaco extends js.Object {
 
 object Monaco {
   @js.native
-  @JSGlobal("IDisposable")
+  @JSGlobal("monaco.IDisposable")
   abstract class IDisposable extends js.Object {
     def dispose(): Unit = js.native
   }
+
+  @js.native
+  @JSGlobal("monaco.Position")
+  class Position extends js.Object {
+    def this(lineNumber: Int, column: Int) = this()
+    def column: Int = js.native
+    def lineNumber: Int = js.native
+  }
+
+  @js.native
+  @JSGlobal("monaco.Range")
+  class Range extends js.Object {
+    def this(startLineNumber: Int, startColumn: Int, endLineNumber: Int, endColumn: Int) = this()
+    def startColumn: Int = js.native
+    def startLineNumber: Int = js.native
+    def endColumn: Int = js.native
+    def endLineNumber: Int = js.native
+  }
+
+  @js.native
+  trait CancellationToken extends js.Object {
+    def isCancellationRequested: Boolean = js.native
+  }
+
+  @js.native
+  trait Uri extends js.Object
 
   /**
    * The context provided when loading the Monaco Editor bundle with `require`.
@@ -75,6 +102,16 @@ object MonacoEditor {
   trait IStandaloneCodeEditor extends js.Object {
     def layout(dimension: js.UndefOr[IDimension] = js.undefined): Unit = js.native
   }
+
+  /**
+   * https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.ireadonlymodel.html
+   */
+  @js.native
+  trait IReadOnlyModel extends js.Object {
+    def uri: Monaco.Uri = js.native
+    def getOffsetAt(position: Monaco.Position): Int = js.native
+    def getPositionAt(offset: Int): Monaco.Position = js.native
+  }
 }
 
 @js.native
@@ -87,9 +124,20 @@ abstract class MonacoLanguages extends js.Object {
   def setLanguageConfiguration(
     languageId: String,
     configuration: MonacoLanguages.LanguageConfiguration): Monaco.IDisposable = js.native
+  def registerDefinitionProvider(
+    languageId: String,
+    provider: MonacoLanguages.DefinitionProvider): Monaco.IDisposable = js.native
 }
 
 object MonacoLanguages {
+  /**
+   * Represents a location inside a resource, such as a line inside a text file.
+   */
+  case class Location(
+    @(JSExport @field) range: Monaco.Range,
+    @(JSExport @field) uri: Monaco.Uri
+  )
+
   case class ILanguageExtensionPoint(
     @(JSExport @field) id: String,
     @(JSExport @field) aliases: js.UndefOr[js.Array[String]] = js.undefined,
@@ -121,4 +169,18 @@ object MonacoLanguages {
   @js.native
   @JSGlobal("LanguageConfiguration")
   class LanguageConfiguration extends js.Object
+
+  type Definition = Location | js.Array[Location]
+
+  /**
+   * The definition provider interface defines the contract between extensions
+   * and the go to definition and peek definition features.
+   */
+  @ScalaJSDefined
+  trait DefinitionProvider extends js.Object {
+    def provideDefinition(
+      model: MonacoEditor.IReadOnlyModel,
+      position: Monaco.Position,
+      token: Monaco.CancellationToken): Definition
+  }
 }
