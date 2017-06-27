@@ -6,7 +6,7 @@ An experiment with [Scalameta Semantic API](http://scalameta.org/tutorial/#Seman
 to build online code browser with "jump to definition" and "see usage". To run,
 
 ```
-git clone https://github.com/olafurpg/metadoc.git
+git clone https://github.com/scalameta/metadoc.git
 cd metadoc
 npm install -g yarn
 sbt metadoc-site js/fastOptJS::startWebpackDevServer
