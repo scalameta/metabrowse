@@ -10,5 +10,3 @@ object ScalaLanguage extends js.Object {
   val language: IMonarchLanguage = js.native
   val conf: LanguageConfiguration = js.native
 }
-
-object ScalaLanguageExtensionPoint extends monaco.languages.ILanguageExtensionPoint(id = "scala")
