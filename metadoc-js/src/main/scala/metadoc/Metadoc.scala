@@ -38,11 +38,10 @@ object MetadocApp extends js.JSApp {
     monaco.languages.Languages.registerDefinitionProvider(ScalaLanguageExtensionPoint.id, new ScalaDefinitionProvider(attrs, index))
     dom.document.getElementById("title").textContent = fileName
 
-    val options = build[IEditorConstructionOptions] { options =>
-      options.readOnly = true
-      options.value = contents
-      options.language = "scala"
-    }
+    val options = jsObject[IEditorConstructionOptions]
+    options.readOnly = true
+    options.value = contents
+    options.language = "scala"
 
     val editor = monaco.editor.Editor.create(app, options)
 

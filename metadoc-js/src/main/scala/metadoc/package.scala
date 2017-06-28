@@ -2,7 +2,7 @@ import scala.scalajs.js
 
 package object metadoc {
   /**
-   * Instanciate a JavaScript object conforming to a
+   * Instantiate a JavaScript object conforming to a
    * given facade. Main usage is to create an empty
    * object and update its mutable fields.
    *
@@ -14,15 +14,11 @@ package object metadoc {
    *   var y: Int = js.native
    * }
    *
-   * build[Point] { (p: Point) =>
-   *   p.x = 42
-   *   p.y = 21
-   * }
+   * val point = jsObject[Point]
+   * point.x = 42
+   * point.y = 21
    * }}}
    */
-  def build[T <: js.Object](f: T => Any): T = {
-    val obj = (new js.Object()).asInstanceOf[T]
-    f(obj)
-    obj
-  }
+  def jsObject[T <: js.Object]: T =
+    (new js.Object()).asInstanceOf[T]
 }
