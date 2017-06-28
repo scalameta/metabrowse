@@ -53,7 +53,6 @@ lazy val cli = project
     mainClass.in(assembly) := Some("metadoc.cli.MetadocCli"),
     assemblyJarName.in(assembly) := "metadoc.jar",
     libraryDependencies ++= List(
-      "org.scalameta" %% "scalameta" % "1.8.0",
       "com.github.alexarchambault" %% "case-app" % "1.2.0-M3",
       "com.github.pathikrit" %% "better-files" % "3.0.0"
     )
@@ -70,7 +69,6 @@ lazy val js = project
     emitSourceMaps := false, // Disabled to reduce warnings
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "scalameta" % "1.8.0",
       "org.scala-js" %%% "scalajs-dom" % "0.9.2"
     ),
     npmDevDependencies in Compile ++= Seq(
@@ -110,6 +108,7 @@ lazy val core = crossProject
       baseDirectory.value./("../src/main/protobuf")
     ),
     libraryDependencies ++= List(
+      "org.scalameta" %%% "scalameta" % "1.8.0",
       "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion
     )
   )
