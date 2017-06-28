@@ -2051,11 +2051,8 @@ trait ReferenceProvider extends js.Object {
   def provideReferences(model: editor.IReadOnlyModel, position: Position, context: ReferenceContext, token: CancellationToken): js.Array[Location] | Thenable[js.Array[Location]] = js.native
 }
 
-@js.native
-trait Location extends js.Object {
-  var uri: Uri = js.native
-  var range: IRange = js.native
-}
+@ScalaJSDefined
+class Location(val uri: Uri, val range: IRange) extends js.Object
 
 @ScalaJSDefined
 trait DefinitionProvider extends js.Object {
@@ -2184,17 +2181,17 @@ trait CodeLensProvider extends js.Object {
   def resolveCodeLens(model: editor.IReadOnlyModel, codeLens: ICodeLensSymbol, token: CancellationToken): ICodeLensSymbol | Thenable[ICodeLensSymbol] = js.native
 }
 
-@js.native
-trait ILanguageExtensionPoint extends js.Object {
-  var id: String = js.native
-  var extensions: js.Array[String] = js.native
-  var filenames: js.Array[String] = js.native
-  var filenamePatterns: js.Array[String] = js.native
-  var firstLine: String = js.native
-  var aliases: js.Array[String] = js.native
-  var mimetypes: js.Array[String] = js.native
-  var configuration: String = js.native
-}
+@ScalaJSDefined
+class ILanguageExtensionPoint(
+  val id: String,
+  val extensions: js.UndefOr[js.Array[String]] = js.undefined,
+  val filenames: js.UndefOr[js.Array[String]] = js.undefined,
+  val filenamePatterns: js.UndefOr[js.Array[String]] = js.undefined,
+  val firstLine: js.UndefOr[String] = js.undefined,
+  val aliases: js.UndefOr[js.Array[String]] = js.undefined,
+  val mimetypes: js.UndefOr[js.Array[String]] = js.undefined,
+  val configuration: js.UndefOr[String] = js.undefined
+) extends js.Object
 
 @js.native
 trait IMonarchLanguage extends js.Object {

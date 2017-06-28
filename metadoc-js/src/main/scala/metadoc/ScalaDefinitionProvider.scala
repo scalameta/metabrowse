@@ -6,6 +6,7 @@ import org.scalajs.dom
 import scala.meta._
 import metadoc.schema.{Index, Symbol}
 import monaco.languages.DefinitionProvider
+import monaco.languages.Location
 
 @ScalaJSDefined
 class ScalaDefinitionProvider(attrs: Attributes, index: Index) extends DefinitionProvider {
@@ -31,17 +32,15 @@ class ScalaDefinitionProvider(attrs: Attributes, index: Index) extends Definitio
       case Some(definition) =>
         val startPos = model.getPositionAt(definition.start)
         val endPos = model.getPositionAt(definition.end)
+        val range = new monaco.Range(
+          startPos.lineNumber, startPos.column,
+          endPos.lineNumber, endPos.column
+        )
 
         // FIXME: check definition.filename and reload
-        build[monaco.languages.Location] { location =>
-          location.range = new monaco.Range(
-            startPos.lineNumber, startPos.column,
-            endPos.lineNumber, endPos.column
-          )
-          location.uri = model.uri
-        }
+        new Location(model.uri, range)
       case None =>
-        js.Array[monaco.languages.Location]()
+        js.Array[Location]()
     }
   }
 }

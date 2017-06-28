@@ -8,6 +8,7 @@ import scala.meta._
 import metadoc.schema.Index
 import monaco.Monaco
 import monaco.editor.IEditorConstructionOptions
+import monaco.languages.ILanguageExtensionPoint
 
 import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -76,5 +77,5 @@ object MetadocApp extends js.JSApp {
     promise.future
   }
 
-  val ScalaLanguageExtensionPoint = build[monaco.languages.ILanguageExtensionPoint] { _.id = "scala" }
+  val ScalaLanguageExtensionPoint = new ILanguageExtensionPoint("scala")
 }
