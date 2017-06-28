@@ -18,12 +18,12 @@ case class MetadocOptions(
     target: Option[String] = None,
     @HelpMessage(
       "Clean the target directory before generating new site. " +
-        "All files will be deleted so be careful.")
+        "All files will be deleted so be careful."
+    )
     cleanTargetFirst: Boolean = false
 )
 
-case class MetadocSite(semanticdb: Seq[AbsolutePath],
-                       index: d.Index)
+case class MetadocSite(semanticdb: Seq[AbsolutePath], index: d.Index)
 
 object MetadocCli extends CaseApp[MetadocOptions] {
   def filename(input: Input): String = input match {
@@ -33,9 +33,11 @@ object MetadocCli extends CaseApp[MetadocOptions] {
   }
 
   def metadocPosition(position: Position): d.Position =
-    d.Position(filename(position.input),
-               start = position.start.offset,
-               end = position.end.offset)
+    d.Position(
+      filename(position.input),
+      start = position.start.offset,
+      end = position.end.offset
+    )
 
   def getAbsolutePath(path: String): AbsolutePath =
     if (PathIO.isAbsolutePath(path)) AbsolutePath(path)
@@ -66,7 +68,8 @@ object MetadocCli extends CaseApp[MetadocOptions] {
 
   def createMetadocSite(site: MetadocSite, options: MetadocOptions): Unit = {
     val target = getAbsolutePath(
-      options.target.getOrElse(sys.error("--target is required!")))
+      options.target.getOrElse(sys.error("--target is required!"))
+    )
     if (options.cleanTargetFirst && Files.exists(target.toNIO)) {
       target.toFile.toScala.delete()
     }
@@ -78,16 +81,20 @@ object MetadocCli extends CaseApp[MetadocOptions] {
     }
 
     def index(): Unit = {
-      Files.write(target.resolve("metadoc.index").toNIO,
-                  site.index.toByteArray)
+      Files.write(
+        target.resolve("metadoc.index").toNIO,
+        site.index.toByteArray
+      )
     }
     semanticdb()
     index()
   }
 
   def run(options: MetadocOptions, remainingArgs: RemainingArgs): Unit = {
-    val classpath = Classpath(remainingArgs.remainingArgs.flatMap(cp =>
-      cp.split(File.pathSeparator).map(getAbsolutePath)))
+    val classpath = Classpath(
+      remainingArgs.remainingArgs
+        .flatMap(cp => cp.split(File.pathSeparator).map(getAbsolutePath))
+    )
     val db = Database.load(classpath)
     val symbols = getSymbols(db)
     val files = db.entries.collect {
