@@ -5,13 +5,14 @@ import scala.scalajs.js.annotation._
 import org.scalajs.dom
 import scala.meta._
 import metadoc.schema.{Index, Symbol}
+import monaco.languages.DefinitionProvider
 
 @ScalaJSDefined
-class ScalaDefinitionProvider(attrs: Attributes, index: Index) extends monaco.languages.DefinitionProvider {
+class ScalaDefinitionProvider(attrs: Attributes, index: Index) extends DefinitionProvider {
   override def provideDefinition(
     model: monaco.editor.IReadOnlyModel,
     position: monaco.Position,
-    token: monaco.CancellationToken): monaco.languages.Definition = {
+    token: monaco.CancellationToken) = {
 
     val offset = model.getOffsetAt(position)
 
@@ -32,12 +33,13 @@ class ScalaDefinitionProvider(attrs: Attributes, index: Index) extends monaco.la
         val endPos = model.getPositionAt(definition.end)
 
         // FIXME: check definition.filename and reload
-        monaco.languages.Location(
-          range = new monaco.Range(
+        build[monaco.languages.Location] { location =>
+          location.range = new monaco.Range(
             startPos.lineNumber, startPos.column,
             endPos.lineNumber, endPos.column
-          ),
-          uri = model.uri)
+          )
+          location.uri = model.uri
+        }
       case None =>
         js.Array[monaco.languages.Location]()
     }

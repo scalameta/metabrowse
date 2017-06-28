@@ -9,13 +9,13 @@ import metadoc.schema.Index
 import monaco.Monaco
 import monaco.editor.IEditorConstructionOptions
 
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object MetadocApp extends js.JSApp {
   def main(): Unit = {
     for {
-      monaco <- Monaco.load()
+      _ <- loadMonaco()
       indexBytes <- fetchBytes("metadoc.index")
       index = Index.parseFrom(indexBytes)
       bytes <- fetchBytes("semanticdb/" + index.files(0).replace(".scala", ".semanticdb"))
@@ -23,25 +23,27 @@ object MetadocApp extends js.JSApp {
       val db = Database.load(bytes)
       db.entries.collectFirst {
         case (Input.LabeledString(fileName, contents), attrs) =>
-          openEditor(monaco, fileName, contents, attrs, index)
+          openEditor(fileName, contents, attrs, index)
       }
     }
   }
 
-  def openEditor(monaco: Monaco, fileName: String, contents: String, attrs: Attributes, index: Index): Unit = {
+  def openEditor(fileName: String, contents: String, attrs: Attributes, index: Index): Unit = {
     val app = dom.document.getElementById("editor")
     app.innerHTML = ""
-    monaco.languages.register(ScalaLanguageExtensionPoint)
-    monaco.languages.setMonarchTokensProvider(ScalaLanguageExtensionPoint.id, ScalaLanguage.language)
-    monaco.languages.setLanguageConfiguration(ScalaLanguageExtensionPoint.id, ScalaLanguage.conf)
-    monaco.languages.registerDefinitionProvider(ScalaLanguageExtensionPoint.id, new ScalaDefinitionProvider(attrs, index))
+    monaco.languages.Languages.register(ScalaLanguageExtensionPoint)
+    monaco.languages.Languages.setMonarchTokensProvider(ScalaLanguageExtensionPoint.id, ScalaLanguage.language)
+    monaco.languages.Languages.setLanguageConfiguration(ScalaLanguageExtensionPoint.id, ScalaLanguage.conf)
+    monaco.languages.Languages.registerDefinitionProvider(ScalaLanguageExtensionPoint.id, new ScalaDefinitionProvider(attrs, index))
     dom.document.getElementById("title").textContent = fileName
 
-    val editor = monaco.editor.create(app, new IEditorConstructionOptions {
-      override val readOnly = true
-      override val value = contents
-      override val language = "scala"
-    })
+    val options = build[IEditorConstructionOptions] { options =>
+      options.readOnly = true
+      options.value = contents
+      options.language = "scala"
+    }
+
+    val editor = monaco.editor.Editor.create(app, options)
 
     dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())
   }
@@ -58,4 +60,21 @@ object MetadocApp extends js.JSApp {
     }
   }
 
+  /**
+   * Load the Monaco Editor AMD bundle using `require`.
+   *
+   * The AMD bundle is not compatible with Webpack and must be loaded
+   * dynamically at runtime to avoid errors:
+   * https://github.com/Microsoft/monaco-editor/issues/18
+   */
+  def loadMonaco(): Future[Unit] = {
+    val promise = Promise[Unit]()
+    js.Dynamic.global.require(js.Array("vs/editor/editor.main"), { ctx: js.Dynamic =>
+      println("Monaco Editor loaded")
+      promise.success(())
+    }: js.ThisFunction)
+    promise.future
+  }
+
+  val ScalaLanguageExtensionPoint = build[monaco.languages.ILanguageExtensionPoint] { _.id = "scala" }
 }
