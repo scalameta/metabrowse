@@ -52,6 +52,10 @@ object MetadocApp extends js.JSApp {
       ScalaLanguageExtensionPoint.id,
       new ScalaDefinitionProvider(attrs, index)
     )
+    monaco.languages.Languages.registerReferenceProvider(
+      ScalaLanguageExtensionPoint.id,
+      new ScalaReferenceProvider(attrs, index)
+    )
     dom.document.getElementById("title").textContent = fileName
 
     val options = jsObject[IEditorConstructionOptions]

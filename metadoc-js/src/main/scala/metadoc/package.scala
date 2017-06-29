@@ -1,5 +1,10 @@
 import scala.scalajs.js
 
+import metadoc.schema.Position
+import monaco.editor.IReadOnlyModel
+import monaco.languages.Location
+import monaco.Range
+
 package object metadoc {
 
   /**
@@ -22,4 +27,18 @@ package object metadoc {
     */
   def jsObject[T <: js.Object]: T =
     (new js.Object()).asInstanceOf[T]
+
+  def resolveLocation(model: IReadOnlyModel)(pos: Position) = {
+    val startPos = model.getPositionAt(pos.start)
+    val endPos = model.getPositionAt(pos.end)
+    val range = new Range(
+      startPos.lineNumber,
+      startPos.column,
+      endPos.lineNumber,
+      endPos.column
+    )
+
+    // FIXME: load new file content
+    new Location(model.uri, range)
+  }
 }

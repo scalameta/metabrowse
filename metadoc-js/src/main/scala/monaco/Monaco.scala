@@ -1108,7 +1108,7 @@ package editor {
     def validatePosition(position: IPosition): Position = js.native
     def modifyPosition(position: IPosition, offset: Double): Position = js.native
     def validateRange(range: IRange): Range = js.native
-    def getOffsetAt(position: IPosition): Double = js.native
+    def getOffsetAt(position: IPosition): Int = js.native
     def getPositionAt(offset: Double): Position = js.native
     def getFullModelRange(): Range = js.native
     def isDisposed(): Boolean = js.native
@@ -2279,14 +2279,14 @@ package languages {
     var includeDeclaration: Boolean = js.native
   }
 
-  @js.native
+  @ScalaJSDefined
   trait ReferenceProvider extends js.Object {
     def provideReferences(
         model: editor.IReadOnlyModel,
         position: Position,
         context: ReferenceContext,
         token: CancellationToken
-    ): js.Array[Location] | Thenable[js.Array[Location]] = js.native
+    ): js.Array[Location] | Thenable[js.Array[Location]]
   }
 
   @ScalaJSDefined
