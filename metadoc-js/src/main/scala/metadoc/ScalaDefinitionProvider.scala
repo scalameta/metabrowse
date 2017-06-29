@@ -9,16 +9,19 @@ import monaco.languages.DefinitionProvider
 import monaco.languages.Location
 
 @ScalaJSDefined
-class ScalaDefinitionProvider(attrs: Attributes, index: Index) extends DefinitionProvider {
+class ScalaDefinitionProvider(attrs: Attributes, index: Index)
+    extends DefinitionProvider {
   override def provideDefinition(
-    model: monaco.editor.IReadOnlyModel,
-    position: monaco.Position,
-    token: monaco.CancellationToken) = {
+      model: monaco.editor.IReadOnlyModel,
+      position: monaco.Position,
+      token: monaco.CancellationToken
+  ) = {
 
     val offset = model.getOffsetAt(position)
 
     val symbol: Option[String] = attrs.names.collectFirst {
-      case (pos, sym) if pos.start.offset <= offset && offset <= pos.end.offset =>
+      case (pos, sym)
+          if pos.start.offset <= offset && offset <= pos.end.offset =>
         sym.syntax
     }
     val maybeDefinition = symbol.flatMap { sym =>
@@ -33,8 +36,10 @@ class ScalaDefinitionProvider(attrs: Attributes, index: Index) extends Definitio
         val startPos = model.getPositionAt(definition.start)
         val endPos = model.getPositionAt(definition.end)
         val range = new monaco.Range(
-          startPos.lineNumber, startPos.column,
-          endPos.lineNumber, endPos.column
+          startPos.lineNumber,
+          startPos.column,
+          endPos.lineNumber,
+          endPos.column
         )
 
         // FIXME: check definition.filename and reload

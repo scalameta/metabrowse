@@ -19,7 +19,9 @@ object MetadocApp extends js.JSApp {
       _ <- loadMonaco()
       indexBytes <- fetchBytes("metadoc.index")
       index = Index.parseFrom(indexBytes)
-      bytes <- fetchBytes("semanticdb/" + index.files(0).replace(".scala", ".semanticdb"))
+      bytes <- fetchBytes(
+        "semanticdb/" + index.files(0).replace(".scala", ".semanticdb")
+      )
     } {
       val db = Database.load(bytes)
       db.entries.collectFirst {
@@ -29,13 +31,27 @@ object MetadocApp extends js.JSApp {
     }
   }
 
-  def openEditor(fileName: String, contents: String, attrs: Attributes, index: Index): Unit = {
+  def openEditor(
+      fileName: String,
+      contents: String,
+      attrs: Attributes,
+      index: Index
+  ): Unit = {
     val app = dom.document.getElementById("editor")
     app.innerHTML = ""
     monaco.languages.Languages.register(ScalaLanguageExtensionPoint)
-    monaco.languages.Languages.setMonarchTokensProvider(ScalaLanguageExtensionPoint.id, ScalaLanguage.language)
-    monaco.languages.Languages.setLanguageConfiguration(ScalaLanguageExtensionPoint.id, ScalaLanguage.conf)
-    monaco.languages.Languages.registerDefinitionProvider(ScalaLanguageExtensionPoint.id, new ScalaDefinitionProvider(attrs, index))
+    monaco.languages.Languages.setMonarchTokensProvider(
+      ScalaLanguageExtensionPoint.id,
+      ScalaLanguage.language
+    )
+    monaco.languages.Languages.setLanguageConfiguration(
+      ScalaLanguageExtensionPoint.id,
+      ScalaLanguage.conf
+    )
+    monaco.languages.Languages.registerDefinitionProvider(
+      ScalaLanguageExtensionPoint.id,
+      new ScalaDefinitionProvider(attrs, index)
+    )
     dom.document.getElementById("title").textContent = fileName
 
     val options = jsObject[IEditorConstructionOptions]
@@ -61,17 +77,18 @@ object MetadocApp extends js.JSApp {
   }
 
   /**
-   * Load the Monaco Editor AMD bundle using `require`.
-   *
-   * The AMD bundle is not compatible with Webpack and must be loaded
-   * dynamically at runtime to avoid errors:
-   * https://github.com/Microsoft/monaco-editor/issues/18
-   */
+    * Load the Monaco Editor AMD bundle using `require`.
+    *
+    * The AMD bundle is not compatible with Webpack and must be loaded
+    * dynamically at runtime to avoid errors:
+    * https://github.com/Microsoft/monaco-editor/issues/18
+    */
   def loadMonaco(): Future[Unit] = {
     val promise = Promise[Unit]()
-    js.Dynamic.global.require(js.Array("vs/editor/editor.main"), { ctx: js.Dynamic =>
-      println("Monaco Editor loaded")
-      promise.success(())
+    js.Dynamic.global.require(js.Array("vs/editor/editor.main"), {
+      ctx: js.Dynamic =>
+        println("Monaco Editor loaded")
+        promise.success(())
     }: js.ThisFunction)
     promise.future
   }

@@ -17,7 +17,8 @@ lazy val allSettings = Seq(
     "-unchecked"
   ),
   licenses := Seq(
-    "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+    "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
+  ),
   homepage := Some(url("https://github.com/olafurpg/metadoc")),
   autoAPIMappings := true,
   apiURL := Some(url("https://olafurpg.github.io/metadoc")),
