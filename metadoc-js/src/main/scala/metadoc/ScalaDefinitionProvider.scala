@@ -4,7 +4,9 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation._
 import org.scalajs.dom
 import scala.meta._
-import metadoc.schema.{Index, Symbol}
+import metadoc.schema.Index
+import monaco.{CancellationToken, Position}
+import monaco.editor.IReadOnlyModel
 import monaco.languages.DefinitionProvider
 import monaco.languages.Location
 
@@ -12,9 +14,9 @@ import monaco.languages.Location
 class ScalaDefinitionProvider(attrs: Attributes, index: Index)
     extends DefinitionProvider {
   override def provideDefinition(
-      model: monaco.editor.IReadOnlyModel,
-      position: monaco.Position,
-      token: monaco.CancellationToken
+      model: IReadOnlyModel,
+      position: Position,
+      token: CancellationToken
   ) = {
     val offset = model.getOffsetAt(position)
     val definition = IndexLookup.findDefinition(offset, attrs, index)
