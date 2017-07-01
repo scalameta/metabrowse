@@ -9,9 +9,11 @@ import metadoc.schema.Index
 import monaco.Monaco
 import monaco.editor.IEditorConstructionOptions
 import monaco.languages.ILanguageExtensionPoint
-
 import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
+import monaco.Uri
+import monaco.editor.IEditorModel
+import monaco.editor.IEditorOverrideServices
 
 object MetadocApp extends js.JSApp {
   def main(): Unit = {
@@ -68,8 +70,15 @@ object MetadocApp extends js.JSApp {
 
     val options = jsObject[IEditorConstructionOptions]
     options.readOnly = true
+    val overrides = jsObject[IEditorOverrideServices]
+    val editorService = new MetadocEditorService
+    overrides.editorService = editorService
+    val editor = monaco.editor.Editor.create(app, options, overrides)
+    editorService.editor = editor
 
-    val editor = monaco.editor.Editor.create(app, options)
+    val uri = Uri.parse(s"semanticdb://$fileName")
+    val model = monaco.editor.Editor.createModel(contents, "scala", uri)
+    editor.setModel(model)
 
     val model = monaco.editor.Editor.createModel(
       value = contents,

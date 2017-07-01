@@ -1,9 +1,9 @@
 import scala.scalajs.js
-
 import metadoc.schema.Position
 import monaco.editor.IReadOnlyModel
 import monaco.languages.Location
 import monaco.Range
+import monaco.Uri
 
 package object metadoc {
 
@@ -37,8 +37,9 @@ package object metadoc {
       endPos.lineNumber,
       endPos.column
     )
+    val uri = Uri.parse(s"file://${pos.filename}")
 
     // FIXME: load new file content
-    new Location(model.uri, range)
+    new Location(uri, range)
   }
 }

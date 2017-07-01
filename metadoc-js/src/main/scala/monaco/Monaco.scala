@@ -513,6 +513,49 @@ class Token protected () extends js.Object {
 }
 
 package editor {
+  @ScalaJSDefined
+  trait IEditorService extends js.Object {
+    def openEditor(
+        input: IResourceInput,
+        sideBySide: Boolean
+    ): Promise[IEditor]
+  }
+
+  @js.native
+  trait IBaseResourceInput extends js.Object {
+    var label: String = js.native
+    var description: String = js.native
+  }
+
+  @js.native
+  trait IResourceInput extends IBaseResourceInput {
+    var resource: Uri = js.native
+    var encoding: String = js.native
+  }
+
+  @js.native
+  trait IUntitledResourceInput extends IBaseResourceInput {
+    var resource: Uri = js.native
+    var filePath: String = js.native
+    var language: String = js.native
+    var contents: String = js.native
+    var encoding: String = js.native
+  }
+
+  @js.native
+  trait IResourceDiffInput extends IBaseResourceInput {
+    var leftResource: Uri = js.native
+    var rightResource: Uri = js.native
+  }
+
+  @js.native
+  trait IResourceSideBySideInput extends IBaseResourceInput {
+    var masterResource: Uri = js.native
+    var detailResource: Uri = js.native
+  }
+
+  @js.native
+  trait IEditorControl extends js.Object {}
 
   @js.native
   trait IDiffNavigator extends js.Object {
@@ -604,8 +647,11 @@ package editor {
     def get(): T = js.native
   }
 
-  @js.native
-  trait IEditorOverrideServices extends js.Object {}
+  @ScalaJSDefined
+  trait IEditorOverrideServices extends js.Object {
+    var editorService: editor.IEditorService
+    var textModelService: services.ITextModelService
+  }
 
   @js.native
   trait IMarkerData extends js.Object {
@@ -2623,4 +2669,24 @@ package worker {
 @js.native
 object Monaco extends js.Object {
   type MarkedString = String | js.Any
+}
+
+package services {
+
+  import monaco.editor.IModel
+
+  @ScalaJSDefined
+  trait ITextModelContentProvider extends js.Object {
+    def provideTextContent(resource: Uri): Promise[IModel]
+  }
+
+  @js.native
+  trait ITextModelService extends js.Object {
+    var _serviceBrand: js.Any = js.native
+    def registerTextModelContentProvider(
+        scheme: String,
+        provider: ITextModelContentProvider
+    ): IDisposable = js.native
+  }
+
 }
