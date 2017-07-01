@@ -46,7 +46,8 @@ lazy val allSettings = Seq(
 lazy val example = project
   .in(file("paiges") / "core")
   .settings(
-    noPublish
+    noPublish,
+    test := {} // no need to run paiges tests.
   )
 
 lazy val cli = project
