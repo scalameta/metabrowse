@@ -68,10 +68,15 @@ object MetadocApp extends js.JSApp {
 
     val options = jsObject[IEditorConstructionOptions]
     options.readOnly = true
-    options.value = contents
-    options.language = "scala"
 
     val editor = monaco.editor.Editor.create(app, options)
+
+    val model = monaco.editor.Editor.createModel(
+      value = contents,
+      language = "scala",
+      uri = monaco.Uri.parse(s"file:$fileName")
+    )
+    editor.setModel(model)
 
     dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())
   }

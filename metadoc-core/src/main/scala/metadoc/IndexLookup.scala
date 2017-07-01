@@ -15,11 +15,13 @@ object IndexLookup {
       offset: Int,
       includeDeclaration: Boolean,
       attrs: Attributes,
-      index: Index
+      index: Index,
+      filename: String
   ): Seq[Position] =
     findSymbol(offset, attrs, index).toSeq.flatMap {
       case Symbol(_, definition, references) =>
-        references ++ definition.filter(_ => includeDeclaration)
+        references.filter(_.filename == filename) ++
+          definition.filter(_ => includeDeclaration)
     }
 
   def findSymbol(

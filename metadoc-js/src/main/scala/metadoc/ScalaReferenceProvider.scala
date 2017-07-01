@@ -22,7 +22,8 @@ class ScalaReferenceProvider(attrs: Attributes, index: Index)
       offset,
       context.includeDeclaration,
       attrs,
-      index
+      index,
+      model.uri.path
     )
     val locations = positions.map(resolveLocation(model))
     js.Array[Location](locations: _*)
