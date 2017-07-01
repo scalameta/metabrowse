@@ -11,12 +11,12 @@ import monaco.languages.Languages.Definition
 import monaco.editor.Editor.BuiltinTheme
 import monaco.editor.Editor.LineNumbersOption
 
-@js.native
+@ScalaJSDefined
 trait Thenable[T] extends js.Object {
   def then[TResult](
-      onfulfilled: js.Function1[T, TResult | Thenable[TResult]] = ???,
-      onrejected: js.Function1[js.Any, TResult | Thenable[TResult]] = ???
-  ): Thenable[TResult] = js.native
+      onfulfilled: js.Function1[T, TResult | Thenable[TResult]],
+      onrejected: js.Function1[js.Any, TResult | Thenable[TResult]]
+  ): Thenable[TResult]
   //def then[TResult](onfulfilled: js.Function1[T, TResult | Thenable[TResult]] = ???, onrejected: js.Function1[js.Any, Unit] = ???): Thenable[TResult] = js.native
 }
 
@@ -651,6 +651,7 @@ package editor {
   trait IEditorOverrideServices extends js.Object {
     var editorService: editor.IEditorService
     var textModelService: services.ITextModelService
+    var textModelResolverService: services.ITextModelResolverService
   }
 
   @js.native
@@ -2673,6 +2674,7 @@ object Monaco extends js.Object {
 
 package services {
 
+  import monaco.common.IReference
   import monaco.editor.IModel
 
   @ScalaJSDefined
@@ -2680,13 +2682,16 @@ package services {
     def provideTextContent(resource: Uri): Promise[IModel]
   }
 
-  @js.native
+  @ScalaJSDefined
   trait ITextModelService extends js.Object {
-    var _serviceBrand: js.Any = js.native
     def registerTextModelContentProvider(
         scheme: String,
         provider: ITextModelContentProvider
-    ): IDisposable = js.native
+    ): IDisposable
   }
 
+  @ScalaJSDefined
+  trait ITextModelResolverService extends js.Object {
+    def createModelReference(resource: Uri): js.Promise[IReference[IModel]]
+  }
 }

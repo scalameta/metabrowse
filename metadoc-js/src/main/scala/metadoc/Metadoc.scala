@@ -14,20 +14,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import monaco.Uri
 import monaco.editor.IEditorModel
 import monaco.editor.IEditorOverrideServices
+import monaco.editor.IModelChangedEvent
 
 object MetadocApp extends js.JSApp {
+  def url(path: String): String =
+    "semanticdb/" + path.replace(".scala", ".semanticdb")
   def main(): Unit = {
     for {
       _ <- loadMonaco()
       indexBytes <- fetchBytes("metadoc.index")
       index = Index.parseFrom(indexBytes)
-      bytes <- fetchBytes(
-        "semanticdb/" +
-          index.files
-            .find(_.endsWith("Doc.scala"))
-            .get
-            .replace(".scala", ".semanticdb")
-      )
+      bytes <- fetchBytes(url(index.files.find(_.endsWith("Doc.scala")).get))
     } {
       val db = Database.load(bytes)
       db.entries.collectFirst {
@@ -66,25 +63,21 @@ object MetadocApp extends js.JSApp {
       ScalaLanguageExtensionPoint.id,
       new ScalaDocumentSymbolProvider(attrs, index)
     )
-    dom.document.getElementById("title").textContent = fileName
 
     val options = jsObject[IEditorConstructionOptions]
     options.readOnly = true
     val overrides = jsObject[IEditorOverrideServices]
-    val editorService = new MetadocEditorService
-    overrides.editorService = editorService
+    val modelHandler = new MetadocModelHandler
+    val textModelResolverService = new MetadocTextModelService(modelHandler)
+    overrides.textModelResolverService = textModelResolverService
     val editor = monaco.editor.Editor.create(app, options, overrides)
-    editorService.editor = editor
+    editor.onDidChangeModel((arg1: IModelChangedEvent) => {
+      val path = arg1.newModelUrl.path
+      dom.document.getElementById("title").textContent = path
+    })
 
-    val uri = Uri.parse(s"semanticdb://$fileName")
-    val model = monaco.editor.Editor.createModel(contents, "scala", uri)
-    editor.setModel(model)
-
-    val model = monaco.editor.Editor.createModel(
-      value = contents,
-      language = "scala",
-      uri = monaco.Uri.parse(s"file:$fileName")
-    )
+    val model =
+      modelHandler.create(monaco.Uri.parse(s"file:$fileName"), contents)
     editor.setModel(model)
 
     dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())

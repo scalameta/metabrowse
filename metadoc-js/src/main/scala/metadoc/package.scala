@@ -4,6 +4,7 @@ import monaco.editor.IReadOnlyModel
 import monaco.languages.Location
 import monaco.Range
 import monaco.Uri
+import org.scalameta.logger
 
 package object metadoc {
 
@@ -37,8 +38,8 @@ package object metadoc {
       endPos.lineNumber,
       endPos.column
     )
-    val uri = Uri.parse(s"file://${pos.filename}")
-
+    val uri = Uri.parse(s"file:${pos.filename}")
+    logger.elem(uri, uri.path)
     // FIXME: load new file content
     new Location(uri, range)
   }
