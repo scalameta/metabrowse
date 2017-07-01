@@ -1,15 +1,22 @@
 package metadoc
 
+import scala.{meta => m}
+import scala.meta.inputs.Input
+import scala.meta.Attributes
+import scala.meta.Denotation
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
-import scala.meta.{Attributes, Denotation}
-import metadoc.schema.{Index, Position, Symbol}
+import metadoc.schema.Index
+import metadoc.schema.Position
 import monaco.CancellationToken
 import monaco.editor.IReadOnlyModel
-import monaco.languages.{DocumentSymbolProvider, SymbolInformation, SymbolKind}
+import monaco.languages.DocumentSymbolProvider
+import monaco.languages.SymbolInformation
+import monaco.languages.SymbolKind
+import org.scalameta.logger
 
 @ScalaJSDefined
-class ScalaDocumentSymbolProvider(attrs: Attributes)
+class ScalaDocumentSymbolProvider(attrs: Attributes, index: Index)
     extends DocumentSymbolProvider {
   override def provideDocumentSymbols(
       model: IReadOnlyModel,
@@ -17,16 +24,25 @@ class ScalaDocumentSymbolProvider(attrs: Attributes)
   ) = {
     val denotations = attrs.denotations.map { case (s, d) => s -> d }.toMap
     val symbols = for {
-      (symPos, sym) <- attrs.names
-      denotation <- denotations.get(sym)
+      sym <- index.symbols
+      denotation <- denotations.get(m.Symbol(sym.symbol))
+      if {
+        import denotation._
+        (!isPARAM && !isTypeParam) && {
+          isClass ||
+          isTrait ||
+          isObject ||
+          isDef ||
+          isVal
+        }
+      }
       kind <- symbolKind(denotation)
     } yield {
-      val pos = Position("???", symPos.start.offset, symPos.end.offset)
       new SymbolInformation(
         name = denotation.name,
-        containerName = "???",
+        containerName = denotation.info,
         kind = kind,
-        location = resolveLocation(model)(pos)
+        location = resolveLocation(model)(sym.definition.get)
       )
     }
     js.Array[SymbolInformation](symbols: _*)
@@ -42,7 +58,7 @@ class ScalaDocumentSymbolProvider(attrs: Attributes)
     else if (denotation.isClass)
       Some(SymbolKind.Class)
     else if (denotation.isObject)
-      Some(SymbolKind.Module)
+      Some(SymbolKind.Object)
     else if (denotation.isTrait)
       Some(SymbolKind.Interface)
     else if (denotation.isPackage || denotation.isPackageObject)
