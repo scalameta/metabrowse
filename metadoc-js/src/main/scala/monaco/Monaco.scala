@@ -2341,20 +2341,20 @@ package languages {
     def apply(value: SymbolKind): String = js.native
   }
 
-  @js.native
-  trait SymbolInformation extends js.Object {
-    var name: String = js.native
-    var containerName: String = js.native
-    var kind: SymbolKind = js.native
-    var location: Location = js.native
-  }
+  @ScalaJSDefined
+  class SymbolInformation(
+      val name: String,
+      val containerName: String,
+      val kind: SymbolKind,
+      val location: Location
+  ) extends js.Object
 
-  @js.native
+  @ScalaJSDefined
   trait DocumentSymbolProvider extends js.Object {
     def provideDocumentSymbols(
         model: editor.IReadOnlyModel,
         token: CancellationToken
-    ): js.Array[SymbolInformation] | Thenable[js.Array[SymbolInformation]] = js.native
+    ): js.Array[SymbolInformation] | Thenable[js.Array[SymbolInformation]]
   }
 
   @js.native

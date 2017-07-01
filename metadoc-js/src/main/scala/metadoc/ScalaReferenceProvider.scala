@@ -3,7 +3,7 @@ package metadoc
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
 import scala.meta.Attributes
-import metadoc.schema.{Index, Symbol}
+import metadoc.schema.Index
 import monaco.{CancellationToken, Position}
 import monaco.editor.IReadOnlyModel
 import monaco.languages.{Location, ReferenceContext, ReferenceProvider}

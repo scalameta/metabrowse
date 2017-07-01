@@ -20,7 +20,11 @@ object MetadocApp extends js.JSApp {
       indexBytes <- fetchBytes("metadoc.index")
       index = Index.parseFrom(indexBytes)
       bytes <- fetchBytes(
-        "semanticdb/" + index.files(0).replace(".scala", ".semanticdb")
+        "semanticdb/" +
+          index.files
+            .find(_.endsWith("Doc.scala"))
+            .get
+            .replace(".scala", ".semanticdb")
       )
     } {
       val db = Database.load(bytes)
@@ -55,6 +59,10 @@ object MetadocApp extends js.JSApp {
     monaco.languages.Languages.registerReferenceProvider(
       ScalaLanguageExtensionPoint.id,
       new ScalaReferenceProvider(attrs, index)
+    )
+    monaco.languages.Languages.registerDocumentSymbolProvider(
+      ScalaLanguageExtensionPoint.id,
+      new ScalaDocumentSymbolProvider(attrs, index)
     )
     dom.document.getElementById("title").textContent = fileName
 
