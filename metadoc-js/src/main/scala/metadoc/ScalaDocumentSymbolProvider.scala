@@ -26,16 +26,6 @@ class ScalaDocumentSymbolProvider(attrs: Attributes, index: Index)
     val symbols = for {
       sym <- index.symbols
       denotation <- denotations.get(m.Symbol(sym.symbol))
-      if {
-        import denotation._
-        (!isPARAM && !isTypeParam) && {
-          isClass ||
-          isTrait ||
-          isObject ||
-          isDef ||
-          isVal
-        }
-      }
       kind <- symbolKind(denotation)
     } yield {
       new SymbolInformation(
@@ -49,7 +39,9 @@ class ScalaDocumentSymbolProvider(attrs: Attributes, index: Index)
   }
 
   def symbolKind(denotation: Denotation): Option[SymbolKind] = {
-    if (denotation.isVal || denotation.isVar)
+    if (denotation.isPARAM || denotation.isTypeParam)
+      None
+    else if (denotation.isVal || denotation.isVar)
       Some(SymbolKind.Variable)
     else if (denotation.isDef)
       Some(SymbolKind.Function)
