@@ -22,6 +22,6 @@ package services {
 
   @ScalaJSDefined
   trait ITextModelResolverService extends js.Object {
-    def createModelReference(resource: Uri): js.Promise[IReference[IModel]]
+    def createModelReference(resource: Uri): Promise[IReference[IModel]]
   }
 }

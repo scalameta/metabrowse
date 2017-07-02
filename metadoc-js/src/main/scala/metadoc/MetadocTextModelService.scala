@@ -7,6 +7,8 @@ import scala.meta.internal.semantic.{schema => s}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.ScalaJSDefined
+import monaco.Promise
+import monaco.Thenable
 import monaco.Uri
 import monaco.common.IReference
 import monaco.editor.Editor
@@ -27,14 +29,14 @@ class MetadocModelHandler {
 class MetadocTextModelService extends ITextModelResolverService {
   override def createModelReference(
       resource: Uri
-  ): js.Promise[IReference[IModel]] = {
+  ): Promise[IReference[IModel]] = {
+    logger.elem(resource)
     val existingModel = Editor.getModel(resource)
-    logger.elem(existingModel, existingModel.uri, existingModel.getValue())
     if (existingModel != null) {
-      js.Promise.resolve[IReference[IModel]](IReference(existingModel))
+      logger.elem(existingModel)
+      Promise.as(IReference(existingModel))
     } else {
-      val path = resource.path
-      logger.elem("YEAH!!!!", path)
+      logger.elem("YEAH!!!!", resource.path)
       val future: Future[IReference[IModel]] = for {
         bytes <- MetadocApp.fetchBytes(MetadocApp.url(resource.path))
       } yield {
@@ -42,10 +44,12 @@ class MetadocTextModelService extends ITextModelResolverService {
         val model = Editor.createModel(attrs.contents, "scala", resource)
         IReference(model)
       }
-      future.onComplete { model =>
-        logger.elem(model)
+      future.onComplete { newModel =>
+        logger.elem(newModel)
       }
-      future.toJSPromise
+      Promise.wrap(
+        future.toJSPromise.asInstanceOf[Thenable[IReference[IModel]]]
+      )
     }
   }
 }

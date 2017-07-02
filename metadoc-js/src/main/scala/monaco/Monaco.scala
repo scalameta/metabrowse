@@ -2675,12 +2675,15 @@ object Monaco extends js.Object {
 package common {
 
   @ScalaJSDefined
-  class IReference[T](val `object`: T) extends IDisposable {
-    override def dispose(): Unit = ()
+  trait IReference[T] extends IDisposable {
+    def `object`: T
   }
 
   object IReference {
-    def apply[T](e: T): IReference[T] = new IReference[T](e)
+    def apply[T](e: T): IReference[T] = new IReference[T] {
+      override def `object`: T = e
+      override def dispose(): Unit = ()
+    }
   }
 
 }
