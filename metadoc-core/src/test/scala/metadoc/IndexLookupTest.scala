@@ -9,9 +9,18 @@ class IndexLookupTest extends FunSuite {
   val attrs = Attributes(
     dialect = dialects.Scala212,
     names = Seq(
-      (Position.Range(Input.String("src/p/C.scala"), 1, 5), Symbol.Local("p.C")),
-      (Position.Range(Input.String("src/p/C.scala"), 6, 10), Symbol.Local("p.fun")),
-      (Position.Range(Input.String("src/p/C.scala"), 11, 14), Symbol.Local("lib.no")),
+      (
+        Position.Range(Input.String("src/p/C.scala"), 1, 5),
+        Symbol.Local("p.C")
+      ),
+      (
+        Position.Range(Input.String("src/p/C.scala"), 6, 10),
+        Symbol.Local("p.fun")
+      ),
+      (
+        Position.Range(Input.String("src/p/C.scala"), 11, 14),
+        Symbol.Local("lib.no")
+      )
     ),
     messages = Seq.empty,
     denotations = Seq.empty,
@@ -56,10 +65,17 @@ class IndexLookupTest extends FunSuite {
   }
 
   test("IndexLookup.findReferences") {
-    assert(IndexLookup.findReferences(3, true, attrs, index, filename) == (cReferences ++ cDefinition))
-    assert(IndexLookup.findReferences(3, false, attrs, index, filename) == cReferences)
-    assert(IndexLookup.findReferences(11, true, attrs, index, filename) == noReferences)
-    assert(IndexLookup.findReferences(0, true, attrs, index, filename).isEmpty)
-    assert(IndexLookup.findReferences(0, false, attrs, index, filename).isEmpty)
+    import IndexLookup._
+    assert(
+      findReferences(3, true, attrs, index, filename) == (cReferences ++ cDefinition)
+    )
+    assert(
+      findReferences(3, false, attrs, index, filename) == cReferences
+    )
+    assert(
+      findReferences(11, true, attrs, index, filename) == noReferences
+    )
+    assert(findReferences(0, true, attrs, index, filename).isEmpty)
+    assert(findReferences(0, false, attrs, index, filename).isEmpty)
   }
 }
