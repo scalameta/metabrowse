@@ -44,7 +44,9 @@ package object metadoc {
     // This method allows us to work with Future[T] in metadoc and convert
     // to monaco.Promise as late as possible.
     def toMonacoPromise: Promise[T] =
-      Promise.wrap(future.toJSPromise.asInstanceOf[Thenable[T]])
+      Promise.wrap(toMonacoThenable)
+    def toMonacoThenable: Thenable[T] =
+      future.toJSPromise.asInstanceOf[Thenable[T]]
   }
 
   def resolveLocation(model: IReadOnlyModel)(pos: Position): Location = {

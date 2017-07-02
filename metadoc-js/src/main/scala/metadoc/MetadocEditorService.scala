@@ -30,7 +30,6 @@ class MetadocEditorService extends IEditorService {
       editor.setPosition(pos)
       editor.revealPositionInCenter(pos)
     }
-
     Future.successful(editor).toMonacoPromise
   }
 

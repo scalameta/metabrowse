@@ -2353,7 +2353,7 @@ package languages {
         model: editor.IReadOnlyModel,
         position: Position,
         token: CancellationToken
-    ): Definition | Thenable[Definition]
+    ): Thenable[js.Array[Location]]
   }
 
   @js.native
