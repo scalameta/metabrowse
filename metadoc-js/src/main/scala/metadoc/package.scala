@@ -29,6 +29,7 @@ package object metadoc {
   def jsObject[T <: js.Object]: T =
     (new js.Object()).asInstanceOf[T]
 
+
   def resolveLocation(model: IReadOnlyModel)(pos: Position) = {
     val startPos = model.getPositionAt(pos.start)
     val endPos = model.getPositionAt(pos.end)

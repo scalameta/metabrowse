@@ -11,12 +11,12 @@ import monaco.languages.Languages.Definition
 import monaco.editor.Editor.BuiltinTheme
 import monaco.editor.Editor.LineNumbersOption
 
-@ScalaJSDefined
+@js.native
 trait Thenable[T] extends js.Object {
   def then[TResult](
       onfulfilled: js.Function1[T, TResult | Thenable[TResult]],
       onrejected: js.Function1[js.Any, TResult | Thenable[TResult]]
-  ): Thenable[TResult]
+  ): Thenable[TResult] = js.native
   //def then[TResult](onfulfilled: js.Function1[T, TResult | Thenable[TResult]] = ???, onrejected: js.Function1[js.Any, Unit] = ???): Thenable[TResult] = js.native
 }
 
@@ -2675,15 +2675,12 @@ object Monaco extends js.Object {
 package common {
 
   @ScalaJSDefined
-  trait IReference[T] extends IDisposable {
-    def `object`: T
+  class IReference[T](val `object`: T) extends IDisposable {
+    override def dispose(): Unit = ()
   }
 
   object IReference {
-    def apply[T](e: T): IReference[T] = new IReference[T] {
-      override def `object`: T = e
-      override def dispose(): Unit = ()
-    }
+    def apply[T](e: T): IReference[T] = new IReference[T](e)
   }
 
 }

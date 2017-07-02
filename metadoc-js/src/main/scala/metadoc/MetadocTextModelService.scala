@@ -13,8 +13,7 @@ import monaco.editor.Editor
 import monaco.editor.IModel
 import monaco.services.ITextModelResolverService
 import org.scalameta.logger
-import scala.scalajs.js.|._
-import monaco.Promise
+
 class MetadocModelHandler {
   private val models = mutable.Map.empty[String, IModel]
   def create(uri: Uri, contents: String): IModel = {
@@ -29,10 +28,10 @@ class MetadocTextModelService extends ITextModelResolverService {
   override def createModelReference(
       resource: Uri
   ): js.Promise[IReference[IModel]] = {
-    val exisingModel = Editor.getModel(resource)
-    logger.elem(exisingModel)
-    if (exisingModel != null) {
-      js.Promise.resolve[IReference[IModel]](IReference(exisingModel))
+    val existingModel = Editor.getModel(resource)
+    logger.elem(existingModel, existingModel.uri, existingModel.getValue())
+    if (existingModel != null) {
+      js.Promise.resolve[IReference[IModel]](IReference(existingModel))
     } else {
       val path = resource.path
       logger.elem("YEAH!!!!", path)
@@ -41,13 +40,7 @@ class MetadocTextModelService extends ITextModelResolverService {
       } yield {
         val attrs = s.Attributes.parseFrom(bytes)
         val model = Editor.createModel(attrs.contents, "scala", resource)
-        new IReference[IModel] {
-          override def `object`: IModel = {
-            logger.elem(model)
-            model
-          }
-          override def dispose(): Unit = ()
-        }
+        IReference(model)
       }
       future.onComplete { model =>
         logger.elem(model)
