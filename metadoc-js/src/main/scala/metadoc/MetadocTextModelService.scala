@@ -13,6 +13,7 @@ import monaco.Uri
 import monaco.common.IReference
 import monaco.editor.Editor
 import monaco.editor.IModel
+import monaco.services.ITextEditorModel
 import monaco.services.ITextModelResolverService
 import org.scalameta.logger
 
@@ -29,26 +30,26 @@ class MetadocModelHandler {
 class MetadocTextModelService extends ITextModelResolverService {
   override def createModelReference(
       resource: Uri
-  ): Promise[IReference[IModel]] = {
+  ): Promise[IReference[ITextEditorModel]] = {
     logger.elem(resource)
     val existingModel = Editor.getModel(resource)
     if (existingModel != null) {
       logger.elem(existingModel)
-      Promise.as(IReference(existingModel))
+      Promise.as(IReference(ITextEditorModel(existingModel)))
     } else {
       logger.elem("YEAH!!!!", resource.path)
-      val future: Future[IReference[IModel]] = for {
+      val future = for {
         bytes <- MetadocApp.fetchBytes(MetadocApp.url(resource.path))
       } yield {
         val attrs = s.Attributes.parseFrom(bytes)
         val model = Editor.createModel(attrs.contents, "scala", resource)
-        IReference(model)
+        IReference(ITextEditorModel(model))
       }
       future.onComplete { newModel =>
         logger.elem(newModel)
       }
       Promise.wrap(
-        future.toJSPromise.asInstanceOf[Thenable[IReference[IModel]]]
+        future.toJSPromise.asInstanceOf[Thenable[IReference[ITextEditorModel]]]
       )
     }
   }

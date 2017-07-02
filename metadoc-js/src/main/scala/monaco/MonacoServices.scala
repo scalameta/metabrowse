@@ -22,6 +22,19 @@ package services {
 
   @ScalaJSDefined
   trait ITextModelResolverService extends js.Object {
-    def createModelReference(resource: Uri): Promise[IReference[IModel]]
+    def createModelReference(
+        resource: Uri
+    ): Promise[IReference[ITextEditorModel]]
+  }
+
+  @ScalaJSDefined
+  trait ITextEditorModel extends js.Object {
+    def textEditorModel: IModel
+  }
+
+  object ITextEditorModel {
+    def apply(model: IModel) = new ITextEditorModel {
+      override def textEditorModel: IModel = model
+    }
   }
 }
