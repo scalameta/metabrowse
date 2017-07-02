@@ -20,6 +20,9 @@ package services {
     ): IDisposable
   }
 
+  // NOTE: This service got recently renamed to ITextModelService
+  // see https://github.com/Microsoft/vscode/commit/337ded059ae5140b86caf07e67ce92a41a8e6581
+  // We will need to update correspondingly when upgrading monaco.
   @ScalaJSDefined
   trait ITextModelResolverService extends js.Object {
     def createModelReference(
