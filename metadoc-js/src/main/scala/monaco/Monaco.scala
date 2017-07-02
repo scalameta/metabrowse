@@ -522,7 +522,15 @@ package editor {
   }
 
   @js.native
+  trait ITextEditorOptions extends IEditorOptions {
+    var selection: js.UndefOr[IRange] = js.native
+    var viewState: js.UndefOr[IEditorViewState]
+    var revealInCenterIfOutsideViewport: js.UndefOr[Boolean]
+  }
+
+  @js.native
   trait IBaseResourceInput extends js.Object {
+    var options: ITextEditorOptions = js.native
     var label: String = js.native
     var description: String = js.native
   }

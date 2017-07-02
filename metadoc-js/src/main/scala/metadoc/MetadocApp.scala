@@ -12,6 +12,7 @@ import monaco.editor.IEditorOverrideServices
 import monaco.editor.IModelChangedEvent
 import monaco.languages.ILanguageExtensionPoint
 import org.scalajs.dom
+import org.scalameta.logger
 
 object MetadocApp extends js.JSApp {
   def url(path: String): String =
@@ -75,6 +76,7 @@ object MetadocApp extends js.JSApp {
     }
     editorService.editor = editor
     editor.onDidChangeModel((arg1: IModelChangedEvent) => {
+      logger.elem(arg1.newModelUrl)
       val path = arg1.newModelUrl.path
       dom.document.getElementById("title").textContent = path
     })
