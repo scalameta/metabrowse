@@ -36,7 +36,7 @@ package services {
   }
 
   object ITextEditorModel {
-    def apply(model: IModel) = new ITextEditorModel {
+    def apply(model: IModel): ITextEditorModel = new ITextEditorModel {
       override def textEditorModel: IModel = model
     }
   }

@@ -1,4 +1,3 @@
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
@@ -9,7 +8,7 @@ import monaco.languages.Location
 import monaco.Range
 import monaco.Thenable
 import monaco.Uri
-import org.scalameta.logger
+import monaco.editor.IModel
 
 package object metadoc {
 
@@ -34,6 +33,12 @@ package object metadoc {
   def jsObject[T <: js.Object]: T =
     (new js.Object()).asInstanceOf[T]
 
+  def createModel(value: String, filename: String): IModel =
+    monaco.editor.Editor.createModel(value, "scala", createUri(filename))
+
+  def createUri(filename: String): Uri =
+    Uri.parse(s"semanticdb:$filename")
+
   implicit class XtensionFutureToThenable[T](future: Future[T]) {
     import scala.scalajs.js.JSConverters._
     // This method allows us to work with Future[T] in metadoc and convert
@@ -42,7 +47,7 @@ package object metadoc {
       Promise.wrap(future.toJSPromise.asInstanceOf[Thenable[T]])
   }
 
-  def resolveLocation(model: IReadOnlyModel)(pos: Position) = {
+  def resolveLocation(model: IReadOnlyModel)(pos: Position): Location = {
     val startPos = model.getPositionAt(pos.start)
     val endPos = model.getPositionAt(pos.end)
     val range = new Range(
@@ -51,8 +56,7 @@ package object metadoc {
       endPos.lineNumber,
       endPos.column
     )
-    val uri = Uri.parse(s"file:${pos.filename}")
-    logger.elem(uri, uri.path)
+    val uri = createUri(pos.filename)
     // FIXME: load new file content
     new Location(uri, range)
   }

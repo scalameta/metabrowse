@@ -1,20 +1,17 @@
 package metadoc
 
-import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.typedarray.TypedArrayBuffer
-import org.scalajs.dom
-import scala.meta._
-import metadoc.schema.Index
-import monaco.Monaco
-import monaco.editor.IEditorConstructionOptions
-import monaco.languages.ILanguageExtensionPoint
-import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
-import monaco.Uri
-import monaco.editor.IEditorModel
+import scala.concurrent.Future
+import scala.concurrent.Promise
+import scala.meta._
+import scala.scalajs.js
+import scala.scalajs.js.typedarray.TypedArrayBuffer
+import metadoc.schema.Index
+import monaco.editor.IEditorConstructionOptions
 import monaco.editor.IEditorOverrideServices
 import monaco.editor.IModelChangedEvent
+import monaco.languages.ILanguageExtensionPoint
+import org.scalajs.dom
 
 object MetadocApp extends js.JSApp {
   def url(path: String): String =
@@ -73,7 +70,7 @@ object MetadocApp extends js.JSApp {
     overrides.editorService = editorService
     val editor = monaco.editor.Editor.create(app, options, overrides)
     editor.asInstanceOf[js.Dynamic].getControl = { () =>
-      // NOTE: getControl() is defined on SimpleEditor.
+      // NOTE: getControl() is defined on SimpleEditor and is called when changing files.
       editor
     }
     editorService.editor = editor
@@ -82,8 +79,7 @@ object MetadocApp extends js.JSApp {
       dom.document.getElementById("title").textContent = path
     })
 
-    val model = monaco.editor.Editor
-      .createModel(contents, "scala", monaco.Uri.parse(s"file:$fileName"))
+    val model = createModel(contents, fileName)
     editor.setModel(model)
 
     dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())
