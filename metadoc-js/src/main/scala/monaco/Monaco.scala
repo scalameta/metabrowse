@@ -20,9 +20,9 @@ trait Thenable[T] extends js.Object {
   //def then[TResult](onfulfilled: js.Function1[T, TResult | Thenable[TResult]] = ???, onrejected: js.Function1[js.Any, Unit] = ???): Thenable[TResult] = js.native
 }
 
-@js.native
+@ScalaJSDefined
 trait IDisposable extends js.Object {
-  def dispose(): Unit = js.native
+  def dispose(): Unit
 }
 
 @js.native
@@ -2672,26 +2672,18 @@ object Monaco extends js.Object {
   type MarkedString = String | js.Any
 }
 
-package services {
-
-  import monaco.common.IReference
-  import monaco.editor.IModel
+package common {
 
   @ScalaJSDefined
-  trait ITextModelContentProvider extends js.Object {
-    def provideTextContent(resource: Uri): Promise[IModel]
+  trait IReference[T] extends IDisposable {
+    def `object`: T
   }
 
-  @ScalaJSDefined
-  trait ITextModelService extends js.Object {
-    def registerTextModelContentProvider(
-        scheme: String,
-        provider: ITextModelContentProvider
-    ): IDisposable
+  object IReference {
+    def apply[T](e: T): IReference[T] = new IReference[T] {
+      override def `object`: T = e
+      override def dispose(): Unit = ()
+    }
   }
 
-  @ScalaJSDefined
-  trait ITextModelResolverService extends js.Object {
-    def createModelReference(resource: Uri): js.Promise[IReference[IModel]]
-  }
 }

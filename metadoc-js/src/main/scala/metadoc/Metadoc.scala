@@ -67,8 +67,7 @@ object MetadocApp extends js.JSApp {
     val options = jsObject[IEditorConstructionOptions]
     options.readOnly = true
     val overrides = jsObject[IEditorOverrideServices]
-    val modelHandler = new MetadocModelHandler
-    val textModelResolverService = new MetadocTextModelService(modelHandler)
+    val textModelResolverService = new MetadocTextModelService
     overrides.textModelResolverService = textModelResolverService
     val editor = monaco.editor.Editor.create(app, options, overrides)
     editor.onDidChangeModel((arg1: IModelChangedEvent) => {
@@ -76,8 +75,8 @@ object MetadocApp extends js.JSApp {
       dom.document.getElementById("title").textContent = path
     })
 
-    val model =
-      modelHandler.create(monaco.Uri.parse(s"file:$fileName"), contents)
+    val model = monaco.editor.Editor
+      .createModel(contents, "scala", monaco.Uri.parse(s"file:$fileName"))
     editor.setModel(model)
 
     dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())
