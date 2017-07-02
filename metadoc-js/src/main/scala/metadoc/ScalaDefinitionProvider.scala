@@ -14,27 +14,30 @@ import monaco.languages.DefinitionProvider
 import monaco.languages.Location
 
 @ScalaJSDefined
-class ScalaDefinitionProvider(attrs: Attributes, index: Index)
-    extends DefinitionProvider {
+class ScalaDefinitionProvider(index: Index) extends DefinitionProvider {
   override def provideDefinition(
       model: IReadOnlyModel,
       position: Position,
       token: CancellationToken
   ) = {
     val offset = model.getOffsetAt(position)
-    val definition = IndexLookup.findDefinition(offset, attrs, index)
-    val locations = definition.map(resolveLocation(model))
-    val jsLocations =
-      Future.successful(js.Array[Location](locations.toSeq: _*))
-    val future = locations.fold(jsLocations) { location =>
-      val model = Editor.getModel(location.uri)
-      if (model == null) {
-        for {
-          _ <- MetadocTextModelService.modelReference(location.uri)
-          locations <- jsLocations
-        } yield locations
-      } else jsLocations
-    }
-    future.toMonacoThenable
-  }
+    for {
+      attrs <- MetadocAttributeService.fetchAttributes(model.uri.path)
+      locations <- {
+        val definition = IndexLookup.findDefinition(offset, attrs, index)
+        val locations = definition.map(resolveLocation(model))
+        val jsLocations =
+          Future.successful(js.Array[Location](locations.toSeq: _*))
+        locations.fold(jsLocations) { location =>
+          val model = Editor.getModel(location.uri)
+          if (model == null) {
+            for {
+              _ <- MetadocTextModelService.modelReference(location.uri)
+              locations <- jsLocations
+            } yield locations
+          } else jsLocations
+        }
+      }
+    } yield locations
+  }.toMonacoThenable
 }

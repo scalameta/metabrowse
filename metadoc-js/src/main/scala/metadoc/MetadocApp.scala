@@ -7,6 +7,7 @@ import scala.meta._
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.TypedArrayBuffer
 import metadoc.schema.Index
+import monaco.editor.IEditor
 import monaco.editor.IEditorConstructionOptions
 import monaco.editor.IEditorOverrideServices
 import monaco.editor.IModelChangedEvent
@@ -23,22 +24,19 @@ object MetadocApp extends js.JSApp {
       _ <- loadMonaco()
       indexBytes <- fetchBytes("metadoc.index")
       index = Index.parseFrom(indexBytes)
-      bytes <- fetchBytes(url(index.files.find(_.endsWith("Doc.scala")).get))
     } {
-      val db = Database.load(bytes)
-      db.entries.collectFirst {
-        case (Input.LabeledString(fileName, contents), attrs) =>
-          openEditor(fileName, contents, attrs, index)
+      val editor = openEditor(index)
+      val filename = index.files.find(_.endsWith("Doc.scala")).get
+      for {
+        attrs <- MetadocAttributeService.fetchsAttributes(filename)
+      } yield {
+        val model = createModel(attrs.contents, attrs.filename)
+        editor.setModel(model)
       }
     }
   }
 
-  def openEditor(
-      fileName: String,
-      contents: String,
-      attrs: Attributes,
-      index: Index
-  ): Unit = {
+  def openEditor(index: Index): IEditor = {
     val app = dom.document.getElementById("editor")
     app.innerHTML = ""
     monaco.languages.Languages.register(ScalaLanguageExtensionPoint)
@@ -52,15 +50,15 @@ object MetadocApp extends js.JSApp {
     )
     monaco.languages.Languages.registerDefinitionProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaDefinitionProvider(attrs, index)
+      new ScalaDefinitionProvider(index)
     )
     monaco.languages.Languages.registerReferenceProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaReferenceProvider(attrs, index)
+      new ScalaReferenceProvider(index)
     )
     monaco.languages.Languages.registerDocumentSymbolProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaDocumentSymbolProvider(attrs, index)
+      new ScalaDocumentSymbolProvider(index)
     )
 
     val options = jsObject[IEditorConstructionOptions]
@@ -91,11 +89,8 @@ object MetadocApp extends js.JSApp {
         editor.setModel(model.`object`.textEditorModel)
       }
     }
-
-    val model = createModel(contents, fileName)
-    editor.setModel(model)
-
     dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())
+    editor
   }
 
   def fetchBytes(url: String): Future[Array[Byte]] = {

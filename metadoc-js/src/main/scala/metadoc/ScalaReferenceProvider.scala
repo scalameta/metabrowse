@@ -1,5 +1,6 @@
 package metadoc
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
 import scala.meta.Attributes
@@ -9,8 +10,7 @@ import monaco.editor.IReadOnlyModel
 import monaco.languages.{Location, ReferenceContext, ReferenceProvider}
 
 @ScalaJSDefined
-class ScalaReferenceProvider(attrs: Attributes, index: Index)
-    extends ReferenceProvider {
+class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
   override def provideReferences(
       model: IReadOnlyModel,
       position: Position,
@@ -18,14 +18,18 @@ class ScalaReferenceProvider(attrs: Attributes, index: Index)
       token: CancellationToken
   ) = {
     val offset = model.getOffsetAt(position)
-    val positions = IndexLookup.findReferences(
-      offset,
-      context.includeDeclaration,
-      attrs,
-      index,
-      model.uri.path
-    )
-    val locations = positions.map(resolveLocation(model))
-    js.Array[Location](locations: _*)
-  }
+    for {
+      attrs <- MetadocAttributeService.fetchAttributes(model.uri.path)
+      positions = IndexLookup.findReferences(
+        offset,
+        context.includeDeclaration,
+        attrs,
+        index,
+        model.uri.path
+      )
+    } yield {
+      val locations = positions.map(resolveLocation(model))
+      js.Array[Location](locations: _*)
+    }
+  }.toMonacoThenable
 }

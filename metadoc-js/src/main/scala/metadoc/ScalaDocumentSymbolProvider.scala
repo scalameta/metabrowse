@@ -1,5 +1,6 @@
 package metadoc
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.{meta => m}
 import scala.meta.inputs.Input
 import scala.meta.Attributes
@@ -16,27 +17,31 @@ import monaco.languages.SymbolKind
 import org.scalameta.logger
 
 @ScalaJSDefined
-class ScalaDocumentSymbolProvider(attrs: Attributes, index: Index)
+class ScalaDocumentSymbolProvider(index: Index)
     extends DocumentSymbolProvider {
   override def provideDocumentSymbols(
       model: IReadOnlyModel,
       token: CancellationToken
   ) = {
-    val denotations = attrs.denotations.map { case (s, d) => s -> d }.toMap
-    val symbols = for {
-      sym <- index.symbols
-      denotation <- denotations.get(m.Symbol(sym.symbol))
-      kind <- symbolKind(denotation)
+    for {
+      attrs <- MetadocAttributeService.fetchAttributes(model.uri.path)
     } yield {
-      new SymbolInformation(
-        name = denotation.name,
-        containerName = denotation.info,
-        kind = kind,
-        location = resolveLocation(model)(sym.definition.get)
-      )
+      val denotations = attrs.denotations.map { case (s, d) => s -> d }.toMap
+      val symbols = for {
+        sym <- index.symbols
+        denotation <- denotations.get(m.Symbol(sym.symbol))
+        kind <- symbolKind(denotation)
+      } yield {
+        new SymbolInformation(
+          name = denotation.name,
+          containerName = denotation.info,
+          kind = kind,
+          location = resolveLocation(model)(sym.definition.get)
+        )
+      }
+      js.Array[SymbolInformation](symbols: _*)
     }
-    js.Array[SymbolInformation](symbols: _*)
-  }
+  }.toMonacoThenable
 
   def symbolKind(denotation: Denotation): Option[SymbolKind] = {
     if (denotation.isPARAM || denotation.isTypeParam)

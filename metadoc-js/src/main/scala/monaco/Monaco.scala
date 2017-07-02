@@ -2341,7 +2341,7 @@ package languages {
         position: Position,
         context: ReferenceContext,
         token: CancellationToken
-    ): js.Array[Location] | Thenable[js.Array[Location]]
+    ): Thenable[js.Array[Location]]
   }
 
   @ScalaJSDefined
@@ -2409,7 +2409,7 @@ package languages {
     def provideDocumentSymbols(
         model: editor.IReadOnlyModel,
         token: CancellationToken
-    ): js.Array[SymbolInformation] | Thenable[js.Array[SymbolInformation]]
+    ): Thenable[js.Array[SymbolInformation]]
   }
 
   @js.native
