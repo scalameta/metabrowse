@@ -53,11 +53,15 @@ object MetadocCli extends CaseApp[MetadocOptions] {
   def getSymbols(implicit db: Database): Seq[d.Symbol] = {
     val symbols = mutable.Map
       .empty[String, d.Symbol]
-      .withDefault(sym => d.Symbol(id = sym))
+      .withDefault(sym => d.Symbol(symbol = sym))
 
     def add(name: Name): Unit = db.names.get(name.pos).foreach {
-      case Symbol.Local(_) => // nothing, no need to persist
+      // do nothing for symbols that are not globally relevant.
+      case Symbol.Local(_) =>
+      case Symbol.Global(_, _: Signature.TypeParameter) =>
+      case Symbol.Global(_, _: Signature.TermParameter) =>
       case symbol =>
+        // add globally relevant symbols to index.
         val syntax = symbol.syntax
         if (name.isBinder) {
           symbols(syntax) =
@@ -93,7 +97,7 @@ object MetadocCli extends CaseApp[MetadocOptions] {
       val root = target.resolve("symbol")
       root.toFile.mkdirs()
       site.symbols.foreach { symbol =>
-        val out = root.resolve(URLEncoder.encode(symbol.id, "UTF-8"))
+        val out = root.resolve(URLEncoder.encode(symbol.symbol, "UTF-8"))
         Files.createDirectories(out.toNIO.getParent)
         Files.write(
           out.toNIO,
@@ -123,7 +127,7 @@ object MetadocCli extends CaseApp[MetadocOptions] {
     val files = db.entries.collect {
       case (Input.LabeledString(path, _), _) => path
     }
-    val index = d.Index(files, symbols.map(_.id))
+    val index = d.Index(files, symbols.map(_.copy(references = Nil)))
     val site = MetadocSite(classpath.shallow, symbols, index)
     createMetadocSite(site, options)
     println(options.target.get)

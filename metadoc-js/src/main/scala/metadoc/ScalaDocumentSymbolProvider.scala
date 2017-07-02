@@ -1,6 +1,6 @@
 package metadoc
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.{meta => m}
 import scala.meta.inputs.Input
 import scala.meta.Attributes
@@ -8,13 +8,12 @@ import scala.meta.Denotation
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
 import metadoc.schema.Index
-import metadoc.schema.Position
 import monaco.CancellationToken
 import monaco.editor.IReadOnlyModel
 import monaco.languages.DocumentSymbolProvider
 import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
-import org.scalameta.logger
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @ScalaJSDefined
 class ScalaDocumentSymbolProvider(index: Index)
@@ -29,7 +28,7 @@ class ScalaDocumentSymbolProvider(index: Index)
       val denotations = attrs.denotations.map { case (s, d) => s -> d }.toMap
       val symbols = for {
         sym <- index.symbols
-        denotation <- denotations.get(m.Symbol(sym))
+        denotation <- denotations.get(m.Symbol(sym.symbol))
         kind <- symbolKind(denotation)
       } yield {
         new SymbolInformation(

@@ -9,13 +9,12 @@ message Position {
 }
 
 message Symbol {
-    string id = 1; // should be syntax but syntax is a proto keyword.
+    string symbol = 1;
     Position definition = 2;
     repeated Position references = 3;
 }
 
 message Index {
-    reserved 2;
     repeated string files = 1;
-    repeated string symbols = 3;
+    repeated Symbol symbols = 2;
 }
