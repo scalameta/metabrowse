@@ -1,18 +1,35 @@
 package metadoc
 
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.meta.internal.semantic.{schema => s}
+import scala.scalajs.js
 import scala.scalajs.js.annotation.ScalaJSDefined
 import monaco.Promise
 import monaco.Uri
 import monaco.common.IReference
 import monaco.editor.Editor
+import monaco.editor.IModel
 import monaco.services.ITextEditorModel
 import monaco.services.ITextModelResolverService
+import org.scalameta.logger
 
 @ScalaJSDefined
 object MetadocTextModelService extends ITextModelResolverService {
+  // NOTE: we have a private cache here to avoid "duplicate model" errors.
+  // It's possible to hit those errors for example in the reference provider, where
+  // we call `Future.sequence(Seq.map(modelReference))`. Since js is single threaded,
+  // we are safe from race conditions.
+  private val cache = mutable.Map.empty[String, IModel]
+  def createModel(value: String, filename: String): IModel =
+    createModel(value, createUri(filename))
+  def createModel(value: String, uri: Uri): IModel =
+    cache.getOrElseUpdate(
+      uri.path,
+      monaco.editor.Editor.createModel(value, "scala", uri)
+    )
+
   def modelReference(
       resource: Uri
   ): Future[IReference[ITextEditorModel]] = {
@@ -24,7 +41,7 @@ object MetadocTextModelService extends ITextModelResolverService {
         bytes <- MetadocApp.fetchBytes(MetadocApp.url(resource.path))
       } yield {
         val attrs = s.Attributes.parseFrom(bytes)
-        val model = Editor.createModel(attrs.contents, "scala", resource)
+        val model = createModel(attrs.contents, resource)
         IReference(ITextEditorModel(model))
       }
     }

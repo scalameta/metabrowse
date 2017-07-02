@@ -23,6 +23,7 @@ class MetadocEditorService extends IEditorService {
       sideBySide: js.UndefOr[Boolean]
   ): Promise[IEditor] = {
     val selection = input.options.selection
+    logger.elem(JSON.stringify(selection), input)
     val model = Editor.getModel(input.resource)
     editor.setModel(model)
     selection.foreach { range =>

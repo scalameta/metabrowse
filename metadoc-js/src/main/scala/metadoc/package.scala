@@ -1,6 +1,7 @@
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.JSON
 import metadoc.schema.Position
 import monaco.Promise
 import monaco.editor.IReadOnlyModel
@@ -9,6 +10,7 @@ import monaco.Range
 import monaco.Thenable
 import monaco.Uri
 import monaco.editor.IModel
+import org.scalameta.logger
 
 package object metadoc {
 
@@ -32,9 +34,6 @@ package object metadoc {
     */
   def jsObject[T <: js.Object]: T =
     (new js.Object()).asInstanceOf[T]
-
-  def createModel(value: String, filename: String): IModel =
-    monaco.editor.Editor.createModel(value, "scala", createUri(filename))
 
   def createUri(filename: String): Uri =
     Uri.parse(s"semanticdb:$filename")
@@ -60,6 +59,11 @@ package object metadoc {
     )
     val uri = createUri(pos.filename)
     // FIXME: load new file content
-    new Location(uri, range)
+
+    val location = new Location(uri, range)
+    if (!pos.filename.contains("Doc.scala")) {
+      logger.elem(pos, JSON.stringify(location))
+    }
+    location
   }
 }

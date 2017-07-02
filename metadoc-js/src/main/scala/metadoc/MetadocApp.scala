@@ -30,7 +30,8 @@ object MetadocApp extends js.JSApp {
       for {
         attrs <- MetadocAttributeService.fetchsAttributes(filename)
       } yield {
-        val model = createModel(attrs.contents, attrs.filename)
+        val model =
+          MetadocTextModelService.createModel(attrs.contents, attrs.filename)
         editor.setModel(model)
       }
     }
