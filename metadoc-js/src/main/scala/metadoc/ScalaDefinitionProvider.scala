@@ -30,7 +30,7 @@ class ScalaDefinitionProvider(attrs: Attributes, index: Index)
       val model = Editor.getModel(location.uri)
       if (model == null) {
         for {
-          _ <- new MetadocTextModelService().modelReference(location.uri)
+          _ <- MetadocTextModelService.modelReference(location.uri)
           locations <- jsLocations
         } yield locations
       } else jsLocations

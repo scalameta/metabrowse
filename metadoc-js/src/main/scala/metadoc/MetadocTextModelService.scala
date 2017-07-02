@@ -12,7 +12,7 @@ import monaco.services.ITextEditorModel
 import monaco.services.ITextModelResolverService
 
 @ScalaJSDefined
-class MetadocTextModelService extends ITextModelResolverService {
+object MetadocTextModelService extends ITextModelResolverService {
   def modelReference(
       resource: Uri
   ): Future[IReference[ITextEditorModel]] = {

@@ -12,6 +12,7 @@ import monaco.editor.IEditorOverrideServices
 import monaco.editor.IModelChangedEvent
 import monaco.languages.ILanguageExtensionPoint
 import org.scalajs.dom
+import org.scalajs.dom.Event
 import org.scalameta.logger
 
 object MetadocApp extends js.JSApp {
@@ -65,9 +66,8 @@ object MetadocApp extends js.JSApp {
     val options = jsObject[IEditorConstructionOptions]
     options.readOnly = true
     val overrides = jsObject[IEditorOverrideServices]
-    val textModelResolverService = new MetadocTextModelService
     val editorService = new MetadocEditorService
-    overrides.textModelResolverService = textModelResolverService
+    overrides.textModelResolverService = MetadocTextModelService
     overrides.editorService = editorService
     val editor = monaco.editor.Editor.create(app, options, overrides)
     editor.asInstanceOf[js.Dynamic].getControl = { () =>
@@ -79,7 +79,18 @@ object MetadocApp extends js.JSApp {
       logger.elem(arg1.newModelUrl)
       val path = arg1.newModelUrl.path
       dom.document.getElementById("title").textContent = path
+      dom.window.location.hash = "#/" + path
     })
+
+    dom.window.onhashchange = { e: Event =>
+      val filename = dom.window.location.hash.stripPrefix("#/")
+      val uri = createUri(filename)
+      for {
+        model <- MetadocTextModelService.modelReference(uri)
+      } {
+        editor.setModel(model.`object`.textEditorModel)
+      }
+    }
 
     val model = createModel(contents, fileName)
     editor.setModel(model)
