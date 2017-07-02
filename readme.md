@@ -4,7 +4,12 @@
 [![Join the chat at https://gitter.im/scalameta/scalameta](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scalameta/metadoc)
 
 An experiment with [Scalameta Semantic API](http://scalameta.org/tutorial/#SemanticAPI)
-to build online code browser with "jump to definition" and "see usage". To run,
+to build online code browser with IDE-like features such as "jump to definition" and "find usages".
+See our [demo](http://scalameta.org/metadoc/) page to try it out!
+
+### Contributing
+
+To run metadoc locally,
 
 ```
 git clone https://github.com/scalameta/metadoc.git
@@ -13,6 +18,7 @@ npm install -g yarn
 sbt
   > metadoc-site                        # generate static site under target/metadoc.
   > js/fastOptJS::startWebpackDevServer # spin up local file server that listens for changes.
+  > ~js/fastOptJS                       # compiles Scala.js application, browser refreshes on edit.
 open http://localhost:8080
 ```
 
