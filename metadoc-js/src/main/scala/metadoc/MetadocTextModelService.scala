@@ -12,7 +12,10 @@ import monaco.Thenable
 import monaco.Uri
 import monaco.common.IReference
 import monaco.editor.Editor
+import monaco.editor.IEditor
+import monaco.editor.IEditorService
 import monaco.editor.IModel
+import monaco.editor.IResourceInput
 import monaco.services.ITextEditorModel
 import monaco.services.ITextModelResolverService
 import org.scalameta.logger
@@ -23,6 +26,20 @@ class MetadocModelHandler {
     val model =
       models.getOrElse(uri.path, Editor.createModel(contents, "scala", uri))
     model
+  }
+}
+
+@ScalaJSDefined
+class MetadocEditorService extends IEditorService {
+  var editor: IEditor = _
+  override def openEditor(
+      input: IResourceInput,
+      sideBySide: Boolean
+  ): Promise[IEditor] = {
+    logger.elem(input.resource)
+    val model = Editor.getModel(input.resource)
+    editor.setModel(model)
+    Future.successful(editor).toMonacoPromise
   }
 }
 
@@ -48,9 +65,7 @@ class MetadocTextModelService extends ITextModelResolverService {
       future.onComplete { newModel =>
         logger.elem(newModel)
       }
-      Promise.wrap(
-        future.toJSPromise.asInstanceOf[Thenable[IReference[ITextEditorModel]]]
-      )
+      future.toMonacoPromise
     }
   }
 }

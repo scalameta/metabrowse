@@ -1,8 +1,13 @@
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
 import metadoc.schema.Position
+import monaco.Promise
 import monaco.editor.IReadOnlyModel
 import monaco.languages.Location
 import monaco.Range
+import monaco.Thenable
 import monaco.Uri
 import org.scalameta.logger
 
@@ -29,6 +34,11 @@ package object metadoc {
   def jsObject[T <: js.Object]: T =
     (new js.Object()).asInstanceOf[T]
 
+  implicit class XtensionFutureToThenable[T](future: Future[T]) {
+    import scala.scalajs.js.JSConverters._
+    def toMonacoPromise: Promise[T] =
+      Promise.wrap(future.toJSPromise.asInstanceOf[Thenable[T]])
+  }
 
   def resolveLocation(model: IReadOnlyModel)(pos: Position) = {
     val startPos = model.getPositionAt(pos.start)

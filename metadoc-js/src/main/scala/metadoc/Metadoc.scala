@@ -68,8 +68,11 @@ object MetadocApp extends js.JSApp {
     options.readOnly = true
     val overrides = jsObject[IEditorOverrideServices]
     val textModelResolverService = new MetadocTextModelService
+    val editorService = new MetadocEditorService
     overrides.textModelResolverService = textModelResolverService
+    overrides.editorService = editorService
     val editor = monaco.editor.Editor.create(app, options, overrides)
+    editorService.editor = editor
     editor.onDidChangeModel((arg1: IModelChangedEvent) => {
       val path = arg1.newModelUrl.path
       dom.document.getElementById("title").textContent = path
