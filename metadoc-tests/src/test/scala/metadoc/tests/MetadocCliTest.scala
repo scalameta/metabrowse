@@ -11,7 +11,7 @@ class MetadocCliTest extends FunSuite {
   test("Cli.main") {
     val out = Files.createTempDirectory("metadoc")
     out.toFile.toScala.deleteOnExit()
-    val options = MetadocOptions(Some(out.toAbsolutePath.toString))
+    val options = MetadocOptions(Some(out.toAbsolutePath.toString), cleanTargetFirst = true)
     val files = BuildInfo.exampleClassDirectory.getAbsolutePath
 
     // main()
@@ -25,5 +25,11 @@ class MetadocCliTest extends FunSuite {
     assert(Files.exists(semanticdb))
     val semanticdbs = semanticdb.toFile.list()
     assert(semanticdbs.nonEmpty)
+
+    // symbol()
+    val symbol = out.resolve("symbol")
+    assert(Files.exists(symbol))
+    val symbols = symbol.toFile.list()
+    assert(symbols.nonEmpty)
   }
 }

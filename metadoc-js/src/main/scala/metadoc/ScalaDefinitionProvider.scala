@@ -1,17 +1,17 @@
 package metadoc
 
-import scala.scalajs.js
-import scala.scalajs.js.annotation._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import org.scalajs.dom
 import scala.meta._
+import scala.scalajs.js
+import scala.scalajs.js.annotation._
 import metadoc.schema.Index
 import monaco.editor.Editor
-import monaco.{CancellationToken, Position}
 import monaco.editor.IReadOnlyModel
 import monaco.languages.DefinitionProvider
 import monaco.languages.Location
+import monaco.CancellationToken
+import monaco.Position
 
 @ScalaJSDefined
 class ScalaDefinitionProvider(index: Index) extends DefinitionProvider {

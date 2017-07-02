@@ -29,7 +29,7 @@ class ScalaDocumentSymbolProvider(index: Index)
       val denotations = attrs.denotations.map { case (s, d) => s -> d }.toMap
       val symbols = for {
         sym <- index.symbols
-        denotation <- denotations.get(m.Symbol(sym.symbol))
+        denotation <- denotations.get(m.Symbol(sym))
         kind <- symbolKind(denotation)
       } yield {
         new SymbolInformation(
