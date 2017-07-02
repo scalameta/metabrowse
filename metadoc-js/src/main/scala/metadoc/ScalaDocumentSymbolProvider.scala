@@ -1,6 +1,5 @@
 package metadoc
 
-
 import scala.{meta => m}
 import scala.meta.inputs.Input
 import scala.meta.Attributes

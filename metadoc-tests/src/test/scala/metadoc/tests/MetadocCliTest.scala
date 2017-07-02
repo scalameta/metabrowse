@@ -11,7 +11,10 @@ class MetadocCliTest extends FunSuite {
   test("Cli.main") {
     val out = Files.createTempDirectory("metadoc")
     out.toFile.toScala.deleteOnExit()
-    val options = MetadocOptions(Some(out.toAbsolutePath.toString), cleanTargetFirst = true)
+    val options = MetadocOptions(
+      Some(out.toAbsolutePath.toString),
+      cleanTargetFirst = true
+    )
     val files = BuildInfo.exampleClassDirectory.getAbsolutePath
 
     // main()

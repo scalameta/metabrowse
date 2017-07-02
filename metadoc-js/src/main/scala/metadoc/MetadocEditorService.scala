@@ -2,9 +2,7 @@ package metadoc
 
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.JSON
 import scala.scalajs.js.annotation.ScalaJSDefined
-import monaco.IPosition
 import monaco.Position
 import monaco.Promise
 import monaco.editor.Editor
@@ -13,7 +11,6 @@ import monaco.editor.IEditorModel
 import monaco.editor.IEditorService
 import monaco.editor.IModel
 import monaco.editor.IResourceInput
-import org.scalameta.logger
 
 @ScalaJSDefined
 class MetadocEditorService extends IEditorService {
@@ -23,7 +20,6 @@ class MetadocEditorService extends IEditorService {
       sideBySide: js.UndefOr[Boolean]
   ): Promise[IEditor] = {
     val selection = input.options.selection
-    logger.elem(JSON.stringify(selection), input)
     val model = Editor.getModel(input.resource)
     editor.setModel(model)
     selection.foreach { range =>

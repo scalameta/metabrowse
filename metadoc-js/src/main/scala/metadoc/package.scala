@@ -1,16 +1,13 @@
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.JSON
 import metadoc.schema.Position
 import monaco.Promise
-import monaco.editor.IReadOnlyModel
-import monaco.languages.Location
 import monaco.Range
 import monaco.Thenable
 import monaco.Uri
-import monaco.editor.IModel
-import org.scalameta.logger
+import monaco.editor.IReadOnlyModel
+import monaco.languages.Location
 
 package object metadoc {
 
@@ -58,12 +55,7 @@ package object metadoc {
       endPos.column
     )
     val uri = createUri(pos.filename)
-    // FIXME: load new file content
-
     val location = new Location(uri, range)
-    if (!pos.filename.contains("Doc.scala")) {
-      logger.elem(pos, JSON.stringify(location))
-    }
     location
   }
 }

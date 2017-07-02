@@ -4,7 +4,6 @@ import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.meta.internal.semantic.{schema => s}
-import scala.scalajs.js
 import scala.scalajs.js.annotation.ScalaJSDefined
 import monaco.Promise
 import monaco.Uri
@@ -13,7 +12,6 @@ import monaco.editor.Editor
 import monaco.editor.IModel
 import monaco.services.ITextEditorModel
 import monaco.services.ITextModelResolverService
-import org.scalameta.logger
 
 @ScalaJSDefined
 object MetadocTextModelService extends ITextModelResolverService {
@@ -38,9 +36,8 @@ object MetadocTextModelService extends ITextModelResolverService {
       Future.successful(IReference(ITextEditorModel(existingModel)))
     } else {
       for {
-        bytes <- MetadocApp.fetchBytes(MetadocApp.url(resource.path))
+        attrs <- MetadocAttributeService.fetchsAttributes(resource.path)
       } yield {
-        val attrs = s.Attributes.parseFrom(bytes)
         val model = createModel(attrs.contents, resource)
         IReference(ITextEditorModel(model))
       }

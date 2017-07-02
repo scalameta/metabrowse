@@ -14,17 +14,15 @@ import monaco.editor.IModelChangedEvent
 import monaco.languages.ILanguageExtensionPoint
 import org.scalajs.dom
 import org.scalajs.dom.Event
-import org.scalameta.logger
 
 object MetadocApp extends js.JSApp {
-  def url(path: String): String =
-    "semanticdb/" + path.replace(".scala", ".semanticdb")
   def main(): Unit = {
     for {
       _ <- loadMonaco()
       indexBytes <- fetchBytes("metadoc.index")
       index = Index.parseFrom(indexBytes)
     } {
+      // 1. Load editor
       val editor = openEditor(index)
       val filename = index.files.find(_.endsWith("Doc.scala")).get
       for {
@@ -32,6 +30,7 @@ object MetadocApp extends js.JSApp {
       } yield {
         val model =
           MetadocTextModelService.createModel(attrs.contents, attrs.filename)
+        // 2. Open intial file.
         editor.setModel(model)
       }
     }
@@ -75,7 +74,6 @@ object MetadocApp extends js.JSApp {
     }
     editorService.editor = editor
     editor.onDidChangeModel((arg1: IModelChangedEvent) => {
-      logger.elem(arg1.newModelUrl)
       val path = arg1.newModelUrl.path
       dom.document.getElementById("title").textContent = path
       dom.window.location.hash = "#/" + path

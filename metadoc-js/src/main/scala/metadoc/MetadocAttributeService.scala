@@ -1,20 +1,16 @@
 package metadoc
 
-import java.net.URLEncoder
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.meta.internal.semantic.{schema => s}
 import scala.meta._
-import scala.scalajs.js.URIUtils
+import scala.meta.internal.semantic.{schema => s}
+import metadoc.MetadocApp._
 import metadoc.{schema => d}
-import MetadocApp._
 import org.scalajs.dom
-import org.scalameta.logger
 
 object MetadocAttributeService {
   def fetchSymbol(symbolId: String): Future[d.Symbol] = {
     val url = "symbol/" + dom.window.btoa(symbolId)
-    logger.elem(symbolId, url)
     for {
       bytes <- fetchBytes(url)
     } yield {
@@ -23,8 +19,9 @@ object MetadocAttributeService {
   }
 
   def fetchsAttributes(filename: String): Future[s.Attributes] = {
+    val url = "semanticdb/" + filename.replace(".scala", ".semanticdb")
     for {
-      bytes <- fetchBytes(url(filename))
+      bytes <- fetchBytes(url)
     } yield {
       s.Attributes.parseFrom(bytes)
     }
