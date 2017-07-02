@@ -9,13 +9,15 @@ import metadoc.{schema => d}
 import org.scalajs.dom
 
 object MetadocAttributeService {
-  def fetchSymbol(symbolId: String): Future[d.Symbol] = {
+  def fetchSymbol(symbolId: String): Future[Option[d.Symbol]] = {
     val url = "symbol/" + dom.window.btoa(symbolId)
     for {
       bytes <- fetchBytes(url)
     } yield {
-      d.Symbol.parseFrom(bytes)
+      Some(d.Symbol.parseFrom(bytes))
     }
+  }.recover {
+    case _: NoSuchElementException => None // 404, not found
   }
 
   def fetchsAttributes(filename: String): Future[s.Attributes] = {

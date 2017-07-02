@@ -29,6 +29,11 @@ object MetadocTextModelService extends ITextModelResolverService {
     )
 
   def modelReference(
+      filename: String
+  ): Future[IReference[ITextEditorModel]] =
+    modelReference(createUri(filename))
+
+  def modelReference(
       resource: Uri
   ): Future[IReference[ITextEditorModel]] = {
     val existingModel = Editor.getModel(resource)
