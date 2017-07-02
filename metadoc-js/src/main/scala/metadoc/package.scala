@@ -36,6 +36,8 @@ package object metadoc {
 
   implicit class XtensionFutureToThenable[T](future: Future[T]) {
     import scala.scalajs.js.JSConverters._
+    // This method allows us to work with Future[T] in metadoc and convert
+    // to monaco.Promise as late as possible.
     def toMonacoPromise: Promise[T] =
       Promise.wrap(future.toJSPromise.asInstanceOf[Thenable[T]])
   }

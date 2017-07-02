@@ -72,6 +72,10 @@ object MetadocApp extends js.JSApp {
     overrides.textModelResolverService = textModelResolverService
     overrides.editorService = editorService
     val editor = monaco.editor.Editor.create(app, options, overrides)
+    editor.asInstanceOf[js.Dynamic].getControl = { () =>
+      // NOTE: getControl() is defined on SimpleEditor.
+      editor
+    }
     editorService.editor = editor
     editor.onDidChangeModel((arg1: IModelChangedEvent) => {
       val path = arg1.newModelUrl.path

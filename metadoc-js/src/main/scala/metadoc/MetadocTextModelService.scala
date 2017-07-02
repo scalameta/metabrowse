@@ -20,21 +20,12 @@ import monaco.services.ITextEditorModel
 import monaco.services.ITextModelResolverService
 import org.scalameta.logger
 
-class MetadocModelHandler {
-  private val models = mutable.Map.empty[String, IModel]
-  def create(uri: Uri, contents: String): IModel = {
-    val model =
-      models.getOrElse(uri.path, Editor.createModel(contents, "scala", uri))
-    model
-  }
-}
-
 @ScalaJSDefined
 class MetadocEditorService extends IEditorService {
   var editor: IEditor = _
   override def openEditor(
       input: IResourceInput,
-      sideBySide: Boolean
+      sideBySide: js.UndefOr[Boolean]
   ): Promise[IEditor] = {
     logger.elem(input.resource)
     val model = Editor.getModel(input.resource)

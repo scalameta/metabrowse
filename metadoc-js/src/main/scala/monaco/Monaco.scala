@@ -517,7 +517,7 @@ package editor {
   trait IEditorService extends js.Object {
     def openEditor(
         input: IResourceInput,
-        sideBySide: Boolean
+        sideBySide: js.UndefOr[Boolean]
     ): Promise[IEditor]
   }
 
