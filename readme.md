@@ -16,6 +16,19 @@ sbt
 open http://localhost:8080
 ```
 
+### Implemented features
+
+- Generates a static site that is possible to serve via GitHub pages
+- Jump to definition
+- Find usages
+- Search by symbol
+
+For other features on the roadmap, see our issue tracker: https://github.com/scalameta/metadoc/issues
+
+### Related projects
+
+- sxr: https://github.com/sbt/sxr/
+
 ### Team
 
 The current maintainers (people who can merge pull requests) are:
