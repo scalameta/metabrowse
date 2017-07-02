@@ -29,13 +29,12 @@ object IndexLookup {
       attrs: Attributes,
       index: Index
   ): Option[Symbol] =
-    None
-//    for {
-//      name <- attrs.names.collectFirst {
-//        case (pos, sym)
-//            if pos.start.offset <= offset && offset <= pos.end.offset =>
-//          sym.syntax
-//      }
-//      symbol <- index.symbols.find(_.symbol == name)
-//    } yield symbol
+    for {
+      name <- attrs.names.collectFirst {
+        case (pos, sym)
+            if pos.start.offset <= offset && offset <= pos.end.offset =>
+          sym.syntax
+      }
+      symbol <- index.symbols.find(_.symbol == name)
+    } yield symbol
 }

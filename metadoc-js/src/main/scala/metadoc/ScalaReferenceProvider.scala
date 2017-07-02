@@ -1,9 +1,11 @@
 package metadoc
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
 import scala.meta.Attributes
+import metadoc.{schema => d}
 import metadoc.schema.Index
 import monaco.{CancellationToken, Position}
 import monaco.editor.IReadOnlyModel
@@ -20,14 +22,11 @@ class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
     val offset = model.getOffsetAt(position)
     for {
       attrs <- MetadocAttributeService.fetchAttributes(model.uri.path)
-      positions = IndexLookup.findReferences(
-        offset,
-        context.includeDeclaration,
-        attrs,
-        index,
-        model.uri.path
-      )
+      id = IndexLookup.findSymbol(offset, attrs, index).map(_.symbol)
+      if id.isDefined
+      symbol <- MetadocAttributeService.fetchSymbol(id.get)
     } yield {
+      val positions = symbol.references
       val locations = positions.map(resolveLocation(model))
       js.Array[Location](locations: _*)
     }

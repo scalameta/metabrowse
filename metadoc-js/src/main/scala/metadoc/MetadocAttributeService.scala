@@ -13,7 +13,7 @@ import org.scalameta.logger
 
 object MetadocAttributeService {
   def fetchSymbol(symbolId: String): Future[d.Symbol] = {
-    val url = "symbol/" + URIUtils.encodeURI(symbolId)
+    val url = "symbol/" + dom.window.btoa(symbolId)
     logger.elem(symbolId, url)
     for {
       bytes <- fetchBytes(url)

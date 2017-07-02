@@ -4,6 +4,7 @@ import java.io.File
 import java.net.URLEncoder
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
+import java.util.Base64
 import scala.collection.mutable
 import scala.meta._
 import scala.meta.internal.io.FileIO
@@ -97,7 +98,8 @@ object MetadocCli extends CaseApp[MetadocOptions] {
       val root = target.resolve("symbol")
       root.toFile.mkdirs()
       site.symbols.foreach { symbol =>
-        val out = root.resolve(URLEncoder.encode(symbol.symbol, "UTF-8"))
+        val url = new String(Base64.getEncoder.encode(symbol.symbol.getBytes))
+        val out = root.resolve(url)
         Files.createDirectories(out.toNIO.getParent)
         Files.write(
           out.toNIO,
