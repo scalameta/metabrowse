@@ -22,18 +22,22 @@ object MetadocApp extends js.JSApp {
       indexBytes <- fetchBytes("metadoc.index")
       index = Index.parseFrom(indexBytes)
     } {
-      // 1. Load editor
       val editor = openEditor(index)
-      val filename = index.files.find(_.endsWith("Doc.scala")).get
-      for {
-        attrs <- MetadocAttributeService.fetchProtoAttributes(filename)
-      } yield {
-        val model =
-          MetadocTextModelService.createModel(attrs.contents, attrs.filename)
-        // 2. Open intial file.
-        editor.setModel(model)
-      }
+
+      val location = editorLocation.getOrElse(
+        index.files.find(_.endsWith("Doc.scala")).get
+      )
+      openLocation(editor, location)
     }
+  }
+
+  def editorLocation(): Option[String] =
+    Option(dom.window.location.hash.stripPrefix("#/")).filter(_.nonEmpty)
+
+  def openLocation(editor: IEditor, filename: String) = {
+    val uri = createUri(filename)
+    for (model <- MetadocTextModelService.modelReference(uri))
+      editor.setModel(model.`object`.textEditorModel)
   }
 
   def openEditor(index: Index): IEditor = {
@@ -80,13 +84,7 @@ object MetadocApp extends js.JSApp {
     })
 
     dom.window.onhashchange = { e: Event =>
-      val filename = dom.window.location.hash.stripPrefix("#/")
-      val uri = createUri(filename)
-      for {
-        model <- MetadocTextModelService.modelReference(uri)
-      } {
-        editor.setModel(model.`object`.textEditorModel)
-      }
+      editorLocation.foreach(openLocation(editor, _))
     }
     dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())
     editor

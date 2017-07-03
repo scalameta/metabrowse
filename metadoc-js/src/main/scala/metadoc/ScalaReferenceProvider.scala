@@ -28,24 +28,24 @@ class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
       symbol <- id.fold(Future.successful(Option.empty[d.Symbol]))(
         MetadocAttributeService.fetchSymbol
       )
-      references <- {
-        symbol.fold(Future.successful(Seq.empty[(IModel, d.Position)])) { s =>
-          val references = s.references.map { reference =>
+      locations <- Future.sequence {
+        val references = symbol.map(_.references).getOrElse(Seq.empty)
+        references.groupBy(_.filename).map {
+          case (filename, positions) =>
             // Create the model for each reference. A reference can come from
             // another file, and we need that file's model in order to get
             // correct range selection.
             MetadocTextModelService
-              .modelReference(createUri(reference.filename))
-              .map(_.`object`.textEditorModel -> reference)
-          }
-          Future.sequence(references)
+              .modelReference(createUri(filename))
+              .map { model =>
+                positions.map { pos =>
+                  model.`object`.textEditorModel.resolveLocation(pos)
+                }
+              }
         }
       }
     } yield {
-      val locations = references.map {
-        case (referenceModel, pos) => resolveLocation(referenceModel)(pos)
-      }
-      js.Array[Location](locations: _*)
+      js.Array[Location](locations.flatten.toSeq: _*)
     }
   }.toMonacoThenable
 }

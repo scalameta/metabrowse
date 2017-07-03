@@ -7,8 +7,8 @@ import monaco.Range
 import monaco.Promise
 import monaco.editor.Editor
 import monaco.editor.IEditor
+import monaco.services.IResourceInput
 import monaco.services.IEditorService
-import monaco.editor.IResourceInput
 
 @ScalaJSDefined
 class MetadocEditorService extends IEditorService {

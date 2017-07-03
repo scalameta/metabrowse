@@ -514,50 +514,6 @@ class Token protected () extends js.Object {
 
 package editor {
   @js.native
-  trait ITextEditorOptions extends IEditorOptions {
-    var selection: js.UndefOr[IRange] = js.native
-    var viewState: js.UndefOr[IEditorViewState]
-    var revealInCenterIfOutsideViewport: js.UndefOr[Boolean]
-  }
-
-  @js.native
-  trait IBaseResourceInput extends js.Object {
-    var options: ITextEditorOptions = js.native
-    var label: String = js.native
-    var description: String = js.native
-  }
-
-  @js.native
-  trait IResourceInput extends IBaseResourceInput {
-    var resource: Uri = js.native
-    var encoding: String = js.native
-  }
-
-  @js.native
-  trait IUntitledResourceInput extends IBaseResourceInput {
-    var resource: Uri = js.native
-    var filePath: String = js.native
-    var language: String = js.native
-    var contents: String = js.native
-    var encoding: String = js.native
-  }
-
-  @js.native
-  trait IResourceDiffInput extends IBaseResourceInput {
-    var leftResource: Uri = js.native
-    var rightResource: Uri = js.native
-  }
-
-  @js.native
-  trait IResourceSideBySideInput extends IBaseResourceInput {
-    var masterResource: Uri = js.native
-    var detailResource: Uri = js.native
-  }
-
-  @js.native
-  trait IEditorControl extends js.Object {}
-
-  @js.native
   trait IDiffNavigator extends js.Object {
     var revealFirst: Boolean = js.native
     def canNavigate(): Boolean = js.native
@@ -650,7 +606,6 @@ package editor {
   @ScalaJSDefined
   trait IEditorOverrideServices extends js.Object {
     var editorService: services.IEditorService
-    var textModelService: services.ITextModelService
     var textModelResolverService: services.ITextModelResolverService
   }
 
@@ -2671,18 +2626,4 @@ package worker {
 @js.native
 object Monaco extends js.Object {
   type MarkedString = String | js.Any
-}
-
-package common {
-
-  @ScalaJSDefined
-  trait IReference[T] extends IDisposable {
-    def `object`: T
-  }
-
-  @ScalaJSDefined
-  class ImmortalReference[T](override val `object`: T) extends IReference[T] {
-    override def dispose(): Unit = ()
-  }
-
 }
