@@ -13,6 +13,7 @@ import caseapp.{Name => _, _}
 import metadoc.{schema => d}
 import better.files._
 import scala.meta.internal.ast.Helpers._
+import metadoc.schema.Ranges
 
 @AppName("metadoc")
 @AppVersion("0.1.0-SNAPSHOT")
@@ -43,8 +44,12 @@ object MetadocCli extends CaseApp[MetadocOptions] {
   def metadocPosition(position: Position): d.Position =
     d.Position(
       filename(position.input),
-      start = position.start.offset,
-      end = position.end.offset
+      Some(
+        d.Range(
+          start = position.start.offset,
+          end = position.end.offset
+        )
+      )
     )
 
   def getAbsolutePath(path: String): AbsolutePath =
@@ -64,8 +69,13 @@ object MetadocCli extends CaseApp[MetadocOptions] {
           symbols(syntax).copy(definition = Some(metadocPosition(name.pos)))
       } else {
         val old = symbols(syntax)
-        symbols(syntax) =
-          old.copy(references = old.references :+ metadocPosition(name.pos))
+        val label = filename(name.pos.input)
+        val ranges = old.references.getOrElse(label, Ranges())
+        val newRefences = old.references.updated(
+          label,
+          ranges.addRanges(d.Range(name.pos.start.offset, name.pos.end.offset))
+        )
+        symbols(syntax) = old.copy(references = newRefences)
       }
     }
 
@@ -124,7 +134,7 @@ object MetadocCli extends CaseApp[MetadocOptions] {
     val files = db.entries.collect {
       case (Input.LabeledString(path, _), _) => path
     }
-    val index = d.Index(files, symbols.map(_.copy(references = Nil)))
+    val index = d.Index(files, symbols.map(_.withReferences(Map.empty)))
     val site = MetadocSite(classpath.shallow, symbols, index)
     createMetadocSite(site, options)
     println(options.target.get)

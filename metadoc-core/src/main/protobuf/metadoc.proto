@@ -4,14 +4,23 @@ package metadoc.schema;
 
 message Position {
     string filename = 1;
-    int32 start = 2;
-    int32 end = 3;
+    reserved 2, 3;
+    Range range = 4;
 }
 
 message Symbol {
     string symbol = 1;
     Position definition = 2;
-    repeated Position references = 3;
+    reserved 3;
+    map<string, Ranges> references = 4;
+}
+message Range {
+    int32 start = 2;
+    int32 end = 3;
+}
+
+message Ranges {
+    repeated Range ranges = 1;
 }
 
 message Index {

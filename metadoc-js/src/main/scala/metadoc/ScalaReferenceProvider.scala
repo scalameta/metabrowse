@@ -29,17 +29,19 @@ class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
         MetadocAttributeService.fetchSymbol
       )
       locations <- Future.sequence {
-        val references = symbol.map(_.references).getOrElse(Seq.empty)
-        references.groupBy(_.filename).map {
-          case (filename, positions) =>
+        val references = symbol.map(_.references).getOrElse(Map.empty)
+        references.map {
+          case (filename, ranges) =>
             // Create the model for each reference. A reference can come from
             // another file, and we need that file's model in order to get
             // correct range selection.
             MetadocTextModelService
               .modelReference(createUri(filename))
               .map { model =>
-                positions.map { pos =>
-                  model.`object`.textEditorModel.resolveLocation(pos)
+                ranges.ranges.map { range =>
+                  model.`object`.textEditorModel.resolveLocation(
+                    schema.Position(filename, Some(range))
+                  )
                 }
               }
         }
