@@ -78,7 +78,7 @@ package services {
   trait IEditorService extends js.Object {
     def openEditor(
         input: IResourceInput,
-        sideBySide: js.UndefOr[Boolean]
+        sideBySide: js.UndefOr[Boolean] = js.undefined
     ): Promise[IEditor]
   }
 

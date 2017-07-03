@@ -12,6 +12,7 @@ import monaco.editor.IEditorConstructionOptions
 import monaco.editor.IEditorOverrideServices
 import monaco.editor.IModelChangedEvent
 import monaco.languages.ILanguageExtensionPoint
+import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom
 import org.scalajs.dom.Event
 
@@ -20,29 +21,30 @@ object MetadocApp extends js.JSApp {
     for {
       _ <- loadMonaco()
       indexBytes <- fetchBytes("metadoc.index")
-      index = Index.parseFrom(indexBytes)
     } {
-      val editor = openEditor(index)
+      val index = Index.parseFrom(indexBytes)
 
-      val location = editorLocation.getOrElse(
+      registerLanguageExtensions(index)
+
+      val editorService = new MetadocEditorService()
+      val input = parseResourceInput(
         index.files.find(_.endsWith("Doc.scala")).get
       )
-      openLocation(editor, location)
+      openEditor(editorService, input)
     }
   }
 
-  def editorLocation(): Option[String] =
-    Option(dom.window.location.hash.stripPrefix("#/")).filter(_.nonEmpty)
-
-  def openLocation(editor: IEditor, filename: String) = {
-    val uri = createUri(filename)
-    for (model <- MetadocTextModelService.modelReference(uri))
-      editor.setModel(model.`object`.textEditorModel)
+  def parseResourceInput(defaultPath: String): IResourceInput = {
+    val path = Option(dom.window.location.hash.stripPrefix("#/"))
+      .filter(_.nonEmpty)
+      .getOrElse(defaultPath)
+    val input = jsObject[IResourceInput]
+    input.resource = createUri(path)
+    input.options = jsObject[ITextEditorOptions]
+    input
   }
 
-  def openEditor(index: Index): IEditor = {
-    val app = dom.document.getElementById("editor")
-    app.innerHTML = ""
+  def registerLanguageExtensions(index: Index): Unit = {
     monaco.languages.Languages.register(ScalaLanguageExtensionPoint)
     monaco.languages.Languages.setMonarchTokensProvider(
       ScalaLanguageExtensionPoint.id,
@@ -64,30 +66,25 @@ object MetadocApp extends js.JSApp {
       ScalaLanguageExtensionPoint.id,
       new ScalaDocumentSymbolProvider(index)
     )
+  }
 
-    val options = jsObject[IEditorConstructionOptions]
-    options.readOnly = true
-    val overrides = jsObject[IEditorOverrideServices]
-    val editorService = new MetadocEditorService
-    overrides.textModelResolverService = MetadocTextModelService
-    overrides.editorService = editorService
-    val editor = monaco.editor.Editor.create(app, options, overrides)
-    editor.asInstanceOf[js.Dynamic].getControl = { () =>
-      // NOTE: getControl() is defined on SimpleEditor and is called when changing files.
-      editor
-    }
-    editorService.editor = editor
-    editor.onDidChangeModel((arg1: IModelChangedEvent) => {
-      val path = arg1.newModelUrl.path
-      dom.document.getElementById("title").textContent = path
-      dom.window.location.hash = "#/" + path
-    })
+  def openEditor(
+      editorService: MetadocEditorService,
+      input: IResourceInput
+  ): Unit = {
+    for (editor <- editorService.open(input)) {
+      editor.onDidChangeModel((event: IModelChangedEvent) => {
+        val path = event.newModelUrl.path
+        dom.document.getElementById("title").textContent = path
+        dom.window.location.hash = "#/" + path
+      })
 
-    dom.window.onhashchange = { e: Event =>
-      editorLocation.foreach(openLocation(editor, _))
+      dom.window.onhashchange = { e: Event =>
+        openEditor(editorService, parseResourceInput(editor.getModel.uri.path))
+      }
+
+      dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())
     }
-    dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())
-    editor
   }
 
   def fetchBytes(url: String): Future[Array[Byte]] = {

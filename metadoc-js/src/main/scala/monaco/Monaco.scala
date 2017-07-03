@@ -67,7 +67,7 @@ trait ProgressCallback extends js.Object {
 
 @js.native
 @JSGlobal("monaco.Promise")
-class Promise[V] protected () extends js.Object {
+class Promise[+V] protected () extends js.Object {
   def this(
       init: js.Function3[TValueCallback[V], js.Function1[js.Any, Unit], ProgressCallback, Unit],
       oncancel: js.Any = ???
