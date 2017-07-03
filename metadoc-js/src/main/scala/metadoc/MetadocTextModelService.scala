@@ -7,10 +7,10 @@ import scala.meta.internal.semantic.{schema => s}
 import scala.scalajs.js.annotation.ScalaJSDefined
 import monaco.Promise
 import monaco.Uri
-import monaco.common.IReference
-import monaco.common.ImmortalReference
 import monaco.editor.Editor
 import monaco.editor.IModel
+import monaco.services.IReference
+import monaco.services.ImmortalReference
 import monaco.services.ITextEditorModel
 import monaco.services.ITextModelResolverService
 
