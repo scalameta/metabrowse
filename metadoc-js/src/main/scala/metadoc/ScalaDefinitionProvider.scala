@@ -29,7 +29,7 @@ class ScalaDefinitionProvider(index: Index) extends DefinitionProvider {
             model <- MetadocTextModelService.modelReference(defn.filename)
           } yield {
             val location =
-              resolveLocation(model.`object`.textEditorModel)(defn)
+              model.`object`.textEditorModel.resolveLocation(defn)
             js.Array[Location](location)
           }
         }

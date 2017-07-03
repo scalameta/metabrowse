@@ -34,7 +34,7 @@ class ScalaDocumentSymbolProvider(index: Index)
           name = denotation.name,
           containerName = denotation.info,
           kind = kind,
-          location = resolveLocation(model)(sym.definition.get)
+          location = model.resolveLocation(sym.definition.get)
         )
       }
       js.Array[SymbolInformation](symbols: _*)

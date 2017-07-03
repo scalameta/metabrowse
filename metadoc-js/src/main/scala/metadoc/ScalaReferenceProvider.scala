@@ -43,7 +43,7 @@ class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
       }
     } yield {
       val locations = references.map {
-        case (referenceModel, pos) => resolveLocation(referenceModel)(pos)
+        case (referenceModel, pos) => referenceModel.resolveLocation(pos)
       }
       js.Array[Location](locations: _*)
     }
