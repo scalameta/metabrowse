@@ -1,9 +1,13 @@
 package metadoc.cli
 
 import java.io.File
+import java.net.URLEncoder
 import java.nio.file.Files
+import java.nio.file.StandardOpenOption
+import java.util.Base64
 import scala.collection.mutable
 import scala.meta._
+import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import caseapp.{Name => _, _}
 import metadoc.{schema => d}
@@ -23,7 +27,11 @@ case class MetadocOptions(
     cleanTargetFirst: Boolean = false
 )
 
-case class MetadocSite(semanticdb: Seq[AbsolutePath], index: d.Index)
+case class MetadocSite(
+    semanticdb: Seq[AbsolutePath],
+    symbols: Seq[d.Symbol],
+    index: d.Index
+)
 
 object MetadocCli extends CaseApp[MetadocOptions] {
   def filename(input: Input): String = input match {
@@ -49,6 +57,7 @@ object MetadocCli extends CaseApp[MetadocOptions] {
       .withDefault(sym => d.Symbol(symbol = sym))
 
     def add(name: Name): Unit = db.names.get(name.pos).foreach { symbol =>
+      // add globally relevant symbols to index.
       val syntax = symbol.syntax
       if (name.isBinder) {
         symbols(syntax) =
@@ -80,6 +89,20 @@ object MetadocCli extends CaseApp[MetadocOptions] {
       }
     }
 
+    def symbol(): Unit = {
+      val root = target.resolve("symbol")
+      root.toFile.mkdirs()
+      site.symbols.foreach { symbol =>
+        val url = new String(Base64.getEncoder.encode(symbol.symbol.getBytes))
+        val out = root.resolve(url)
+        Files.createDirectories(out.toNIO.getParent)
+        Files.write(
+          out.toNIO,
+          symbol.toByteArray,
+          StandardOpenOption.CREATE
+        )
+      }
+    }
     def index(): Unit = {
       Files.write(
         target.resolve("metadoc.index").toNIO,
@@ -87,6 +110,7 @@ object MetadocCli extends CaseApp[MetadocOptions] {
       )
     }
     semanticdb()
+    symbol()
     index()
   }
 
@@ -100,8 +124,8 @@ object MetadocCli extends CaseApp[MetadocOptions] {
     val files = db.entries.collect {
       case (Input.LabeledString(path, _), _) => path
     }
-    val index = d.Index(files, symbols)
-    val site = MetadocSite(classpath.shallow, index)
+    val index = d.Index(files, symbols.map(_.copy(references = Nil)))
+    val site = MetadocSite(classpath.shallow, symbols, index)
     createMetadocSite(site, options)
     println(options.target.get)
   }

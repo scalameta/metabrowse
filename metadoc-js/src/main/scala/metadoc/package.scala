@@ -1,9 +1,13 @@
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
-
 import metadoc.schema.Position
+import monaco.Promise
+import monaco.Range
+import monaco.Thenable
+import monaco.Uri
 import monaco.editor.IReadOnlyModel
 import monaco.languages.Location
-import monaco.Range
 
 package object metadoc {
 
@@ -28,7 +32,20 @@ package object metadoc {
   def jsObject[T <: js.Object]: T =
     (new js.Object()).asInstanceOf[T]
 
-  def resolveLocation(model: IReadOnlyModel)(pos: Position) = {
+  def createUri(filename: String): Uri =
+    Uri.parse(s"semanticdb:$filename")
+
+  implicit class XtensionFutureToThenable[T](future: Future[T]) {
+    import scala.scalajs.js.JSConverters._
+    // This method allows us to work with Future[T] in metadoc and convert
+    // to monaco.Promise as late as possible.
+    def toMonacoPromise: Promise[T] =
+      Promise.wrap(toMonacoThenable)
+    def toMonacoThenable: Thenable[T] =
+      future.toJSPromise.asInstanceOf[Thenable[T]]
+  }
+
+  def resolveLocation(model: IReadOnlyModel)(pos: Position): Location = {
     val startPos = model.getPositionAt(pos.start)
     val endPos = model.getPositionAt(pos.end)
     val range = new Range(
@@ -37,8 +54,8 @@ package object metadoc {
       endPos.lineNumber,
       endPos.column
     )
-
-    // FIXME: load new file content
-    new Location(model.uri, range)
+    val uri = createUri(pos.filename)
+    val location = new Location(uri, range)
+    location
   }
 }

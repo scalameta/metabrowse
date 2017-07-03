@@ -2,12 +2,15 @@ import com.trueaccord.scalapb.compiler.Version.scalapbVersion
 
 scalaVersion in ThisBuild := "2.12.2"
 
-lazy val allSettings = Seq(
-  organization := "com.geirsson",
+lazy val testDependencies = List(
   libraryDependencies ++= Seq(
     "org.scalatest" %%% "scalatest" % "3.0.3" % Test,
     "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
-  ),
+  )
+)
+
+lazy val allSettings = Seq(
+  organization := "com.geirsson",
   resolvers += Resolver.bintrayRepo("scalameta", "maven"),
   scalacOptions := Seq(
     "-deprecation",
@@ -41,11 +44,12 @@ lazy val allSettings = Seq(
         <url>https://github.com/jonas</url>
       </developer>
     </developers>
-)
+) ++ testDependencies
 
 lazy val example = project
   .in(file("paiges") / "core")
   .settings(
+    testDependencies,
     noPublish,
     test := {} // no need to run paiges tests.
   )
@@ -126,10 +130,11 @@ commands += Command.command("metadoc-site") { s =>
     "--clean-target-first",
     "--target",
     "target/metadoc",
-    classDirectory.in(example, Compile).value
+    classDirectory.in(example, Compile).value,
+    classDirectory.in(example, Test).value
   ).mkString(" ")
 
-  "example/compile" ::
+  "example/test:compile" ::
     cliRun ::
     s
 }

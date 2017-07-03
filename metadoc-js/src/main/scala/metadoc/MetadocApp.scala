@@ -1,17 +1,19 @@
 package metadoc
 
-import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.typedarray.TypedArrayBuffer
-import org.scalajs.dom
-import scala.meta._
-import metadoc.schema.Index
-import monaco.Monaco
-import monaco.editor.IEditorConstructionOptions
-import monaco.languages.ILanguageExtensionPoint
-
-import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.concurrent.Promise
+import scala.meta._
+import scala.scalajs.js
+import scala.scalajs.js.typedarray.TypedArrayBuffer
+import metadoc.schema.Index
+import monaco.editor.IEditor
+import monaco.editor.IEditorConstructionOptions
+import monaco.editor.IEditorOverrideServices
+import monaco.editor.IModelChangedEvent
+import monaco.languages.ILanguageExtensionPoint
+import org.scalajs.dom
+import org.scalajs.dom.Event
 
 object MetadocApp extends js.JSApp {
   def main(): Unit = {
@@ -19,28 +21,22 @@ object MetadocApp extends js.JSApp {
       _ <- loadMonaco()
       indexBytes <- fetchBytes("metadoc.index")
       index = Index.parseFrom(indexBytes)
-      bytes <- fetchBytes(
-        "semanticdb/" +
-          index.files
-            .find(_.endsWith("Doc.scala"))
-            .get
-            .replace(".scala", ".semanticdb")
-      )
     } {
-      val db = Database.load(bytes)
-      db.entries.collectFirst {
-        case (Input.LabeledString(fileName, contents), attrs) =>
-          openEditor(fileName, contents, attrs, index)
+      // 1. Load editor
+      val editor = openEditor(index)
+      val filename = index.files.find(_.endsWith("Doc.scala")).get
+      for {
+        attrs <- MetadocAttributeService.fetchProtoAttributes(filename)
+      } yield {
+        val model =
+          MetadocTextModelService.createModel(attrs.contents, attrs.filename)
+        // 2. Open intial file.
+        editor.setModel(model)
       }
     }
   }
 
-  def openEditor(
-      fileName: String,
-      contents: String,
-      attrs: Attributes,
-      index: Index
-  ): Unit = {
+  def openEditor(index: Index): IEditor = {
     val app = dom.document.getElementById("editor")
     app.innerHTML = ""
     monaco.languages.Languages.register(ScalaLanguageExtensionPoint)
@@ -54,31 +50,46 @@ object MetadocApp extends js.JSApp {
     )
     monaco.languages.Languages.registerDefinitionProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaDefinitionProvider(attrs, index)
+      new ScalaDefinitionProvider(index)
     )
     monaco.languages.Languages.registerReferenceProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaReferenceProvider(attrs, index)
+      new ScalaReferenceProvider(index)
     )
     monaco.languages.Languages.registerDocumentSymbolProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaDocumentSymbolProvider(attrs, index)
+      new ScalaDocumentSymbolProvider(index)
     )
-    dom.document.getElementById("title").textContent = fileName
 
     val options = jsObject[IEditorConstructionOptions]
     options.readOnly = true
+    val overrides = jsObject[IEditorOverrideServices]
+    val editorService = new MetadocEditorService
+    overrides.textModelResolverService = MetadocTextModelService
+    overrides.editorService = editorService
+    val editor = monaco.editor.Editor.create(app, options, overrides)
+    editor.asInstanceOf[js.Dynamic].getControl = { () =>
+      // NOTE: getControl() is defined on SimpleEditor and is called when changing files.
+      editor
+    }
+    editorService.editor = editor
+    editor.onDidChangeModel((arg1: IModelChangedEvent) => {
+      val path = arg1.newModelUrl.path
+      dom.document.getElementById("title").textContent = path
+      dom.window.location.hash = "#/" + path
+    })
 
-    val editor = monaco.editor.Editor.create(app, options)
-
-    val model = monaco.editor.Editor.createModel(
-      value = contents,
-      language = "scala",
-      uri = monaco.Uri.parse(s"file:$fileName")
-    )
-    editor.setModel(model)
-
+    dom.window.onhashchange = { e: Event =>
+      val filename = dom.window.location.hash.stripPrefix("#/")
+      val uri = createUri(filename)
+      for {
+        model <- MetadocTextModelService.modelReference(uri)
+      } {
+        editor.setModel(model.`object`.textEditorModel)
+      }
+    }
     dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())
+    editor
   }
 
   def fetchBytes(url: String): Future[Array[Byte]] = {

@@ -20,9 +20,9 @@ trait Thenable[T] extends js.Object {
   //def then[TResult](onfulfilled: js.Function1[T, TResult | Thenable[TResult]] = ???, onrejected: js.Function1[js.Any, Unit] = ???): Thenable[TResult] = js.native
 }
 
-@js.native
+@ScalaJSDefined
 trait IDisposable extends js.Object {
-  def dispose(): Unit = js.native
+  def dispose(): Unit
 }
 
 @js.native
@@ -513,6 +513,49 @@ class Token protected () extends js.Object {
 }
 
 package editor {
+  @js.native
+  trait ITextEditorOptions extends IEditorOptions {
+    var selection: js.UndefOr[IRange] = js.native
+    var viewState: js.UndefOr[IEditorViewState]
+    var revealInCenterIfOutsideViewport: js.UndefOr[Boolean]
+  }
+
+  @js.native
+  trait IBaseResourceInput extends js.Object {
+    var options: ITextEditorOptions = js.native
+    var label: String = js.native
+    var description: String = js.native
+  }
+
+  @js.native
+  trait IResourceInput extends IBaseResourceInput {
+    var resource: Uri = js.native
+    var encoding: String = js.native
+  }
+
+  @js.native
+  trait IUntitledResourceInput extends IBaseResourceInput {
+    var resource: Uri = js.native
+    var filePath: String = js.native
+    var language: String = js.native
+    var contents: String = js.native
+    var encoding: String = js.native
+  }
+
+  @js.native
+  trait IResourceDiffInput extends IBaseResourceInput {
+    var leftResource: Uri = js.native
+    var rightResource: Uri = js.native
+  }
+
+  @js.native
+  trait IResourceSideBySideInput extends IBaseResourceInput {
+    var masterResource: Uri = js.native
+    var detailResource: Uri = js.native
+  }
+
+  @js.native
+  trait IEditorControl extends js.Object {}
 
   @js.native
   trait IDiffNavigator extends js.Object {
@@ -604,8 +647,12 @@ package editor {
     def get(): T = js.native
   }
 
-  @js.native
-  trait IEditorOverrideServices extends js.Object {}
+  @ScalaJSDefined
+  trait IEditorOverrideServices extends js.Object {
+    var editorService: services.IEditorService
+    var textModelService: services.ITextModelService
+    var textModelResolverService: services.ITextModelResolverService
+  }
 
   @js.native
   trait IMarkerData extends js.Object {
@@ -1962,6 +2009,7 @@ package editor {
         diffEditor: IStandaloneDiffEditor,
         opts: IDiffNavigatorOptions = ???
     ): IDiffNavigator = js.native
+    // NOTE: Do not call this method, use MetadocTextModelService.createModel instead.
     def createModel(
         value: String,
         language: String = ???,
@@ -2286,7 +2334,7 @@ package languages {
         position: Position,
         context: ReferenceContext,
         token: CancellationToken
-    ): js.Array[Location] | Thenable[js.Array[Location]]
+    ): Thenable[js.Array[Location]]
   }
 
   @ScalaJSDefined
@@ -2298,7 +2346,7 @@ package languages {
         model: editor.IReadOnlyModel,
         position: Position,
         token: CancellationToken
-    ): Definition | Thenable[Definition]
+    ): Thenable[js.Array[Location]]
   }
 
   @js.native
@@ -2354,7 +2402,7 @@ package languages {
     def provideDocumentSymbols(
         model: editor.IReadOnlyModel,
         token: CancellationToken
-    ): js.Array[SymbolInformation] | Thenable[js.Array[SymbolInformation]]
+    ): Thenable[js.Array[SymbolInformation]]
   }
 
   @js.native
@@ -2623,4 +2671,18 @@ package worker {
 @js.native
 object Monaco extends js.Object {
   type MarkedString = String | js.Any
+}
+
+package common {
+
+  @ScalaJSDefined
+  trait IReference[T] extends IDisposable {
+    def `object`: T
+  }
+
+  @ScalaJSDefined
+  class ImmortalReference[T](override val `object`: T) extends IReference[T] {
+    override def dispose(): Unit = ()
+  }
+
 }

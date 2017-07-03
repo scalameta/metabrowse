@@ -1,26 +1,39 @@
 package metadoc
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.meta._
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
-import org.scalajs.dom
-import scala.meta._
 import metadoc.schema.Index
-import monaco.{CancellationToken, Position}
 import monaco.editor.IReadOnlyModel
 import monaco.languages.DefinitionProvider
 import monaco.languages.Location
+import monaco.CancellationToken
+import monaco.Position
 
 @ScalaJSDefined
-class ScalaDefinitionProvider(attrs: Attributes, index: Index)
-    extends DefinitionProvider {
+class ScalaDefinitionProvider(index: Index) extends DefinitionProvider {
   override def provideDefinition(
       model: IReadOnlyModel,
       position: Position,
       token: CancellationToken
   ) = {
     val offset = model.getOffsetAt(position)
-    val definition = IndexLookup.findDefinition(offset, attrs, index)
-    val locations = definition.map(resolveLocation(model))
-    js.Array[Location](locations.toSeq: _*)
-  }
+    for {
+      attrs <- MetadocAttributeService.fetchAttributes(model.uri.path)
+      locations <- {
+        val definition = IndexLookup.findDefinition(offset, attrs, index)
+        definition.fold(Future.successful(js.Array[Location]())) { defn =>
+          for {
+            model <- MetadocTextModelService.modelReference(defn.filename)
+          } yield {
+            val location =
+              resolveLocation(model.`object`.textEditorModel)(defn)
+            js.Array[Location](location)
+          }
+        }
+      }
+    } yield locations
+  }.toMonacoThenable
 }
