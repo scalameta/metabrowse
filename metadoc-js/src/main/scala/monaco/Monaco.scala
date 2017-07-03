@@ -513,14 +513,6 @@ class Token protected () extends js.Object {
 }
 
 package editor {
-  @ScalaJSDefined
-  trait IEditorService extends js.Object {
-    def openEditor(
-        input: IResourceInput,
-        sideBySide: js.UndefOr[Boolean]
-    ): Promise[IEditor]
-  }
-
   @js.native
   trait ITextEditorOptions extends IEditorOptions {
     var selection: js.UndefOr[IRange] = js.native
@@ -657,7 +649,7 @@ package editor {
 
   @ScalaJSDefined
   trait IEditorOverrideServices extends js.Object {
-    var editorService: editor.IEditorService
+    var editorService: services.IEditorService
     var textModelService: services.ITextModelService
     var textModelResolverService: services.ITextModelResolverService
   }
@@ -2688,11 +2680,9 @@ package common {
     def `object`: T
   }
 
-  object IReference {
-    def apply[T](e: T): IReference[T] = new IReference[T] {
-      override def `object`: T = e
-      override def dispose(): Unit = ()
-    }
+  @ScalaJSDefined
+  class ImmortalReference[T](override val `object`: T) extends IReference[T] {
+    override def dispose(): Unit = ()
   }
 
 }

@@ -20,7 +20,7 @@ object MetadocAttributeService {
     case _: NoSuchElementException => None // 404, not found
   }
 
-  def fetchsAttributes(filename: String): Future[s.Attributes] = {
+  def fetchProtoAttributes(filename: String): Future[s.Attributes] = {
     val url = "semanticdb/" + filename.replace(".scala", ".semanticdb")
     for {
       bytes <- fetchBytes(url)
@@ -31,7 +31,7 @@ object MetadocAttributeService {
 
   def fetchAttributes(filename: String): Future[Attributes] = {
     for {
-      sattrs <- fetchsAttributes(filename)
+      sattrs <- fetchProtoAttributes(filename)
     } yield {
       val db = s.Database(List(sattrs)).toMeta(None)
       db.entries.head._2

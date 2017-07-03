@@ -56,22 +56,17 @@ object MetadocCli extends CaseApp[MetadocOptions] {
       .empty[String, d.Symbol]
       .withDefault(sym => d.Symbol(symbol = sym))
 
-    def add(name: Name): Unit = db.names.get(name.pos).foreach {
-      // do nothing for symbols that are not globally relevant.
-      case Symbol.Local(_) =>
-      case Symbol.Global(_, _: Signature.TypeParameter) =>
-      case Symbol.Global(_, _: Signature.TermParameter) =>
-      case symbol =>
-        // add globally relevant symbols to index.
-        val syntax = symbol.syntax
-        if (name.isBinder) {
-          symbols(syntax) =
-            symbols(syntax).copy(definition = Some(metadocPosition(name.pos)))
-        } else {
-          val old = symbols(syntax)
-          symbols(syntax) =
-            old.copy(references = old.references :+ metadocPosition(name.pos))
-        }
+    def add(name: Name): Unit = db.names.get(name.pos).foreach { symbol =>
+      // add globally relevant symbols to index.
+      val syntax = symbol.syntax
+      if (name.isBinder) {
+        symbols(syntax) =
+          symbols(syntax).copy(definition = Some(metadocPosition(name.pos)))
+      } else {
+        val old = symbols(syntax)
+        symbols(syntax) =
+          old.copy(references = old.references :+ metadocPosition(name.pos))
+      }
     }
 
     db.sources.foreach { source =>

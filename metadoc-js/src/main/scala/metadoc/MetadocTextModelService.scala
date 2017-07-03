@@ -8,6 +8,7 @@ import scala.scalajs.js.annotation.ScalaJSDefined
 import monaco.Promise
 import monaco.Uri
 import monaco.common.IReference
+import monaco.common.ImmortalReference
 import monaco.editor.Editor
 import monaco.editor.IModel
 import monaco.services.ITextEditorModel
@@ -38,13 +39,13 @@ object MetadocTextModelService extends ITextModelResolverService {
   ): Future[IReference[ITextEditorModel]] = {
     val existingModel = Editor.getModel(resource)
     if (existingModel != null) {
-      Future.successful(IReference(ITextEditorModel(existingModel)))
+      Future.successful(new ImmortalReference(ITextEditorModel(existingModel)))
     } else {
       for {
-        attrs <- MetadocAttributeService.fetchsAttributes(resource.path)
+        attrs <- MetadocAttributeService.fetchProtoAttributes(resource.path)
       } yield {
         val model = createModel(attrs.contents, resource)
-        IReference(ITextEditorModel(model))
+        new ImmortalReference(ITextEditorModel(model))
       }
     }
   }

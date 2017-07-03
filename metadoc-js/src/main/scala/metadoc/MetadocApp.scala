@@ -26,7 +26,7 @@ object MetadocApp extends js.JSApp {
       val editor = openEditor(index)
       val filename = index.files.find(_.endsWith("Doc.scala")).get
       for {
-        attrs <- MetadocAttributeService.fetchsAttributes(filename)
+        attrs <- MetadocAttributeService.fetchProtoAttributes(filename)
       } yield {
         val model =
           MetadocTextModelService.createModel(attrs.contents, attrs.filename)

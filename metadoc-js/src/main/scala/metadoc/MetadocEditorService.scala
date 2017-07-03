@@ -3,13 +3,11 @@ package metadoc
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.annotation.ScalaJSDefined
-import monaco.Position
+import monaco.Range
 import monaco.Promise
 import monaco.editor.Editor
 import monaco.editor.IEditor
-import monaco.editor.IEditorModel
-import monaco.editor.IEditorService
-import monaco.editor.IModel
+import monaco.services.IEditorService
 import monaco.editor.IResourceInput
 
 @ScalaJSDefined
@@ -22,19 +20,12 @@ class MetadocEditorService extends IEditorService {
     val selection = input.options.selection
     val model = Editor.getModel(input.resource)
     editor.setModel(model)
-    selection.foreach { range =>
-      val pos = new Position(range.startLineNumber, range.startColumn)
-      editor.setPosition(pos)
-      editor.revealPositionInCenter(pos)
+    selection.foreach {
+      case range: Range =>
+        val pos = range.getStartPosition()
+        editor.setPosition(pos)
+        editor.revealPositionInCenter(pos)
     }
     Future.successful(editor).toMonacoPromise
-  }
-
-  def findModel(model: IModel, data: IResourceInput): IEditorModel = {
-    if (model.uri.toString() != data.resource.toString()) {
-      null
-    } else {
-      model
-    }
   }
 }
