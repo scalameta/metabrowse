@@ -60,6 +60,8 @@ class ScalaDocumentSymbolProvider(index: Index)
       Some(SymbolKind.Interface)
     else if (isPackage || isPackageObject)
       Some(SymbolKind.Package)
+    else if (isType)
+      Some(SymbolKind.Namespace) // Note: no type related symbol kind exists
     else
       None
   }
