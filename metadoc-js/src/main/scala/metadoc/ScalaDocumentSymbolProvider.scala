@@ -42,21 +42,23 @@ class ScalaDocumentSymbolProvider(index: Index)
   }.toMonacoThenable
 
   def symbolKind(denotation: Denotation): Option[SymbolKind] = {
-    if (denotation.isPARAM || denotation.isTypeParam)
+    import denotation._
+
+    if (isPARAM || isTypeParam)
       None
-    else if (denotation.isVal || denotation.isVar)
+    else if (isVal || isVar)
       Some(SymbolKind.Variable)
-    else if (denotation.isDef)
+    else if (isDef)
       Some(SymbolKind.Function)
-    else if (denotation.isPrimaryCtor || denotation.isSecondaryCtor)
+    else if (isPrimaryCtor || isSecondaryCtor)
       Some(SymbolKind.Constructor)
-    else if (denotation.isClass)
+    else if (isClass)
       Some(SymbolKind.Class)
-    else if (denotation.isObject)
+    else if (isObject)
       Some(SymbolKind.Object)
-    else if (denotation.isTrait)
+    else if (isTrait)
       Some(SymbolKind.Interface)
-    else if (denotation.isPackage || denotation.isPackageObject)
+    else if (isPackage || isPackageObject)
       Some(SymbolKind.Package)
     else
       None
