@@ -14,6 +14,8 @@ To run metadoc locally,
 ```
 git clone https://github.com/scalameta/metadoc.git
 cd metadoc
+git submodules init
+git submodules update
 npm install -g yarn
 sbt
   > metadoc-site                        # generate static site under target/metadoc.
