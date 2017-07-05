@@ -25,7 +25,6 @@ class MetadocEditorService extends IEditorService {
     options.readOnly = true
 
     val overrides = jsObject[IEditorOverrideServices]
-    val editorService = new MetadocEditorService
     overrides.textModelResolverService = MetadocTextModelService
     overrides.editorService = this
 

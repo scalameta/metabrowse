@@ -7,6 +7,7 @@ import scala.meta._
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.TypedArrayBuffer
 import metadoc.schema.Index
+import monaco.Uri
 import monaco.editor.IEditor
 import monaco.editor.IEditorConstructionOptions
 import monaco.editor.IEditorOverrideServices
@@ -44,6 +45,11 @@ object MetadocApp extends js.JSApp {
     input
   }
 
+  def updateLocation(uri: Uri): Unit = {
+    dom.document.getElementById("title").textContent = uri.path
+    dom.window.location.hash = "#/" + uri.path
+  }
+
   def registerLanguageExtensions(index: Index): Unit = {
     monaco.languages.Languages.register(ScalaLanguageExtensionPoint)
     monaco.languages.Languages.setMonarchTokensProvider(
@@ -72,12 +78,9 @@ object MetadocApp extends js.JSApp {
       editorService: MetadocEditorService,
       input: IResourceInput
   ): Unit = {
+    updateLocation(input.resource)
     for (editor <- editorService.open(input)) {
-      editor.onDidChangeModel((event: IModelChangedEvent) => {
-        val path = event.newModelUrl.path
-        dom.document.getElementById("title").textContent = path
-        dom.window.location.hash = "#/" + path
-      })
+      editor.onDidChangeModel(event => updateLocation(event.newModelUrl))
 
       dom.window.onhashchange = { e: Event =>
         openEditor(editorService, parseResourceInput(editor.getModel.uri.path))
