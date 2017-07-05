@@ -1,4 +1,5 @@
 import com.trueaccord.scalapb.compiler.Version.scalapbVersion
+import scalajsbundler.util.JSON._
 
 scalaVersion in ThisBuild := "2.12.2"
 
@@ -72,6 +73,9 @@ lazy val js = project
   .in(file("metadoc-js"))
   .settings(
     moduleName := "metadoc-js",
+    additionalNpmConfig in Compile := Map("private" -> bool(true)),
+    additionalNpmConfig in Test := additionalNpmConfig.in(Test).value,
+    scalaJSUseMainModuleInitializer := true,
     version in webpack := "2.6.1",
     version in installWebpackDevServer := "2.2.0",
     useYarn := true,
