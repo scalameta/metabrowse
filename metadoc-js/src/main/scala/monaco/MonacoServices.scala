@@ -2,7 +2,8 @@ package monaco
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.ScalaJSDefined
-import monaco.editor.{IEditor, IEditorOptions, IEditorViewState, IModel}
+import monaco.editor.{IEditor, IEditorOptions, IModel}
+import monaco.editor.Editor.IEditorViewState
 
 /**
   * Service declarations to hook into the Monaco Editor.

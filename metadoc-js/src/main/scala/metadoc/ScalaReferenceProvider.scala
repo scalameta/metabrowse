@@ -20,7 +20,7 @@ class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
       context: ReferenceContext,
       token: CancellationToken
   ) = {
-    val offset = model.getOffsetAt(position)
+    val offset = model.getOffsetAt(position).toInt
     for {
       attrs <- MetadocAttributeService.fetchAttributes(model.uri.path)
       id = IndexLookup.findSymbol(offset, attrs, index).map(_.symbol)
