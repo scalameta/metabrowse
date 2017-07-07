@@ -661,7 +661,7 @@ package editor {
   @ScalaJSDefined
   trait IEditorOverrideServices extends js.Object {
     var editorService: services.IEditorService
-    var textModelResolverService: services.ITextModelResolverService
+    var textModelService: services.ITextModelService
     /*
     @JSBracketAccess
     def apply(index: String): js.Any = js.native
