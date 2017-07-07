@@ -12,10 +12,10 @@ import monaco.editor.IModel
 import monaco.services.IReference
 import monaco.services.ImmortalReference
 import monaco.services.ITextEditorModel
-import monaco.services.ITextModelResolverService
+import monaco.services.ITextModelService
 
 @ScalaJSDefined
-object MetadocTextModelService extends ITextModelResolverService {
+object MetadocTextModelService extends ITextModelService {
   def modelReference(
       filename: String
   ): Future[IReference[ITextEditorModel]] =

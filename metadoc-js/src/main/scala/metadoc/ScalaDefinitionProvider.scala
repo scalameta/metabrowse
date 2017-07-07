@@ -19,7 +19,7 @@ class ScalaDefinitionProvider(index: Index) extends DefinitionProvider {
       position: Position,
       token: CancellationToken
   ) = {
-    val offset = model.getOffsetAt(position)
+    val offset = model.getOffsetAt(position).toInt
     for {
       attrs <- MetadocAttributeService.fetchAttributes(model.uri.path)
       locations <- {

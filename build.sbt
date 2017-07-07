@@ -99,7 +99,7 @@ lazy val js = project
       "webpack-merge" -> "4.1.0"
     ),
     npmDependencies in Compile ++= Seq(
-      "monaco-editor" -> "0.8.3",
+      "monaco-editor" -> "0.9.0",
       "roboto-fontface" -> "0.7.0"
     )
   )

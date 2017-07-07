@@ -25,7 +25,7 @@ class MetadocEditorService extends IEditorService {
     options.readOnly = true
 
     val overrides = jsObject[IEditorOverrideServices]
-    overrides.textModelResolverService = MetadocTextModelService
+    overrides.textModelService = MetadocTextModelService
     overrides.editorService = this
 
     val editor = monaco.editor.Editor.create(app, options, overrides)

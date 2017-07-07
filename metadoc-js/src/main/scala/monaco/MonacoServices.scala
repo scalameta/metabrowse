@@ -2,7 +2,8 @@ package monaco
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.ScalaJSDefined
-import monaco.editor.{IEditor, IEditorOptions, IEditorViewState, IModel}
+import monaco.editor.{IEditor, IEditorOptions, IModel}
+import monaco.editor.Editor.IEditorViewState
 
 /**
   * Service declarations to hook into the Monaco Editor.
@@ -84,13 +85,9 @@ package services {
 
   /**
     * Service to dynamically load models.
-    *
-    * @note This service was renamed to ITextModelService in
-    * [[https://github.com/Microsoft/vscode/commit/337ded059ae5140b86caf07e67ce92a41a8e6581]]
-    * We will need to update correspondingly when upgrading monaco.
     */
   @ScalaJSDefined
-  trait ITextModelResolverService extends js.Object {
+  trait ITextModelService extends js.Object {
     def createModelReference(
         resource: Uri
     ): Promise[IReference[ITextEditorModel]]
