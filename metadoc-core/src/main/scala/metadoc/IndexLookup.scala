@@ -1,7 +1,7 @@
 package metadoc
 
 import scala.meta.Attributes
-import metadoc.schema.{Index, Position, Symbol}
+import metadoc.schema.{Index, Position, Symbol, Range}
 
 object IndexLookup {
   def findDefinition(
@@ -20,7 +20,12 @@ object IndexLookup {
   ): Seq[Position] =
     findSymbol(offset, attrs, index).toSeq.flatMap {
       case Symbol(_, definition, references) =>
-        references.filter(_.filename == filename) ++
+        references
+          .get(filename)
+          .toSeq
+          .flatMap(
+            _.ranges.map(r => Position(filename, r.start, r.end))
+          ) ++
           definition.filter(_ => includeDeclaration)
     }
 
