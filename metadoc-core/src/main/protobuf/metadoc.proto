@@ -4,8 +4,8 @@ package metadoc.schema;
 
 message Position {
     string filename = 1;
-    reserved 2, 3;
-    Range range = 4;
+    int32 start = 2;
+    int32 end = 3;
 }
 
 message Symbol {

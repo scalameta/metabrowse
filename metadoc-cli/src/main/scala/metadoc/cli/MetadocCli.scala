@@ -44,12 +44,8 @@ object MetadocCli extends CaseApp[MetadocOptions] {
   def metadocPosition(position: Position): d.Position =
     d.Position(
       filename(position.input),
-      Some(
-        d.Range(
-          start = position.start.offset,
-          end = position.end.offset
-        )
-      )
+      position.start.offset,
+      position.end.offset
     )
 
   def getAbsolutePath(path: String): AbsolutePath =

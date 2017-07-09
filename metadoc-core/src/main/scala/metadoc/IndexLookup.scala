@@ -24,7 +24,7 @@ object IndexLookup {
           .get(filename)
           .toSeq
           .flatMap(
-            _.ranges.map(r => Position(filename, Some(r)))
+            _.ranges.map(r => Position(filename, r.start, r.end))
           ) ++
           definition.filter(_ => includeDeclaration)
     }

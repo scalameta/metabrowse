@@ -40,7 +40,7 @@ class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
               .map { model =>
                 ranges.ranges.map { range =>
                   model.`object`.textEditorModel.resolveLocation(
-                    schema.Position(filename, Some(range))
+                    schema.Position(filename, range.start, range.end)
                   )
                 }
               }

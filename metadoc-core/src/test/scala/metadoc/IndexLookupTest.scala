@@ -28,18 +28,27 @@ class IndexLookupTest extends FunSuite {
   )
 
   val cDefinition = Some(doc.Position("src/p/C.scala", 1, 5))
-  val cReferences = Seq(
-    doc.Position("src/p/C.scala", 20, 25),
-    doc.Position("src/p/C.scala", 30, 35)
+  val cReferences = Map(
+    "src/p/C.scala" ->
+      doc.Ranges(
+        List(
+          doc.Range(20, 25),
+          doc.Range(30, 35)
+        )
+      )
   )
   val cSymbol = doc.Symbol("p.C", cDefinition, cReferences)
 
   val funDefinition = Some(doc.Position("src/p/C.scala", 6, 10))
-  val funReferences = Seq(doc.Position("src/p/C.scala", 40, 45))
+  val funReferences = Map(
+    "src/p/C.scala" -> doc.Ranges(List(doc.Range(40, 45)))
+  )
   val funSymbol = doc.Symbol("p.fun", funDefinition, funReferences)
 
   val noDefinition = None
-  val noReferences = Seq(doc.Position("src/p/C.scala", 37, 39))
+  val noReferences = Map(
+    "src/p/C.scala" -> doc.Ranges(List(doc.Range(37, 39)))
+  )
   val noSymbol = doc.Symbol("lib.no", noDefinition, noReferences)
 
   val filename = "src/p/C.scala"
@@ -64,16 +73,27 @@ class IndexLookupTest extends FunSuite {
     assert(IndexLookup.findDefinition(0, attrs, index) == None)
   }
 
+  def toPositions(map: Map[String, doc.Ranges]): Iterable[doc.Position] =
+    map.flatMap {
+      case (filename, ranges) =>
+        ranges.ranges.map(
+          range => doc.Position(filename, range.start, range.end)
+        )
+    }
+
   test("IndexLookup.findReferences") {
     import IndexLookup._
+    val cReferencesPositions = toPositions(cReferences)
+    val noReferencesPositions = toPositions(noReferences)
     assert(
-      findReferences(3, true, attrs, index, filename) == (cReferences ++ cDefinition)
+      findReferences(3, true, attrs, index, filename) ==
+        (cReferencesPositions ++ cDefinition)
     )
     assert(
-      findReferences(3, false, attrs, index, filename) == cReferences
+      findReferences(3, false, attrs, index, filename) == cReferencesPositions
     )
     assert(
-      findReferences(11, true, attrs, index, filename) == noReferences
+      findReferences(11, true, attrs, index, filename) == noReferencesPositions
     )
     assert(findReferences(0, true, attrs, index, filename).isEmpty)
     assert(findReferences(0, false, attrs, index, filename).isEmpty)

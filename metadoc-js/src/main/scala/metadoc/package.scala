@@ -48,8 +48,8 @@ package object metadoc {
   implicit class XtensionIReadOnlyModel(val self: IReadOnlyModel)
       extends AnyVal {
     def resolveLocation(pos: Position): Location = {
-      val startPos = self.getPositionAt(pos.range.get.start)
-      val endPos = self.getPositionAt(pos.range.get.end)
+      val startPos = self.getPositionAt(pos.start)
+      val endPos = self.getPositionAt(pos.end)
       val range = new Range(
         startPos.lineNumber,
         startPos.column,
