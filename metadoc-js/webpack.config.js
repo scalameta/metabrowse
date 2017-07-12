@@ -41,7 +41,7 @@ module.exports = merge(config, {
         })
       },
       {
-        test: /\.scss$/,
+        test: /\.s?css$/,
         use: ExtractSass.extract({
           use: [
             { loader: "css-loader" }, // translates CSS into CommonJS
