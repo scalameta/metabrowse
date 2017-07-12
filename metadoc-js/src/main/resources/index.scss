@@ -12,21 +12,24 @@
   font-style: normal;
 }
 
-html, body {
+$header-height: 40px;
+
+body {
   margin: 0;
   width: 100%;
   height: 100%;
   font-family: 'Roboto';
+  overflow: hidden;
 }
 
 header {
   background-color: #002b36;
   color: white;
-  height: 40px;
+  height: $header-height;
   padding: 10px 10px;
 
   #title {
-    line-height: 40px;
+    line-height: $header-height;
     font-size: 16px;
     padding-left: 50px;
     background-image: url('images/favicon.png');
@@ -34,22 +37,20 @@ header {
     background-size: contain;
     display: block;
     font-weight: bold;
+
+    // Show partial path as: ".../org/example/Module.scala"
+    text-overflow: ellipsis;
+    direction: rtl;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
   }
 }
 
 main {
-  // FIXME:
-  position: relative;
-  min-height: 90vh;
-}
-
-#editor {
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	margin: 0;
-	padding: 0;
-	overflow: hidden;
+  #editor {
+    // Header height + padding-{top,bottom} = 40px + 2 * 10px
+    height: calc(100vh - 60px);
+    margin: 0;
+  }
 }
