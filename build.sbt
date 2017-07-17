@@ -100,7 +100,8 @@ lazy val js = project
     ),
     npmDependencies in Compile ++= Seq(
       "monaco-editor" -> "0.9.0",
-      "roboto-fontface" -> "0.7.0"
+      "roboto-fontface" -> "0.7.0",
+      "js-sha512" -> "0.4.0"
     )
   )
   .dependsOn(coreJS)

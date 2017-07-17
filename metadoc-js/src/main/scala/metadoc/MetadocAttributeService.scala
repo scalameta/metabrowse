@@ -10,7 +10,7 @@ import org.scalajs.dom
 
 object MetadocAttributeService {
   def fetchSymbol(symbolId: String): Future[Option[d.Symbol]] = {
-    val url = "symbol/" + dom.window.btoa(symbolId)
+    val url = "symbol/" + JSSha512.sha512(symbolId)
     for {
       bytes <- fetchBytes(url)
     } yield {
