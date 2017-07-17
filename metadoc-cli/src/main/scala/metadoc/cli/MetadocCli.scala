@@ -81,6 +81,13 @@ object MetadocCli extends CaseApp[MetadocOptions] {
     symbols.values.iterator.filter(_.definition.isDefined).toSeq
   }
 
+  def encodeSymbolName(name: String): String = {
+    val md = java.security.MessageDigest.getInstance("SHA-512")
+    val sha = md.digest(name.getBytes("UTF-8"))
+    // 512 bits ~> 64 bytes and doubled for the hex encoding
+    String.format("%0128x", new java.math.BigInteger(1, sha))
+  }
+
   def createMetadocSite(site: MetadocSite, options: MetadocOptions): Unit = {
     val target = getAbsolutePath(
       options.target.getOrElse(sys.error("--target is required!"))
@@ -99,7 +106,7 @@ object MetadocCli extends CaseApp[MetadocOptions] {
       val root = target.resolve("symbol")
       root.toFile.mkdirs()
       site.symbols.foreach { symbol =>
-        val url = new String(Base64.getEncoder.encode(symbol.symbol.getBytes))
+        val url = encodeSymbolName(symbol.symbol)
         val out = root.resolve(url)
         Files.createDirectories(out.toNIO.getParent)
         Files.write(

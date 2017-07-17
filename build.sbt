@@ -23,13 +23,13 @@ lazy val allSettings = Seq(
   licenses := Seq(
     "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
   ),
-  homepage := Some(url("https://github.com/olafurpg/metadoc")),
+  homepage := Some(url("https://github.com/scalameta/metadoc")),
   autoAPIMappings := true,
-  apiURL := Some(url("https://olafurpg.github.io/metadoc")),
+  apiURL := Some(url("https://scalameta.github.io/metadoc")),
   scmInfo := Some(
     ScmInfo(
-      url("https://github.com/olafurpg/metadoc"),
-      "scm:git:git@github.com:olafurpg/metadoc.git"
+      url("https://github.com/scalameta/metadoc"),
+      "scm:git:git@github.com:scalameta/metadoc.git"
     )
   ),
   pomExtra :=
@@ -100,7 +100,8 @@ lazy val js = project
     ),
     npmDependencies in Compile ++= Seq(
       "monaco-editor" -> "0.9.0",
-      "roboto-fontface" -> "0.7.0"
+      "roboto-fontface" -> "0.7.0",
+      "js-sha512" -> "0.4.0"
     )
   )
   .dependsOn(coreJS)
