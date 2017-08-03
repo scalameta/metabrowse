@@ -39,7 +39,6 @@ object MetadocPlugin extends AutoPlugin {
   override def requires = plugins.JvmPlugin
 
   lazy val classpathTask = Def.taskDyn {
-    val filter = metadocScopeFilter.value
     fullClasspath.all(metadocScopeFilter.value)
   }
 
@@ -83,7 +82,6 @@ object MetadocPlugin extends AutoPlugin {
           case entry if entry.isDirectory => entry.getAbsolutePath
         }
         .distinct
-      println(classDirectories)
       val options = Seq(
         "--clean-target-first",
         "--target",
