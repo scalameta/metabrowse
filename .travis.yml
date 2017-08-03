@@ -8,6 +8,7 @@ env:
     - TRAVIS_NODE_VERSION="8"
   matrix:
     - CI_TEST: test
+    - CI_TEST: scripted
     - CI_TEST: scalafmt
 
 cache:
