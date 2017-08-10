@@ -3,6 +3,7 @@ import scalajsbundler.util.JSON._
 
 scalaVersion in ThisBuild := "2.12.2"
 crossScalaVersions in ThisBuild := Seq("2.12.2")
+lazy val scalametaVersion = "1.8.0"
 
 lazy val testDependencies = List(
   libraryDependencies ++= Seq(
@@ -123,7 +124,7 @@ lazy val core = crossProject
       baseDirectory.value./("../src/main/protobuf")
     ),
     libraryDependencies ++= List(
-      "org.scalameta" %%% "scalameta" % "1.8.0",
+      "org.scalameta" %%% "scalameta" % scalametaVersion,
       "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion
     )
   )
@@ -164,6 +165,7 @@ val sbtPlugin = project
     buildInfoPackage := "metadoc.sbt",
     buildInfoKeys := Seq[BuildInfoKey](
       version,
+      "scalametaVersion" -> scalametaVersion,
       scalaVersion in ThisBuild,
       scalaBinaryVersion in ThisBuild
     )

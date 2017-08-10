@@ -37,6 +37,7 @@ object MetadocPlugin extends AutoPlugin {
   import autoImport._
 
   override def requires = plugins.JvmPlugin
+//  override def trigger: PluginTrigger = allRequirements
 
   lazy val classpathTask = Def.taskDyn {
     fullClasspath.all(metadocScopeFilter.value)

@@ -98,7 +98,11 @@ object MetadocCli extends CaseApp[MetadocOptions] {
     def semanticdb(): Unit = {
       site.semanticdb.foreach { root =>
         val from = root.resolve("META-INF").resolve("semanticdb")
-        from.toFile.toScala.copyTo(target.resolve("semanticdb").toFile.toScala)
+        val to = target.resolve("semanticdb").toFile.toScala
+        to.parent.createDirectories()
+        if (from.toFile.exists()) {
+          from.toFile.toScala.copyTo(to, overwrite = true)
+        }
       }
     }
 
