@@ -4,7 +4,7 @@ import sbt._
 import sbt.Keys._
 
 /**
-  * Generate a metadoc site.
+  * Generate a staic Metadoc site.
   *
   * == Usage ==
   *
@@ -32,7 +32,7 @@ object MetadocPlugin extends AutoPlugin {
       )
     val metadocClasspath =
       taskKey[Seq[Classpath]]("Class directories to be included in metadoc")
-    val metadoc = taskKey[File]("Generate GraphQL API code")
+    val metadoc = taskKey[File]("Generate a static Metadoc site")
   }
   import autoImport._
 
