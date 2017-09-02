@@ -1,18 +1,15 @@
 package metadoc
 
-import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js.annotation.ScalaJSDefined
 import monaco.Promise
 import monaco.Uri
 import monaco.editor.Editor
-import monaco.editor.IModel
 import monaco.services.IReference
-import monaco.services.ImmortalReference
 import monaco.services.ITextEditorModel
 import monaco.services.ITextModelService
-import org.scalameta.logger
+import monaco.services.ImmortalReference
 
 @ScalaJSDefined
 object MetadocTextModelService extends ITextModelService {

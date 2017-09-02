@@ -2,9 +2,9 @@ package metadoc
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.meta._
+import org.langmeta._
 import org.langmeta.internal.semanticdb.{schema => s}
-import scala.meta.internal.semanticdb._
+import org.langmeta.internal.semanticdb._
 import metadoc.MetadocApp._
 import metadoc.{schema => d}
 

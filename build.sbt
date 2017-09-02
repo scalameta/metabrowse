@@ -137,7 +137,7 @@ lazy val core = crossProject
       baseDirectory.value./("../src/main/protobuf")
     ),
     libraryDependencies ++= List(
-      "org.scalameta" %%% "scalameta" % Version.scalameta,
+      "org.scalameta" %%% "langmeta" % Version.scalameta,
       "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion
     )
   )

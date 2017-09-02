@@ -1,9 +1,6 @@
 package metadoc
 
-import scala.{meta => m}
-import scala.meta.inputs.Input
-import scala.meta.Document
-import scala.meta.Denotation
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
 import metadoc.schema.Index
@@ -12,8 +9,9 @@ import monaco.editor.IReadOnlyModel
 import monaco.languages.DocumentSymbolProvider
 import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.langmeta.Denotation
 import org.langmeta.semanticdb.ResolvedSymbol
+import org.{langmeta => m}
 
 @ScalaJSDefined
 class ScalaDocumentSymbolProvider(index: Index)

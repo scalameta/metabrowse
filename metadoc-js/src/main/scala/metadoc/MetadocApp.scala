@@ -3,7 +3,7 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Promise
-import scala.meta._
+import org.langmeta._
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.TypedArrayBuffer
 import metadoc.schema.Index

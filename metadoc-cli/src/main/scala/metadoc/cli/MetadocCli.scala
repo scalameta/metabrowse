@@ -5,8 +5,8 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
 import scala.collection.mutable
-import scala.meta._
-import scala.meta.internal.io.PathIO
+import org.langmeta._
+import org.langmeta.internal.io.PathIO
 import caseapp.{Name => _, _}
 import metadoc.{schema => d}
 import better.files._
@@ -95,8 +95,6 @@ object MetadocCli extends CaseApp[MetadocOptions] {
         FileIO.listAllFilesRecursively(from).files.foreach { path =>
           val in = from.toNIO.resolve(path.toNIO)
           val out = to.resolve(path).toNIO
-          val semanticdbFile = from.toNIO.resolve(path.toNIO)
-          Files.createDirectories(in.getParent)
           Files.createDirectories(out.getParent)
           Files.copy(in, out, StandardCopyOption.REPLACE_EXISTING)
         }

@@ -4,7 +4,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
-import scala.meta.Document
+import org.langmeta.Document
 import metadoc.schema.Index
 import monaco.{CancellationToken, Position}
 import monaco.editor.IReadOnlyModel

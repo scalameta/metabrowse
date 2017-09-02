@@ -2,7 +2,7 @@ package metadoc
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.meta._
+import org.langmeta._
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
 import metadoc.schema.Index

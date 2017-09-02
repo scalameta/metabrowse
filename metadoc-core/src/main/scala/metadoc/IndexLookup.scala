@@ -1,7 +1,7 @@
 package metadoc
 
-import scala.meta.Document
-import scala.meta.ResolvedName
+import org.langmeta.Document
+import org.langmeta.ResolvedName
 import metadoc.schema.{Index, Position, Symbol, Range}
 
 object IndexLookup {
