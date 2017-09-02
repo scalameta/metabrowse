@@ -31,9 +31,9 @@ object MetadocAttributeService {
 
   def fetchDocument(filename: String): Future[Document] = {
     for {
-      sattrs <- fetchProtoDocument(filename)
+      sdoc <- fetchProtoDocument(filename)
     } yield {
-      val db = s.Database(List(sattrs)).toDb(None)
+      val db = s.Database(List(sdoc)).toDb(None)
       db.documents.head
     }
   }

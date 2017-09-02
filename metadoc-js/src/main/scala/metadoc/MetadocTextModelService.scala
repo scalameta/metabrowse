@@ -26,9 +26,9 @@ object MetadocTextModelService extends ITextModelService {
       Future.successful(new ImmortalReference(ITextEditorModel(existingModel)))
     } else {
       for {
-        attrs <- MetadocAttributeService.fetchProtoDocument(resource.path)
+        doc <- MetadocAttributeService.fetchProtoDocument(resource.path)
       } yield {
-        val model = Editor.createModel(attrs.contents, "scala", resource)
+        val model = Editor.createModel(doc.contents, "scala", resource)
         new ImmortalReference(ITextEditorModel(model))
       }
     }

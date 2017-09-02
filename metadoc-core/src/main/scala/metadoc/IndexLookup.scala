@@ -7,19 +7,19 @@ import metadoc.schema.{Index, Position, Symbol, Range}
 object IndexLookup {
   def findDefinition(
       offset: Int,
-      attrs: Document,
+      doc: Document,
       index: Index
   ): Option[Position] =
-    findSymbol(offset, attrs, index).flatMap(_.definition)
+    findSymbol(offset, doc, index).flatMap(_.definition)
 
   def findReferences(
       offset: Int,
       includeDeclaration: Boolean,
-      attrs: Document,
+      doc: Document,
       index: Index,
       filename: String
   ): Seq[Position] =
-    findSymbol(offset, attrs, index).toSeq.flatMap {
+    findSymbol(offset, doc, index).toSeq.flatMap {
       case Symbol(_, definition, references) =>
         references
           .get(filename)
@@ -32,11 +32,11 @@ object IndexLookup {
 
   def findSymbol(
       offset: Int,
-      attrs: Document,
+      doc: Document,
       index: Index
   ): Option[Symbol] =
     for {
-      name <- attrs.names.collectFirst {
+      name <- doc.names.collectFirst {
         case ResolvedName(pos, sym, _)
             if pos.start <= offset && offset <= pos.end =>
           sym.syntax

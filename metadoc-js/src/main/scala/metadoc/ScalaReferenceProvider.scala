@@ -22,8 +22,8 @@ class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
   ) = {
     val offset = model.getOffsetAt(position).toInt
     for {
-      attrs <- MetadocAttributeService.fetchDocument(model.uri.path)
-      id = IndexLookup.findSymbol(offset, attrs, index).map(_.symbol)
+      doc <- MetadocAttributeService.fetchDocument(model.uri.path)
+      id = IndexLookup.findSymbol(offset, doc, index).map(_.symbol)
       // Monad transformers might come in handy here.
       symbol <- id.fold(Future.successful(Option.empty[d.Symbol]))(
         MetadocAttributeService.fetchSymbol

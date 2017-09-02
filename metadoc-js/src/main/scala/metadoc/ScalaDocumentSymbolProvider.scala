@@ -21,9 +21,9 @@ class ScalaDocumentSymbolProvider(index: Index)
       token: CancellationToken
   ) = {
     for {
-      attrs <- MetadocAttributeService.fetchDocument(model.uri.path)
+      doc <- MetadocAttributeService.fetchDocument(model.uri.path)
     } yield {
-      val denotations = attrs.symbols.map {
+      val denotations = doc.symbols.map {
         case ResolvedSymbol(s, d) => s -> d
       }.toMap
       val symbols = for {
