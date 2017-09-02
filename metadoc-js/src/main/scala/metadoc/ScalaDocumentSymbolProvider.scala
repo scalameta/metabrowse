@@ -16,7 +16,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.langmeta.semanticdb.ResolvedSymbol
 
 @ScalaJSDefined
-class ScalaDocumentSymbolProvider(index: Index) extends DocumentSymbolProvider {
+class ScalaDocumentSymbolProvider(index: Index)
+    extends DocumentSymbolProvider {
   override def provideDocumentSymbols(
       model: IReadOnlyModel,
       token: CancellationToken
