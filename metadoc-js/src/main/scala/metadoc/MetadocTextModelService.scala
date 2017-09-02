@@ -3,7 +3,6 @@ package metadoc
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.meta.internal.semantic.{schema => s}
 import scala.scalajs.js.annotation.ScalaJSDefined
 import monaco.Promise
 import monaco.Uri
@@ -29,7 +28,7 @@ object MetadocTextModelService extends ITextModelService {
       Future.successful(new ImmortalReference(ITextEditorModel(existingModel)))
     } else {
       for {
-        attrs <- MetadocAttributeService.fetchProtoAttributes(resource.path)
+        attrs <- MetadocAttributeService.fetchProtoDocument(resource.path)
       } yield {
         val model = Editor.createModel(attrs.contents, "scala", resource)
         new ImmortalReference(ITextEditorModel(model))

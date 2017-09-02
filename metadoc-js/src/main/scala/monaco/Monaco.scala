@@ -16,7 +16,7 @@ import monaco.editor.Editor.IEditorViewState
 
 @js.native
 trait Thenable[T] extends js.Object {
-  def then[TResult](
+  def `then`[TResult](
       onfulfilled: js.Function1[T, TResult | Thenable[TResult]] = ???,
       onrejected: js.Function1[js.Any, TResult | Thenable[TResult]] = ???
   ): Thenable[TResult] = js.native
@@ -80,7 +80,7 @@ class Promise[+V] protected () extends js.Object {
       init: js.Function3[TValueCallback[V], js.Function1[js.Any, Unit], ProgressCallback, Unit],
       oncancel: js.Any = ???
   ) = this()
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, Promise[U]] = ???,
       error: js.Function1[js.Any, Promise[U]] = ???,
       progress: ProgressCallback = ???

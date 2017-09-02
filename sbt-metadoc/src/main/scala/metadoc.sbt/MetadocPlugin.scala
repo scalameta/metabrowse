@@ -21,6 +21,8 @@ object MetadocPlugin extends AutoPlugin {
 
   object autoImport {
     val Metadoc = config("metadoc")
+    val metadocScalametaVersion = BuildInfo.scalametaVersion
+    val metadocScalaVersion = BuildInfo.scalaVersion
     val metadocScopeFilter =
       settingKey[ScopeFilter]("Control sources to be included in metadoc.")
     val metadocProjectFilter = settingKey[ScopeFilter.ProjectFilter](

@@ -1,12 +1,13 @@
 package metadoc
 
-import scala.meta.Attributes
+import scala.meta.Document
+import scala.meta.ResolvedName
 import metadoc.schema.{Index, Position, Symbol, Range}
 
 object IndexLookup {
   def findDefinition(
       offset: Int,
-      attrs: Attributes,
+      attrs: Document,
       index: Index
   ): Option[Position] =
     findSymbol(offset, attrs, index).flatMap(_.definition)
@@ -14,7 +15,7 @@ object IndexLookup {
   def findReferences(
       offset: Int,
       includeDeclaration: Boolean,
-      attrs: Attributes,
+      attrs: Document,
       index: Index,
       filename: String
   ): Seq[Position] =
@@ -31,13 +32,13 @@ object IndexLookup {
 
   def findSymbol(
       offset: Int,
-      attrs: Attributes,
+      attrs: Document,
       index: Index
   ): Option[Symbol] =
     for {
       name <- attrs.names.collectFirst {
-        case (pos, sym)
-            if pos.start.offset <= offset && offset <= pos.end.offset =>
+        case ResolvedName(pos, sym, _)
+            if pos.start <= offset && offset <= pos.end =>
           sym.syntax
       }
       symbol <- index.symbols.find(_.symbol == name)

@@ -21,7 +21,7 @@ class ScalaDefinitionProvider(index: Index) extends DefinitionProvider {
   ) = {
     val offset = model.getOffsetAt(position).toInt
     for {
-      attrs <- MetadocAttributeService.fetchAttributes(model.uri.path)
+      attrs <- MetadocAttributeService.fetchDocument(model.uri.path)
       locations <- {
         val definition = IndexLookup.findDefinition(offset, attrs, index)
         definition.fold(Future.successful(js.Array[Location]())) { defn =>

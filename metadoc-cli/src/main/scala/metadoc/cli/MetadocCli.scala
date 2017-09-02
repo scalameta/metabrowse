@@ -1,18 +1,15 @@
 package metadoc.cli
 
 import java.io.File
-import java.net.URLEncoder
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
-import java.util.Base64
 import scala.collection.mutable
 import scala.meta._
-import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import caseapp.{Name => _, _}
 import metadoc.{schema => d}
 import better.files._
-import scala.meta.internal.ast.Helpers._
+import org.langmeta.internal.inputs._
 import metadoc.schema.Ranges
 
 @AppName("metadoc")
@@ -36,49 +33,43 @@ case class MetadocSite(
 
 object MetadocCli extends CaseApp[MetadocOptions] {
   def filename(input: Input): String = input match {
-    case Input.LabeledString(path, _) => path
+    case Input.VirtualFile(path, _) => path
     case Input.File(path, _) =>
       path.toRelative(PathIO.workingDirectory).toString()
+    case els => els.syntax
   }
 
   def metadocPosition(position: Position): d.Position =
     d.Position(
       filename(position.input),
-      position.start.offset,
-      position.end.offset
+      position.start,
+      position.end
     )
 
-  def getAbsolutePath(path: String): AbsolutePath =
-    if (PathIO.isAbsolutePath(path)) AbsolutePath(path)
-    else PathIO.workingDirectory.resolve(path)
-
-  def getSymbols(implicit db: Database): Seq[d.Symbol] = {
+  def getSymbols(db: Database): Seq[d.Symbol] = {
     val symbols = mutable.Map
       .empty[String, d.Symbol]
       .withDefault(sym => d.Symbol(symbol = sym))
 
-    def add(name: Name): Unit = db.names.get(name.pos).foreach { symbol =>
-      // add globally relevant symbols to index.
-      val syntax = symbol.syntax
-      if (name.isBinder) {
-        symbols(syntax) =
-          symbols(syntax).copy(definition = Some(metadocPosition(name.pos)))
+    def add(name: ResolvedName): Unit = {
+      val syntax = name.symbol.syntax
+      if (name.isDefinition) {
+        symbols(syntax) = symbols(syntax).copy(
+          definition = Some(metadocPosition(name.position))
+        )
       } else {
         val old = symbols(syntax)
-        val label = filename(name.pos.input)
+        val label = filename(name.position.input)
         val ranges = old.references.getOrElse(label, Ranges())
         val newRefences = old.references.updated(
           label,
-          ranges.addRanges(d.Range(name.pos.start.offset, name.pos.end.offset))
+          ranges.addRanges(d.Range(name.position.start, name.position.end))
         )
         symbols(syntax) = old.copy(references = newRefences)
       }
     }
-
-    db.sources.foreach { source =>
-      source.traverse { case name: Name => add(name) }
-    }
-    symbols.values.iterator.filter(_.definition.isDefined).toSeq
+    db.names.foreach(add)
+    symbols.values.filter(_.definition.isDefined).toSeq
   }
 
   def encodeSymbolName(name: String): String = {
@@ -89,7 +80,7 @@ object MetadocCli extends CaseApp[MetadocOptions] {
   }
 
   def createMetadocSite(site: MetadocSite, options: MetadocOptions): Unit = {
-    val target = getAbsolutePath(
+    val target = AbsolutePath(
       options.target.getOrElse(sys.error("--target is required!"))
     )
     if (options.cleanTargetFirst && Files.exists(target.toNIO)) {
@@ -133,13 +124,15 @@ object MetadocCli extends CaseApp[MetadocOptions] {
 
   def run(options: MetadocOptions, remainingArgs: RemainingArgs): Unit = {
     val classpath = Classpath(
-      remainingArgs.remainingArgs
-        .flatMap(cp => cp.split(File.pathSeparator).map(getAbsolutePath))
+      remainingArgs.remainingArgs.flatMap { cp =>
+        cp.split(File.pathSeparator).map(AbsolutePath(_))
+      }.toList
     )
     val db = Database.load(classpath)
     val symbols = getSymbols(db)
-    val files = db.entries.collect {
-      case (Input.LabeledString(path, _), _) => path
+    val files = db.documents.collect {
+      case doc if doc.input.isInstanceOf[Input.VirtualFile] =>
+        filename(doc.input)
     }
     val index = d.Index(files, symbols.map(_.withReferences(Map.empty)))
     val site = MetadocSite(classpath.shallow, symbols, index)
