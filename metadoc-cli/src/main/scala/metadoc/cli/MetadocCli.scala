@@ -2,6 +2,7 @@ package metadoc.cli
 
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
 import scala.collection.mutable
 import scala.meta._
@@ -11,6 +12,7 @@ import metadoc.{schema => d}
 import better.files._
 import org.langmeta.internal.inputs._
 import metadoc.schema.Ranges
+import org.langmeta.internal.io.FileIO
 
 @AppName("metadoc")
 @AppVersion("0.1.0-SNAPSHOT")
@@ -89,10 +91,14 @@ object MetadocCli extends CaseApp[MetadocOptions] {
     def semanticdb(): Unit = {
       site.semanticdb.foreach { root =>
         val from = root.resolve("META-INF").resolve("semanticdb")
-        val to = target.resolve("semanticdb").toFile.toScala
-        to.parent.createDirectories()
-        if (from.toFile.exists()) {
-          from.toFile.toScala.copyTo(to, overwrite = true)
+        val to = target.resolve("semanticdb")
+        FileIO.listAllFilesRecursively(from).files.foreach { path =>
+          val in = from.toNIO.resolve(path.toNIO)
+          val out = to.resolve(path).toNIO
+          val semanticdbFile = from.toNIO.resolve(path.toNIO)
+          Files.createDirectories(in.getParent)
+          Files.createDirectories(out.getParent)
+          Files.copy(in, out, StandardCopyOption.REPLACE_EXISTING)
         }
       }
     }

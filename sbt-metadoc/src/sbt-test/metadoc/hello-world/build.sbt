@@ -56,9 +56,4 @@ TaskKey[Unit]("check") := {
       s"Symbol does not exist: $symbol"
     )
 
-  val actualSymbols = (dir / "symbol").listFiles().length
-  assert(
-    actualSymbols == expectedSymbols.length,
-    s"Found $actualSymbols symbols, expected ${expectedSymbols.length}"
-  )
 }

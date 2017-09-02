@@ -1,7 +1,3 @@
 > update
-> show scalacOptions
-> show libraryDependencies
-$ pause
-> test:compile
 > check
 > test
