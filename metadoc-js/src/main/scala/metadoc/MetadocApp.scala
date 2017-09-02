@@ -8,10 +8,6 @@ import scala.scalajs.js
 import scala.scalajs.js.typedarray.TypedArrayBuffer
 import metadoc.schema.Index
 import monaco.Uri
-import monaco.editor.IEditor
-import monaco.editor.IEditorConstructionOptions
-import monaco.editor.IEditorOverrideServices
-import monaco.editor.IModelChangedEvent
 import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom

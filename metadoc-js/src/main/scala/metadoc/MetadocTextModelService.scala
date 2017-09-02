@@ -12,6 +12,7 @@ import monaco.services.IReference
 import monaco.services.ImmortalReference
 import monaco.services.ITextEditorModel
 import monaco.services.ITextModelService
+import org.scalameta.logger
 
 @ScalaJSDefined
 object MetadocTextModelService extends ITextModelService {

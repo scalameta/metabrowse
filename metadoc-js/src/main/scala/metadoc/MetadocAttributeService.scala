@@ -25,7 +25,7 @@ object MetadocAttributeService {
     for {
       bytes <- fetchBytes(url)
     } yield {
-      s.Document.parseFrom(bytes)
+      s.Database.parseFrom(bytes).documents.head
     }
   }
 
