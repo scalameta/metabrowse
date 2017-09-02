@@ -2,6 +2,7 @@ import com.trueaccord.scalapb.compiler.Version.scalapbVersion
 import scalajsbundler.util.JSON._
 
 scalaVersion in ThisBuild := "2.12.2"
+crossScalaVersions in ThisBuild := Seq("2.12.2")
 
 lazy val testDependencies = List(
   libraryDependencies ++= Seq(
@@ -11,7 +12,7 @@ lazy val testDependencies = List(
 )
 
 lazy val allSettings = Seq(
-  organization := "com.geirsson",
+  organization := "org.scalameta",
   resolvers += Resolver.bintrayRepo("scalameta", "maven"),
   scalacOptions := Seq(
     "-deprecation",
@@ -143,6 +144,30 @@ commands += Command.command("metadoc-site") { s =>
     cliRun ::
     s
 }
+
+val sbtPlugin = project
+  .in(file("sbt-metadoc"))
+  .enablePlugins(BuildInfoPlugin)
+  .settings(
+    name := "sbt-metadoc",
+    allSettings,
+    scalaVersion := "2.10.6",
+    crossScalaVersions := Seq("2.10.6"),
+    publishLocal := publishLocal
+      .dependsOn(publishLocal in coreJVM)
+      .dependsOn(publishLocal in cli)
+      .value,
+    sbt.Keys.sbtPlugin := true,
+    scriptedSettings,
+    // scriptedBufferLog := false,
+    scriptedLaunchOpts += "-Dproject.version=" + version.value,
+    buildInfoPackage := "metadoc.sbt",
+    buildInfoKeys := Seq[BuildInfoKey](
+      version,
+      scalaVersion in ThisBuild,
+      scalaBinaryVersion in ThisBuild
+    )
+  )
 
 lazy val tests = project
   .in(file("metadoc-tests"))
