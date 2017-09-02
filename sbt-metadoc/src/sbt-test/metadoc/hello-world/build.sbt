@@ -1,16 +1,7 @@
 name := "test"
 enablePlugins(MetadocPlugin)
-scalaVersion := metadocScalaVersion
-
-addCompilerPlugin(
-  "org.scalameta" % "semanticdb-scalac" % metadocScalametaVersion cross CrossVersion.full
-)
-
-scalacOptions ++= Seq(
-  "-Yrangepos",
-  "-Xplugin-require:semanticdb"
-)
-
+scalaVersion := _root_.metadoc.sbt.BuildInfo.scalaVersion
+metadocSettings // enable semanticdb-scalac
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.3" % Test
 
 // Copied from the CLI code
