@@ -1,40 +1,23 @@
 import com.trueaccord.scalapb.compiler.Version.scalapbVersion
 import scalajsbundler.util.JSON._
 
-scalaVersion in ThisBuild := "2.12.2"
-crossScalaVersions in ThisBuild := Seq("2.12.2")
-
-lazy val testDependencies = List(
-  libraryDependencies ++= Seq(
-    "org.scalatest" %%% "scalatest" % "3.0.3" % Test,
-    "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
-  )
-)
-
-lazy val allSettings = Seq(
-  organization := "org.scalameta",
-  resolvers += Resolver.bintrayRepo("scalameta", "maven"),
-  scalacOptions := Seq(
-    "-deprecation",
-    "-encoding",
-    "UTF-8",
-    "-feature",
-    "-unchecked"
-  ),
-  licenses := Seq(
-    "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
-  ),
-  homepage := Some(url("https://github.com/scalameta/metadoc")),
-  autoAPIMappings := true,
-  apiURL := Some(url("https://scalameta.github.io/metadoc")),
-  scmInfo := Some(
-    ScmInfo(
-      url("https://github.com/scalameta/metadoc"),
-      "scm:git:git@github.com:scalameta/metadoc.git"
-    )
-  ),
-  pomExtra :=
-    <developers>
+inThisBuild(
+  List(
+    organization := "org.scalameta",
+    licenses := Seq(
+      "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
+    ),
+    homepage := Some(url("https://github.com/scalameta/metadoc")),
+    autoAPIMappings := true,
+    apiURL := Some(url("https://scalameta.github.io/metadoc")),
+    scmInfo := Some(
+      ScmInfo(
+        url("https://github.com/scalameta/metadoc"),
+        "scm:git:git@github.com:scalameta/metadoc.git"
+      )
+    ),
+    pomExtra :=
+      <developers>
       <developer>
         <id>olafurpg</id>
         <name>Ólafur Páll Geirsson</name>
@@ -46,13 +29,42 @@ lazy val allSettings = Seq(
         <url>https://github.com/jonas</url>
       </developer>
     </developers>
-) ++ testDependencies
+  )
+)
+
+lazy val Version = new {
+  def scala = "2.12.3"
+  def scala210 = "2.10.6"
+  def scalameta = "2.0.0-RC1"
+}
+
+lazy val allSettings = Seq(
+  scalaVersion := Version.scala,
+  crossScalaVersions := Seq(Version.scala),
+  scalacOptions := Seq(
+    "-deprecation",
+    "-encoding",
+    "UTF-8",
+    "-feature",
+    "-unchecked"
+  ),
+  libraryDependencies ++= Seq(
+    "org.scalatest" %%% "scalatest" % "3.0.3" % Test,
+    "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
+  )
+)
 
 lazy val example = project
   .in(file("paiges") / "core")
   .settings(
-    testDependencies,
     noPublish,
+    addCompilerPlugin(
+      "org.scalameta" % "semanticdb-scalac" % Version.scalameta cross CrossVersion.full
+    ),
+    scalacOptions ++= Seq(
+      "-Yrangepos",
+      "-Xplugin-require:semanticdb"
+    ),
     test := {} // no need to run paiges tests.
   )
 
@@ -73,6 +85,7 @@ lazy val cli = project
 lazy val js = project
   .in(file("metadoc-js"))
   .settings(
+    noPublish,
     moduleName := "metadoc-js",
     additionalNpmConfig in Compile := Map("private" -> bool(true)),
     additionalNpmConfig in Test := additionalNpmConfig.in(Test).value,
@@ -113,6 +126,7 @@ lazy val core = crossProject
   .in(file("metadoc-core"))
   .settings(
     allSettings,
+    moduleName := "metadoc-core",
     PB.targets.in(Compile) := Seq(
       scalapb.gen(
         flatPackage = true // Don't append filename to package
@@ -123,7 +137,7 @@ lazy val core = crossProject
       baseDirectory.value./("../src/main/protobuf")
     ),
     libraryDependencies ++= List(
-      "org.scalameta" %%% "scalameta" % "1.8.0",
+      "org.scalameta" %%% "langmeta" % Version.scalameta,
       "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion
     )
   )
@@ -151,8 +165,8 @@ val sbtPlugin = project
   .settings(
     name := "sbt-metadoc",
     allSettings,
-    scalaVersion := "2.10.6",
-    crossScalaVersions := Seq("2.10.6"),
+    scalaVersion := Version.scala210,
+    crossScalaVersions := Seq(Version.scala210),
     publishLocal := publishLocal
       .dependsOn(publishLocal in coreJVM)
       .dependsOn(publishLocal in cli)
@@ -164,25 +178,25 @@ val sbtPlugin = project
     buildInfoPackage := "metadoc.sbt",
     buildInfoKeys := Seq[BuildInfoKey](
       version,
-      scalaVersion in ThisBuild,
-      scalaBinaryVersion in ThisBuild
+      "scalametaVersion" -> Version.scalameta,
+      scalaVersion.in(coreJVM),
+      scalaBinaryVersion.in(coreJVM)
     )
   )
 
 lazy val tests = project
   .in(file("metadoc-tests"))
   .settings(
-    allSettings,
     noPublish,
     buildInfoPackage := "metadoc.tests",
     buildInfoKeys := Seq[BuildInfoKey](
       "exampleClassDirectory" -> classDirectory.in(example, Compile).value
     )
   )
-  .dependsOn(cli, example)
+  .dependsOn(cli, example % Test)
   .enablePlugins(BuildInfoPlugin)
 
-lazy val noPublish = Seq(
+lazy val noPublish = allSettings ++ Seq(
   publish := {},
   publishLocal := {},
   publishArtifact := false

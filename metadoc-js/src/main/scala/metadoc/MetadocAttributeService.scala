@@ -2,11 +2,11 @@ package metadoc
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.meta._
-import scala.meta.internal.semantic.{schema => s}
+import org.langmeta._
+import org.langmeta.internal.semanticdb.{schema => s}
+import org.langmeta.internal.semanticdb._
 import metadoc.MetadocApp._
 import metadoc.{schema => d}
-import org.scalajs.dom
 
 object MetadocAttributeService {
   def fetchSymbol(symbolId: String): Future[Option[d.Symbol]] = {
@@ -20,21 +20,21 @@ object MetadocAttributeService {
     case _: NoSuchElementException => None // 404, not found
   }
 
-  def fetchProtoAttributes(filename: String): Future[s.Attributes] = {
+  def fetchProtoDocument(filename: String): Future[s.Document] = {
     val url = "semanticdb/" + filename.replace(".scala", ".semanticdb")
     for {
       bytes <- fetchBytes(url)
     } yield {
-      s.Attributes.parseFrom(bytes)
+      s.Database.parseFrom(bytes).documents.head
     }
   }
 
-  def fetchAttributes(filename: String): Future[Attributes] = {
+  def fetchDocument(filename: String): Future[Document] = {
     for {
-      sattrs <- fetchProtoAttributes(filename)
+      sdoc <- fetchProtoDocument(filename)
     } yield {
-      val db = s.Database(List(sattrs)).toMeta(None)
-      db.entries.head._2
+      val db = s.Database(List(sdoc)).toDb(None)
+      db.documents.head
     }
   }
 }

@@ -6,11 +6,9 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.ScalaJSDefined
 import monaco.Range
 import monaco.Promise
-import monaco.editor.Editor
 import monaco.editor.IEditor
 import monaco.editor.IEditorConstructionOptions
 import monaco.editor.IEditorOverrideServices
-import monaco.editor.IModelChangedEvent
 import monaco.editor.IStandaloneCodeEditor
 import monaco.services.IResourceInput
 import monaco.services.IEditorService

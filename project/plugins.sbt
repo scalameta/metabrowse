@@ -1,6 +1,4 @@
-resolvers += Resolver.bintrayIvyRepo("scalameta", "maven")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.18")
-addSbtPlugin("org.scalameta" % "sbt-scalahost" % "1.8.0")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.7.0")
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-RC6")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.7.0")

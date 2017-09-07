@@ -4,7 +4,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
-import scala.meta.Attributes
+import org.langmeta.Document
 import metadoc.schema.Index
 import monaco.{CancellationToken, Position}
 import monaco.editor.IReadOnlyModel
@@ -22,8 +22,8 @@ class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
   ) = {
     val offset = model.getOffsetAt(position).toInt
     for {
-      attrs <- MetadocAttributeService.fetchAttributes(model.uri.path)
-      id = IndexLookup.findSymbol(offset, attrs, index).map(_.symbol)
+      doc <- MetadocAttributeService.fetchDocument(model.uri.path)
+      id = IndexLookup.findSymbol(offset, doc, index).map(_.symbol)
       // Monad transformers might come in handy here.
       symbol <- id.fold(Future.successful(Option.empty[d.Symbol]))(
         MetadocAttributeService.fetchSymbol

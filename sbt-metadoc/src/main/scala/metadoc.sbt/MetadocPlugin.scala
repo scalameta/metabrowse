@@ -8,10 +8,21 @@ import sbt.Keys._
   *
   * == Usage ==
   *
-  * This plugin must be explicitly enabled. To enable it add the following line
+  * This plugin must be explicitly enabled in the project that generates the
+  * static metadoc site. To enable it add the following line
   * to your `.sbt` file:
   * {{{
   * enablePlugins(MetadocPlugin)
+  * }}}
+  *
+  * The static site includes sources for projects that enable the semanticdb-scalac
+  * compiler plugin, see http://scalameta.org/tutorial/#semanticdb-scalac.
+  * To enable the compiler plugin, add the following to your projects settings
+  *
+  * {{{
+  *   lazy val projectToIncludeSourcesForMetadocSite = project.settings(
+  *     metadocSettings // important, must *appear* after scalacOptions.
+  *   )
   * }}}
   *
   * By default, semantic data is read from `metadocClasspath` which is
@@ -21,6 +32,7 @@ object MetadocPlugin extends AutoPlugin {
 
   object autoImport {
     val Metadoc = config("metadoc")
+    val metadocSettings = MetadocPlugin.metadocSettings
     val metadocScopeFilter =
       settingKey[ScopeFilter]("Control sources to be included in metadoc.")
     val metadocProjectFilter = settingKey[ScopeFilter.ProjectFilter](
@@ -37,6 +49,17 @@ object MetadocPlugin extends AutoPlugin {
   import autoImport._
 
   override def requires = plugins.JvmPlugin
+  override def trigger: PluginTrigger = allRequirements
+
+  lazy val metadocSettings: List[Def.Setting[_]] = List(
+    addCompilerPlugin(
+      "org.scalameta" % "semanticdb-scalac" % BuildInfo.scalametaVersion cross CrossVersion.full
+    ),
+    scalacOptions ++= Seq(
+      "-Yrangepos",
+      "-Xplugin-require:semanticdb"
+    )
+  )
 
   lazy val classpathTask = Def.taskDyn {
     fullClasspath.all(metadocScopeFilter.value)

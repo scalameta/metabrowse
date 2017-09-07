@@ -1,9 +1,6 @@
 package metadoc
 
-import scala.{meta => m}
-import scala.meta.inputs.Input
-import scala.meta.Attributes
-import scala.meta.Denotation
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
 import metadoc.schema.Index
@@ -12,7 +9,9 @@ import monaco.editor.IReadOnlyModel
 import monaco.languages.DocumentSymbolProvider
 import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.langmeta.Denotation
+import org.langmeta.semanticdb.ResolvedSymbol
+import org.{langmeta => m}
 
 @ScalaJSDefined
 class ScalaDocumentSymbolProvider(index: Index)
@@ -22,9 +21,11 @@ class ScalaDocumentSymbolProvider(index: Index)
       token: CancellationToken
   ) = {
     for {
-      attrs <- MetadocAttributeService.fetchAttributes(model.uri.path)
+      doc <- MetadocAttributeService.fetchDocument(model.uri.path)
     } yield {
-      val denotations = attrs.denotations.map { case (s, d) => s -> d }.toMap
+      val denotations = doc.symbols.map {
+        case ResolvedSymbol(s, d) => s -> d
+      }.toMap
       val symbols = for {
         sym <- index.symbols
         denotation <- denotations.get(m.Symbol(sym.symbol))
@@ -32,7 +33,7 @@ class ScalaDocumentSymbolProvider(index: Index)
       } yield {
         new SymbolInformation(
           name = denotation.name,
-          containerName = denotation.info,
+          containerName = denotation.signature,
           kind = kind,
           location = model.resolveLocation(sym.definition.get)
         )
@@ -44,7 +45,7 @@ class ScalaDocumentSymbolProvider(index: Index)
   def symbolKind(denotation: Denotation): Option[SymbolKind] = {
     import denotation._
 
-    if (isPARAM || isTypeParam)
+    if (isParam || isTypeParam)
       None
     else if (isVal || isVar)
       Some(SymbolKind.Variable)

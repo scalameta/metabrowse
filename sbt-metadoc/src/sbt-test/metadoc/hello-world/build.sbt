@@ -1,7 +1,7 @@
 name := "test"
 enablePlugins(MetadocPlugin)
-scalaVersion := "2.11.11"
-
+scalaVersion := _root_.metadoc.sbt.BuildInfo.scalaVersion
+metadocSettings // enable semanticdb-scalac
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.3" % Test
 
 // Copied from the CLI code
@@ -47,9 +47,4 @@ TaskKey[Unit]("check") := {
       s"Symbol does not exist: $symbol"
     )
 
-  val actualSymbols = (dir / "symbol").listFiles().length
-  assert(
-    actualSymbols == expectedSymbols.length,
-    s"Found $actualSymbols symbols, expected ${expectedSymbols.length}"
-  )
 }
