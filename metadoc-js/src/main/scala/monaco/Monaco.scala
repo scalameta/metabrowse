@@ -3,6 +3,7 @@ package monaco
 import scala.scalajs.js
 import js.annotation._
 import js.|
+import js.RegExp
 
 import org.scalajs.dom.{Element => HTMLElement, MouseEvent, KeyboardEvent}
 
@@ -65,7 +66,7 @@ object Severity extends js.Object {
 
 @js.native
 trait TValueCallback[T] extends js.Object {
-  def apply(value: T): Unit = js.native
+  def apply(value: Thenable[T]): Unit = js.native
 }
 
 @js.native
@@ -668,6 +669,20 @@ package editor {
     @JSBracketAccess
     def update(index: String, v: js.Any): Unit = js.native
    */
+  }
+
+  @js.native
+  trait IMarker extends js.Object {
+    var owner: String = js.native
+    var resource: Uri = js.native
+    var severity: Severity = js.native
+    var code: String = js.native
+    var message: String = js.native
+    var source: String = js.native
+    var startLineNumber: Double = js.native
+    var startColumn: Double = js.native
+    var endLineNumber: Double = js.native
+    var endColumn: Double = js.native
   }
 
   @js.native
@@ -1970,6 +1985,7 @@ package editor {
         owner: String,
         markers: js.Array[IMarkerData]
     ): Unit = js.native
+    def getModelMarkers(filter: js.Any): js.Array[IMarker] = js.native
     def getModel(uri: Uri): IModel = js.native
     def getModels(): js.Array[IModel] = js.native
     def onDidCreateModel(listener: js.Function1[IModel, Unit]): IDisposable = js.native
@@ -2035,7 +2051,7 @@ package languages {
         range: Range,
         context: CodeActionContext,
         token: CancellationToken
-    ): js.Array[CodeAction] | Thenable[js.Array[CodeAction]] = js.native
+    ): js.Array[Command] | Thenable[js.Array[Command]] = js.native
   }
 
   @js.native
@@ -2117,7 +2133,7 @@ package languages {
   trait LanguageConfiguration extends js.Object {
     var comments: CommentRule = js.native
     var brackets: js.Array[CharacterPair] = js.native
-    var wordPattern: js.RegExp = js.native
+    var wordPattern: RegExp = js.native
     var indentationRules: IndentationRule = js.native
     var onEnterRules: js.Array[OnEnterRule] = js.native
     var autoClosingPairs: js.Array[IAutoClosingPairConditional] = js.native
@@ -2127,16 +2143,16 @@ package languages {
 
   @js.native
   trait IndentationRule extends js.Object {
-    var decreaseIndentPattern: js.RegExp = js.native
-    var increaseIndentPattern: js.RegExp = js.native
-    var indentNextLinePattern: js.RegExp = js.native
-    var unIndentedLinePattern: js.RegExp = js.native
+    var decreaseIndentPattern: RegExp = js.native
+    var increaseIndentPattern: RegExp = js.native
+    var indentNextLinePattern: RegExp = js.native
+    var unIndentedLinePattern: RegExp = js.native
   }
 
   @js.native
   trait OnEnterRule extends js.Object {
-    var beforeText: js.RegExp = js.native
-    var afterText: js.RegExp = js.native
+    var beforeText: RegExp = js.native
+    var afterText: RegExp = js.native
     var action: EnterAction = js.native
   }
 
@@ -2203,12 +2219,6 @@ package languages {
         position: Position,
         token: CancellationToken
     ): Hover | Thenable[Hover] = js.native
-  }
-
-  @js.native
-  trait CodeAction extends js.Object {
-    var command: Command = js.native
-    var score: Double = js.native
   }
 
   @js.native
@@ -2293,7 +2303,7 @@ package languages {
         model: editor.IReadOnlyModel,
         position: Position,
         token: CancellationToken
-    ): Thenable[js.Array[Location]]
+    ): Thenable[Definition]
   }
 
   @js.native
@@ -2302,7 +2312,7 @@ package languages {
         model: editor.IReadOnlyModel,
         position: Position,
         token: CancellationToken
-    ): Definition | Thenable[Definition] = js.native
+    ): Thenable[Definition] = js.native
   }
 
   @js.native
@@ -2311,7 +2321,7 @@ package languages {
         model: editor.IReadOnlyModel,
         position: Position,
         token: CancellationToken
-    ): Definition | Thenable[Definition] = js.native
+    ): Thenable[Definition] = js.native
   }
 
   @js.native
@@ -2467,7 +2477,7 @@ package languages {
 
   @js.native
   trait CodeLensProvider extends js.Object {
-    var onDidChange: js.Any = js.native
+    var onDidChange: IEvent[CodeLensProvider] = js.native
     def provideCodeLenses(
         model: editor.IReadOnlyModel,
         token: CancellationToken
@@ -2503,7 +2513,7 @@ package languages {
 
   @js.native
   trait IMonarchLanguageRule extends js.Object {
-    var regex: String | js.RegExp = js.native
+    var regex: String | RegExp = js.native
     var action: IMonarchLanguageAction = js.native
     var include: String = js.native
   }
@@ -2614,7 +2624,7 @@ package languages {
         provider: CompletionItemProvider
     ): IDisposable = js.native
     type CharacterPair = js.Tuple2[String, String]
-    type Definition = Location | js.Array[Location]
+    type Definition = js.Array[Location]
   }
 
 }
