@@ -32,7 +32,7 @@ class MetadocCliTest extends FunSuite {
     // symbol()
     val symbol = out.resolve("symbol")
     assert(Files.exists(symbol))
-    val symbols = symbol.toFile.list().toList
+    val symbols = symbol.toFile.list()
     assert(symbols.nonEmpty)
   }
 }
