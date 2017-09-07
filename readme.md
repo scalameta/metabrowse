@@ -39,13 +39,14 @@ open http://localhost:8080
 
 ### Upgrading the Monaco Editor
 
-Metadoc interfaces with the Monaco Editor uses a Scala.js facade based on the
+Metadoc interfaces with the Monaco Editor using a Scala.js facade based on the
 `monaco.d.ts` TypeScript type definition file provided as part of the
 `monaco-editor` NPM package. The facade can be generated with
 [scala-js-ts-importer], however, manual merging is necessary, since the facade
-contains several tweaks.
+contains several custom tweaks.
 
-The following instructions gives a .
+The following instructions give a rough idea how to upgrade the monaco editor
+facades:
 
  - Update the Monaco Editor version in `build.sbt`
    ```scala
