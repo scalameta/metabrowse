@@ -25,11 +25,8 @@ fi
 # Curated list of edits required for scala-js-ts-importer to parse monaco.d.ts
 sed \
    -e 's/): [^ ]* is [^; ]*;/): boolean;/' \
-   -e 's/BuiltinTheme = .*;/BuiltinTheme = string;/' \
    -e 's/: void | /: /' \
    -e 's/onDidChange?: IEvent<this>/onDidChange?: IEvent<CodeLensProvider>/' \
-   -e "s/\([a-zA-Z]\+[?]\?\): '[a-zA-Z0-9| '-]*'\([,;]\?\)$/\1: string\2/" \
-   -e 's/lineNumbers?: .*;/lineNumbers?: string/' \
    -e '/^declare module monaco.languages.\(typescript\|html\|css\|json\) {$/,/^}$/d' \
    < "$NPM_MONACO_D_TS" \
    > "$MONACO_D_TS"
