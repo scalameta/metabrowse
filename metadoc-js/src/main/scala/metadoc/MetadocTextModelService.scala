@@ -2,7 +2,6 @@ package metadoc
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.scalajs.js.annotation.ScalaJSDefined
 import monaco.Promise
 import monaco.Uri
 import monaco.editor.Editor
@@ -11,7 +10,6 @@ import monaco.services.ITextEditorModel
 import monaco.services.ITextModelService
 import monaco.services.ImmortalReference
 
-@ScalaJSDefined
 object MetadocTextModelService extends ITextModelService {
   def modelReference(
       filename: String

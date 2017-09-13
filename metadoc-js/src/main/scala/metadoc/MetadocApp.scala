@@ -13,8 +13,8 @@ import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom
 import org.scalajs.dom.Event
 
-object MetadocApp extends js.JSApp {
-  def main(): Unit = {
+object MetadocApp {
+  def main(args: Array[String]): Unit = {
     for {
       _ <- loadMonaco()
       indexBytes <- fetchBytes("metadoc.index")

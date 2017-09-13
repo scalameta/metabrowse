@@ -3,7 +3,6 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.annotation.ScalaJSDefined
 import monaco.Range
 import monaco.Promise
 import monaco.editor.IEditor
@@ -14,7 +13,6 @@ import monaco.services.IResourceInput
 import monaco.services.IEditorService
 import org.scalajs.dom
 
-@ScalaJSDefined
 class MetadocEditorService extends IEditorService {
   private lazy val editor: IStandaloneCodeEditor = {
     val app = dom.document.getElementById("editor")

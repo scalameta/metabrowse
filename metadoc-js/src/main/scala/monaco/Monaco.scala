@@ -29,7 +29,6 @@ trait Thenable[T] extends js.Object {
  */
 }
 
-@ScalaJSDefined
 trait IDisposable extends js.Object {
   def dispose(): Unit
 }
@@ -659,7 +658,6 @@ package editor {
     def get(): T = js.native
   }
 
-  @ScalaJSDefined
   trait IEditorOverrideServices extends js.Object {
     var editorService: services.IEditorService
     var textModelService: services.ITextModelService
@@ -2284,7 +2282,6 @@ package languages {
     var includeDeclaration: Boolean = js.native
   }
 
-  @ScalaJSDefined
   trait ReferenceProvider extends js.Object {
     def provideReferences(
         model: editor.IReadOnlyModel,
@@ -2294,10 +2291,8 @@ package languages {
     ): Thenable[js.Array[Location]]
   }
 
-  @ScalaJSDefined
   class Location(val uri: Uri, val range: IRange) extends js.Object
 
-  @ScalaJSDefined
   trait DefinitionProvider extends js.Object {
     def provideDefinition(
         model: editor.IReadOnlyModel,
@@ -2360,7 +2355,6 @@ package languages {
     def apply(value: SymbolKind): String = js.native
   }
 
-  @ScalaJSDefined
   class SymbolInformation(
       val name: String,
       val containerName: String,
@@ -2368,7 +2362,6 @@ package languages {
       val location: Location
   ) extends js.Object
 
-  @ScalaJSDefined
   trait DocumentSymbolProvider extends js.Object {
     def provideDocumentSymbols(
         model: editor.IReadOnlyModel,
@@ -2489,7 +2482,6 @@ package languages {
     ): ICodeLensSymbol | Thenable[ICodeLensSymbol] = js.native
   }
 
-  @ScalaJSDefined
   class ILanguageExtensionPoint(
       val id: String,
       val extensions: js.UndefOr[js.Array[String]] = js.undefined,

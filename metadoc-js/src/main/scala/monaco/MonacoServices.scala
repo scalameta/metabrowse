@@ -1,7 +1,6 @@
 package monaco
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.ScalaJSDefined
 import monaco.editor.{IEditor, IEditorOptions, IModel}
 import monaco.editor.Editor.IEditorViewState
 
@@ -21,12 +20,10 @@ import monaco.editor.Editor.IEditorViewState
   */
 package services {
 
-  @ScalaJSDefined
   trait IReference[T] extends IDisposable {
     def `object`: T
   }
 
-  @ScalaJSDefined
   class ImmortalReference[T](override val `object`: T) extends IReference[T] {
     override def dispose(): Unit = ()
   }
@@ -75,7 +72,6 @@ package services {
   @js.native
   trait IEditorControl extends js.Object {}
 
-  @ScalaJSDefined
   trait IEditorService extends js.Object {
     def openEditor(
         input: IResourceInput,
@@ -86,14 +82,12 @@ package services {
   /**
     * Service to dynamically load models.
     */
-  @ScalaJSDefined
   trait ITextModelService extends js.Object {
     def createModelReference(
         resource: Uri
     ): Promise[IReference[ITextEditorModel]]
   }
 
-  @ScalaJSDefined
   trait ITextEditorModel extends js.Object {
     def textEditorModel: IModel
   }
