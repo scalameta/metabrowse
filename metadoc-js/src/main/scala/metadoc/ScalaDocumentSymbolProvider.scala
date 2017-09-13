@@ -2,7 +2,6 @@ package metadoc
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
-import scala.scalajs.js.annotation._
 import metadoc.schema.Index
 import monaco.CancellationToken
 import monaco.editor.IReadOnlyModel
@@ -13,7 +12,6 @@ import org.langmeta.Denotation
 import org.langmeta.semanticdb.ResolvedSymbol
 import org.{langmeta => m}
 
-@ScalaJSDefined
 class ScalaDocumentSymbolProvider(index: Index)
     extends DocumentSymbolProvider {
   override def provideDocumentSymbols(

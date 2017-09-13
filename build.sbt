@@ -89,6 +89,7 @@ lazy val js = project
     moduleName := "metadoc-js",
     additionalNpmConfig in Compile := Map("private" -> bool(true)),
     additionalNpmConfig in Test := additionalNpmConfig.in(Test).value,
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     scalaJSUseMainModuleInitializer := true,
     version in webpack := "2.6.1",
     version in installWebpackDevServer := "2.2.0",

@@ -3,7 +3,6 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.annotation._
 import org.langmeta.Document
 import metadoc.schema.Index
 import monaco.{CancellationToken, Position}
@@ -12,7 +11,6 @@ import monaco.languages.{Location, ReferenceContext, ReferenceProvider}
 import metadoc.{schema => d}
 import monaco.editor.IModel
 
-@ScalaJSDefined
 class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
   override def provideReferences(
       model: IReadOnlyModel,
