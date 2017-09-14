@@ -18,6 +18,7 @@ import caseapp.{Name => _, _}
 import java.nio.file.attribute.BasicFileAttributes
 import java.util
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
@@ -79,6 +80,7 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
   private val semanticdb = target.resolve("semanticdb")
   private val symbolRoot = target.resolve("symbol")
   private type Symbol = String
+  private val filenames = new ConcurrentSkipListSet[String]()
   private val symbols =
     new ConcurrentHashMap[Symbol, AtomicReference[d.Symbol]]()
   private val mappingFunction =
@@ -140,6 +142,7 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
               .resolveSibling(out.toNIO.getFileName.toString + ".semanticdb"),
             s.Database(document :: Nil).toByteArray
           )
+          filenames.add(document.filename)
         }
       } catch {
         case NonFatal(e) =>
@@ -183,17 +186,6 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
     }
   }
 
-  def writeFilesnames(): Unit = {
-    import scala.collection.JavaConverters._
-    val index = d.Index(files = filenames.asScala.toSeq)
-    Files.write(
-      target.resolve("metadoc.index").toNIO,
-      index.toByteArray,
-      StandardOpenOption.TRUNCATE_EXISTING,
-      StandardOpenOption.CREATE
-    )
-  }
-
   def writeAssets(): Unit = {
     val root = target.toNIO
     val inputStream = MetadocCli.getClass.getClassLoader
@@ -227,6 +219,12 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
       }
   }
 
+  def writeWorkspace(): Unit = {
+    import scala.collection.JavaConverters._
+    val workspace = d.Workspace(filenames.asScala.toSeq)
+    overwrite(target.resolve("index.workspace").toNIO, workspace.toByteArray)
+  }
+
   def run(): Unit = {
     try {
       display.init()
@@ -234,6 +232,7 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
       buildSymbolIndex()
       writeSymbolIndex()
       writeAssets()
+      writeWorkspace()
     } finally {
       display.stop()
       onClose()

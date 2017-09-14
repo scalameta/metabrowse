@@ -40,7 +40,7 @@ object MetadocTextModelService extends ITextModelService {
       Future.successful(document(model))
     } else {
       for {
-        Some(doc) <- MetadocAttributeService.fetchProtoDocument(resource.path)
+        Some(doc) <- MetadocFetchService.fetchProtoDocument(resource.path)
       } yield {
         val model = Editor.createModel(doc.contents, "scala", resource)
         modelDocument(model) = doc

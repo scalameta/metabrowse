@@ -23,3 +23,7 @@ message Range {
 message Ranges {
     repeated Range ranges = 1;
 }
+
+message Workspace {
+    repeated string filenames = 1;
+}

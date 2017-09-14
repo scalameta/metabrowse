@@ -9,12 +9,10 @@ import scala.scalajs.js.typedarray.TypedArrayBuffer
 import monaco.Uri
 import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
-import org.langmeta.internal.semanticdb.schema.Database
 import org.scalajs.dom
 import org.scalajs.dom.Event
 import metadoc.{schema => d}
 import org.langmeta.internal.semanticdb.schema.Document
-import org.langmeta.semanticdb.ResolvedName
 
 case class MetadocState(document: s.Document)
 
@@ -28,19 +26,19 @@ class MetadocRoot(init: MetadocState) extends MetadocIndex {
     }
   override def document: Document = state.document
   override def symbol(sym: String): Future[Option[schema.Symbol]] =
-    MetadocAttributeService.fetchSymbol(sym)
+    MetadocFetchService.fetchSymbol(sym)
   override def semanticdb(sym: String): Future[Option[s.Document]] =
-    MetadocAttributeService.fetchProtoDocument(sym)
+    MetadocFetchService.fetchProtoDocument(sym)
 }
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {
     for {
       _ <- loadMonaco()
-      Some(document) <- MetadocAttributeService
-        .fetchProtoDocument(
-          "paiges/core/src/main/scala/org/typelevel/paiges/Doc.scala"
-        )
+      workspace <- MetadocFetchService.fetchWorkspace()
+      Some(document) <- MetadocFetchService.fetchProtoDocument(
+        workspace.filenames.head
+      )
     } {
       val root = new MetadocRoot(MetadocState(document))
       registerLanguageExtensions(root)

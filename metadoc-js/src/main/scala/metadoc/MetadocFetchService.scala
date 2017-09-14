@@ -8,7 +8,7 @@ import org.langmeta.internal.semanticdb._
 import metadoc.MetadocApp._
 import metadoc.{schema => d}
 
-object MetadocAttributeService {
+object MetadocFetchService {
 
   def or404[T]: PartialFunction[Throwable, Option[T]] = {
     case _: NoSuchElementException => None // 404, not found
@@ -23,6 +23,14 @@ object MetadocAttributeService {
     }
   }.recover(or404)
 
+  def fetchWorkspace(): Future[d.Workspace] = {
+    for {
+      bytes <- fetchBytes("index.workspace")
+    } yield {
+      d.Workspace.parseFrom(bytes)
+    }
+
+  }
   def fetchProtoDocument(filename: String): Future[Option[s.Document]] = {
     val url = "semanticdb/" + filename + ".semanticdb"
     for {

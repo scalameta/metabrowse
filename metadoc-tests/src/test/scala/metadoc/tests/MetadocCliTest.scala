@@ -29,22 +29,22 @@ class MetadocCliTest
     MetadocCli.run(options, RemainingArgs(files, Nil))
   }
 
+  val expectedFiles =
+    """paiges/core/src/main/scala/org/typelevel/paiges/Chunk.scala.semanticdb
+      |paiges/core/src/main/scala/org/typelevel/paiges/Doc.scala.semanticdb
+      |paiges/core/src/main/scala/org/typelevel/paiges/Document.scala.semanticdb
+      |paiges/core/src/main/scala/org/typelevel/paiges/package.scala.semanticdb
+      |paiges/core/src/test/scala/org/typelevel/paiges/DocumentTests.scala.semanticdb
+      |paiges/core/src/test/scala/org/typelevel/paiges/Generators.scala.semanticdb
+      |paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala.semanticdb
+      |paiges/core/src/test/scala/org/typelevel/paiges/PaigesTest.scala.semanticdb
+    """.stripMargin
   test("target/semanticdb") {
     val obtained = FileIO
       .listAllFilesRecursively(out.resolve("semanticdb"))
       .files
       .sortBy(_.toString())
-    val expected =
-      """paiges/core/src/main/scala/org/typelevel/paiges/Chunk.scala.semanticdb
-        |paiges/core/src/main/scala/org/typelevel/paiges/Doc.scala.semanticdb
-        |paiges/core/src/main/scala/org/typelevel/paiges/Document.scala.semanticdb
-        |paiges/core/src/main/scala/org/typelevel/paiges/package.scala.semanticdb
-        |paiges/core/src/test/scala/org/typelevel/paiges/DocumentTests.scala.semanticdb
-        |paiges/core/src/test/scala/org/typelevel/paiges/Generators.scala.semanticdb
-        |paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala.semanticdb
-        |paiges/core/src/test/scala/org/typelevel/paiges/PaigesTest.scala.semanticdb
-      """.stripMargin
-    assertNoDiff(obtained.mkString("\n"), expected)
+    assertNoDiff(obtained.mkString("\n"), expectedFiles)
   }
 
   test("target/symbol") {
@@ -227,6 +227,16 @@ class MetadocCliTest
          |_root_.org.typelevel.paiges.package.call(Ljava/lang/Object;Lscala/collection/immutable/List;)Ljava/lang/Object;.A#
       """.stripMargin
     assertNoDiff(obtained, expected)
+  }
+
+  test("target/index.workspace") {
+    val workspacePath = out.resolve("index.workspace")
+    assert(Files.exists(workspacePath.toNIO))
+    val workspace = d.Workspace.parseFrom(workspacePath.readAllBytes)
+    assert(workspace.filenames.nonEmpty)
+    expectedFiles.lines.filter(_.trim.nonEmpty).foreach { file =>
+      assert(workspace.filenames.contains(file.stripSuffix(".semanticdb")))
+    }
   }
 
 }
