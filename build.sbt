@@ -200,6 +200,14 @@ lazy val tests = project
   .settings(
     noPublish,
     buildInfoPackage := "metadoc.tests",
+    compileInputs.in(Test, compile) :=
+      compileInputs
+        .in(Test, compile)
+        .dependsOn(
+          compile.in(example, Compile),
+          compile.in(example, Test)
+        )
+        .value,
     libraryDependencies += "org.scalameta" %% "testkit" % Version.scalameta % Test,
     buildInfoKeys := Seq[BuildInfoKey](
       "exampleClassDirectory" -> List(
@@ -208,7 +216,7 @@ lazy val tests = project
       )
     )
   )
-  .dependsOn(cli, example % Test)
+  .dependsOn(cli)
   .enablePlugins(BuildInfoPlugin)
 
 lazy val noPublish = allSettings ++ Seq(
