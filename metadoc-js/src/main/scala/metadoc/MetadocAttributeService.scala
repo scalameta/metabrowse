@@ -9,6 +9,11 @@ import metadoc.MetadocApp._
 import metadoc.{schema => d}
 
 object MetadocAttributeService {
+
+  def or404[T]: PartialFunction[Throwable, Option[T]] = {
+    case _: NoSuchElementException => None // 404, not found
+  }
+
   def fetchSymbol(symbolId: String): Future[Option[d.Symbol]] = {
     val url = "symbol/" + JSSha512.sha512(symbolId)
     for {
@@ -16,25 +21,14 @@ object MetadocAttributeService {
     } yield {
       Some(d.Symbol.parseFrom(bytes))
     }
-  }.recover {
-    case _: NoSuchElementException => None // 404, not found
-  }
+  }.recover(or404)
 
-  def fetchProtoDocument(filename: String): Future[s.Document] = {
-    val url = "semanticdb/" + filename.replace(".scala", ".semanticdb")
+  def fetchProtoDocument(filename: String): Future[Option[s.Document]] = {
+    val url = "semanticdb/" + filename + ".semanticdb"
     for {
       bytes <- fetchBytes(url)
     } yield {
-      s.Database.parseFrom(bytes).documents.head
+      Some(s.Database.parseFrom(bytes).documents.head)
     }
-  }
-
-  def fetchDocument(filename: String): Future[Document] = {
-    for {
-      sdoc <- fetchProtoDocument(filename)
-    } yield {
-      val db = s.Database(List(sdoc)).toDb(None)
-      db.documents.head
-    }
-  }
+  }.recover(or404)
 }

@@ -3,30 +3,49 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Promise
-import org.langmeta._
+import org.langmeta.internal.semanticdb.{schema => s}
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.TypedArrayBuffer
-import metadoc.schema.Index
 import monaco.Uri
 import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
+import org.langmeta.internal.semanticdb.schema.Database
 import org.scalajs.dom
 import org.scalajs.dom.Event
+import metadoc.{schema => d}
+import org.langmeta.internal.semanticdb.schema.Document
+import org.langmeta.semanticdb.ResolvedName
+
+case class MetadocState(document: s.Document)
+
+class MetadocRoot(init: MetadocState) extends MetadocIndex {
+  // TODO(olafur) find way to avoid mutating root.
+  var state: MetadocState = init
+  def definition(symbol: String): Option[d.Position] =
+    state.document.names.collectFirst {
+      case s.ResolvedName(Some(s.Position(start, end)), `symbol`, true) =>
+        d.Position(state.document.filename, start, end)
+    }
+  override def document: Document = state.document
+  override def symbol(sym: String): Future[Option[schema.Symbol]] =
+    MetadocAttributeService.fetchSymbol(sym)
+  override def semanticdb(sym: String): Future[Option[s.Document]] =
+    MetadocAttributeService.fetchProtoDocument(sym)
+}
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {
     for {
       _ <- loadMonaco()
-      indexBytes <- fetchBytes("metadoc.index")
+      Some(document) <- MetadocAttributeService
+        .fetchProtoDocument(
+          "paiges/core/src/main/scala/org/typelevel/paiges/Doc.scala"
+        )
     } {
-      val index = Index.parseFrom(indexBytes)
-
-      registerLanguageExtensions(index)
-
-      val editorService = new MetadocEditorService()
-      val input = parseResourceInput(
-        index.files.find(_.endsWith("Doc.scala")).get
-      )
+      val root = new MetadocRoot(MetadocState(document))
+      registerLanguageExtensions(root)
+      val editorService = new MetadocEditorService(root)
+      val input = parseResourceInput(document.filename)
       openEditor(editorService, input)
     }
   }
@@ -46,7 +65,7 @@ object MetadocApp {
     dom.window.location.hash = "#/" + uri.path
   }
 
-  def registerLanguageExtensions(index: Index): Unit = {
+  def registerLanguageExtensions(root: MetadocRoot): Unit = {
     monaco.languages.Languages.register(ScalaLanguageExtensionPoint)
     monaco.languages.Languages.setMonarchTokensProvider(
       ScalaLanguageExtensionPoint.id,
@@ -58,15 +77,15 @@ object MetadocApp {
     )
     monaco.languages.Languages.registerDefinitionProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaDefinitionProvider(index)
+      new ScalaDefinitionProvider(root)
     )
     monaco.languages.Languages.registerReferenceProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaReferenceProvider(index)
+      new ScalaReferenceProvider(root)
     )
     monaco.languages.Languages.registerDocumentSymbolProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaDocumentSymbolProvider(index)
+      new ScalaDocumentSymbolProvider(root)
     )
   }
 
@@ -89,7 +108,7 @@ object MetadocApp {
   def fetchBytes(url: String): Future[Array[Byte]] = {
     for {
       response <- dom.experimental.Fetch.fetch(url).toFuture
-      if response.status == 200
+      _ = require(response.status == 200, s"${response.status} != 200")
       buffer <- response.arrayBuffer().toFuture
     } yield {
       val bytes = Array.ofDim[Byte](buffer.byteLength)

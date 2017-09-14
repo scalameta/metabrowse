@@ -35,14 +35,14 @@ class MetadocCliTest
       .files
       .sortBy(_.toString())
     val expected =
-      """paiges/core/src/main/scala/org/typelevel/paiges/Chunk.scala
-        |paiges/core/src/main/scala/org/typelevel/paiges/Doc.scala
-        |paiges/core/src/main/scala/org/typelevel/paiges/Document.scala
-        |paiges/core/src/main/scala/org/typelevel/paiges/package.scala
-        |paiges/core/src/test/scala/org/typelevel/paiges/DocumentTests.scala
-        |paiges/core/src/test/scala/org/typelevel/paiges/Generators.scala
-        |paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala
-        |paiges/core/src/test/scala/org/typelevel/paiges/PaigesTest.scala
+      """paiges/core/src/main/scala/org/typelevel/paiges/Chunk.scala.semanticdb
+        |paiges/core/src/main/scala/org/typelevel/paiges/Doc.scala.semanticdb
+        |paiges/core/src/main/scala/org/typelevel/paiges/Document.scala.semanticdb
+        |paiges/core/src/main/scala/org/typelevel/paiges/package.scala.semanticdb
+        |paiges/core/src/test/scala/org/typelevel/paiges/DocumentTests.scala.semanticdb
+        |paiges/core/src/test/scala/org/typelevel/paiges/Generators.scala.semanticdb
+        |paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala.semanticdb
+        |paiges/core/src/test/scala/org/typelevel/paiges/PaigesTest.scala.semanticdb
       """.stripMargin
     assertNoDiff(obtained.mkString("\n"), expected)
   }
@@ -227,13 +227,6 @@ class MetadocCliTest
          |_root_.org.typelevel.paiges.package.call(Ljava/lang/Object;Lscala/collection/immutable/List;)Ljava/lang/Object;.A#
       """.stripMargin
     assertNoDiff(obtained, expected)
-  }
-
-  test("target/metadoc.index") {
-    val path = out.resolve("metadoc.index")
-    assert(Files.exists(path.toNIO))
-    val index = d.Index.parseFrom(path.readAllBytes)
-    assert(index.files.length == 8) // should match filesnames in "ls target/semanaticdb"
   }
 
 }

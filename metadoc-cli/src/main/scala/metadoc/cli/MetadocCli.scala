@@ -3,6 +3,8 @@ package metadoc.cli
 import java.io.File
 import java.io.OutputStreamWriter
 import java.io.PrintStream
+import java.net.URI
+import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
@@ -14,8 +16,8 @@ import org.langmeta._
 import org.langmeta.internal.io.PathIO
 import caseapp.{Name => _, _}
 import java.nio.file.attribute.BasicFileAttributes
+import java.util
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
@@ -24,8 +26,8 @@ import java.{util => ju}
 import scala.collection.GenSeq
 import scala.collection.mutable.ArrayBuffer
 import scala.util.control.NonFatal
-import caseapp.{Name => _}
 import caseapp._
+import caseapp.{Name => _}
 import metadoc.schema
 import metadoc.{schema => d}
 import org.langmeta._
@@ -42,14 +44,34 @@ case class MetadocOptions(
         "All files will be deleted so be careful."
     )
     cleanTargetFirst: Boolean = false,
+    @HelpMessage(
+      "Experimental. Emit metadoc.zip file instead of static files."
+    )
+    zip: Boolean = false,
     @HelpMessage("Disable fancy progress bar")
     nonInteractive: Boolean = false
 )
 
+case class Target(target: AbsolutePath, onClose: () => Unit)
+
 class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
-  val target = AbsolutePath(
-    options.target.getOrElse(sys.error("--target is required"))
-  )
+  require(options.target.isDefined, "--target is required")
+  type Target = (AbsolutePath, () => Unit)
+
+  val Target(target, onClose) = if (options.zip) {
+    val out = AbsolutePath(options.target.get).resolve("metadoc.zip")
+    Files.createDirectories(out.toNIO.getParent)
+    val zipfs = FileSystems.newFileSystem(
+      URI.create(s"jar:file:${out.toURI.getPath}"), {
+        val env = new util.HashMap[String, String]()
+        env.put("create", "true")
+        env
+      }
+    )
+    Target(AbsolutePath(zipfs.getPath("/")), () => zipfs.close())
+  } else {
+    Target(AbsolutePath(options.target.get), () => ())
+  }
   private val display = new TermDisplay(
     new OutputStreamWriter(System.out),
     fallbackMode = options.nonInteractive || TermDisplay.defaultFallbackMode
@@ -57,7 +79,6 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
   private val semanticdb = target.resolve("semanticdb")
   private val symbolRoot = target.resolve("symbol")
   private type Symbol = String
-  private val filenames = new ConcurrentSkipListSet[String]()
   private val symbols =
     new ConcurrentHashMap[Symbol, AtomicReference[d.Symbol]]()
   private val mappingFunction =
@@ -114,8 +135,11 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
           }
           val out = semanticdb.resolve(document.filename)
           Files.createDirectories(out.toNIO.getParent)
-          Files.write(out.toNIO, s.Database(document :: Nil).toByteArray)
-          filenames.add(document.filename)
+          overwrite(
+            out.toNIO
+              .resolveSibling(out.toNIO.getFileName.toString + ".semanticdb"),
+            s.Database(document :: Nil).toByteArray
+          )
         }
       } catch {
         case NonFatal(e) =>
@@ -125,6 +149,15 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
           e.printStackTrace(new PrintStream(System.err))
       }
     }
+  }
+
+  private def overwrite(out: Path, bytes: Array[Byte]): Unit = {
+    Files.write(
+      out,
+      bytes,
+      StandardOpenOption.TRUNCATE_EXISTING,
+      StandardOpenOption.CREATE
+    )
   }
 
   def writeSymbolIndex(): Unit = {
@@ -195,13 +228,16 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
   }
 
   def run(): Unit = {
-    display.init()
-    Files.createDirectories(target.toNIO)
-    buildSymbolIndex()
-    writeSymbolIndex()
-    writeFilesnames()
-    writeAssets()
-    display.stop()
+    try {
+      display.init()
+      Files.createDirectories(target.toNIO)
+      buildSymbolIndex()
+      writeSymbolIndex()
+      writeAssets()
+    } finally {
+      display.stop()
+      onClose()
+    }
   }
 }
 

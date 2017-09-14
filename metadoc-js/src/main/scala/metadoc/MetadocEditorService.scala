@@ -13,7 +13,7 @@ import monaco.services.IResourceInput
 import monaco.services.IEditorService
 import org.scalajs.dom
 
-class MetadocEditorService extends IEditorService {
+class MetadocEditorService(root: MetadocRoot) extends IEditorService {
   private lazy val editor: IStandaloneCodeEditor = {
     val app = dom.document.getElementById("editor")
     app.innerHTML = ""
@@ -37,9 +37,13 @@ class MetadocEditorService extends IEditorService {
   def open(input: IResourceInput): Future[IStandaloneCodeEditor] = {
     val selection = input.options.selection
     for {
-      model <- MetadocTextModelService.modelReference(input.resource)
+      EditorDocument(document, model) <- MetadocTextModelService
+        .modelReference(
+          input.resource
+        )
     } yield {
       editor.setModel(model.`object`.textEditorModel)
+      root.state = root.state.copy(document = document)
       selection.foreach {
         case range: Range =>
           val pos = range.getStartPosition()

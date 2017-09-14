@@ -3,15 +3,14 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
-import org.langmeta.Document
-import metadoc.schema.Index
-import monaco.{CancellationToken, Position}
 import monaco.editor.IReadOnlyModel
-import monaco.languages.{Location, ReferenceContext, ReferenceProvider}
-import metadoc.{schema => d}
-import monaco.editor.IModel
+import monaco.languages.Location
+import monaco.languages.ReferenceContext
+import monaco.languages.ReferenceProvider
+import monaco.CancellationToken
+import monaco.Position
 
-class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
+class ScalaReferenceProvider(root: MetadocRoot) extends ReferenceProvider {
   override def provideReferences(
       model: IReadOnlyModel,
       position: Position,
@@ -20,14 +19,9 @@ class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
   ) = {
     val offset = model.getOffsetAt(position).toInt
     for {
-      doc <- MetadocAttributeService.fetchDocument(model.uri.path)
-      id = IndexLookup.findSymbol(offset, doc, index).map(_.symbol)
-      // Monad transformers might come in handy here.
-      symbol <- id.fold(Future.successful(Option.empty[d.Symbol]))(
-        MetadocAttributeService.fetchSymbol
-      )
+      sym <- root.fetchSymbol(offset)
       locations <- Future.sequence {
-        val references = symbol.map(_.references).getOrElse(Map.empty)
+        val references = sym.map(_.references).getOrElse(Map.empty)
         references.map {
           case (filename, ranges) =>
             // Create the model for each reference. A reference can come from
@@ -35,12 +29,13 @@ class ScalaReferenceProvider(index: Index) extends ReferenceProvider {
             // correct range selection.
             MetadocTextModelService
               .modelReference(createUri(filename))
-              .map { model =>
-                ranges.ranges.map { range =>
-                  model.`object`.textEditorModel.resolveLocation(
-                    schema.Position(filename, range.start, range.end)
-                  )
-                }
+              .map {
+                case EditorDocument(_, model) =>
+                  ranges.ranges.map { range =>
+                    model.`object`.textEditorModel.resolveLocation(
+                      schema.Position(filename, range.start, range.end)
+                    )
+                  }
               }
         }
       }

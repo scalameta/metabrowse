@@ -1,46 +1,51 @@
 package metadoc
 
-import org.langmeta.Document
-import org.langmeta.ResolvedName
-import metadoc.schema.{Index, Position, Symbol, Range}
+import scala.concurrent.Future
+import metadoc.{schema => d}
+import org.{langmeta => m}
+import org.langmeta.internal.semanticdb.{schema => s}
+import scala.concurrent.ExecutionContext.Implicits.global
 
-object IndexLookup {
-  def findDefinition(
-      offset: Int,
-      doc: Document,
-      index: Index
-  ): Option[Position] =
-    findSymbol(offset, doc, index).flatMap(_.definition)
-
-  def findReferences(
-      offset: Int,
-      includeDeclaration: Boolean,
-      doc: Document,
-      index: Index,
-      filename: String
-  ): Seq[Position] =
-    findSymbol(offset, doc, index).toSeq.flatMap {
-      case Symbol(_, definition, references) =>
-        references
-          .get(filename)
-          .toSeq
-          .flatMap(
-            _.ranges.map(r => Position(filename, r.start, r.end))
-          ) ++
-          definition.filter(_ => includeDeclaration)
+trait MetadocIndex {
+  def document: s.Document
+  def resolve(offset: Int): Option[s.ResolvedName] =
+    document.names.collectFirst {
+      case name @ s.ResolvedName(Some(pos), _, _)
+          if pos.start <= offset && offset <= pos.end =>
+        name
     }
+  def fetchSymbol(offset: Int): Future[Option[d.Symbol]] =
+    resolve(offset).fold(Future.successful(Option.empty[d.Symbol])) {
+      case s.ResolvedName(_, sym, _) =>
+        m.Symbol(sym) match {
+          case m.Symbol.Global(_, _) =>
+            symbol(sym)
+          case _ =>
+            // resolve from active document
+            val names = document.names.filter(_.symbol == sym)
+            val dsymbol = d.Symbol(
+              sym,
+              definition = names.collectFirst {
+                case s.ResolvedName(Some(s.Position(start, end)), _, true) =>
+                  d.Position(document.filename, start, end)
+              },
+              references = Map(
+                document.filename -> d.Ranges(
+                  names.collect {
+                    case s.ResolvedName(
+                        Some(s.Position(start, end)),
+                        _,
+                        false
+                        ) =>
+                      d.Range(start, end)
+                  }
+                )
+              )
+            )
+            Future.successful(Some(dsymbol))
+        }
 
-  def findSymbol(
-      offset: Int,
-      doc: Document,
-      index: Index
-  ): Option[Symbol] =
-    for {
-      name <- doc.names.collectFirst {
-        case ResolvedName(pos, sym, _)
-            if pos.start <= offset && offset <= pos.end =>
-          sym.syntax
-      }
-      symbol <- index.symbols.find(_.symbol == name)
-    } yield symbol
+    }
+  def symbol(sym: String): Future[Option[d.Symbol]]
+  def semanticdb(sym: String): Future[Option[s.Document]]
 }

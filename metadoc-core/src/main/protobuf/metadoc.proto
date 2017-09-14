@@ -14,6 +14,7 @@ message Symbol {
     reserved 3;
     map<string, Ranges> references = 4;
 }
+
 message Range {
     int32 start = 2;
     int32 end = 3;
@@ -21,9 +22,4 @@ message Range {
 
 message Ranges {
     repeated Range ranges = 1;
-}
-
-message Index {
-    repeated string files = 1;
-    repeated Symbol symbols = 2;
 }
