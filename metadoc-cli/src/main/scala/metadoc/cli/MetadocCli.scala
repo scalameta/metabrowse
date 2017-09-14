@@ -4,6 +4,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
+import java.util.zip.{ZipEntry, ZipInputStream}
 import scala.collection.mutable
 import org.langmeta._
 import org.langmeta.internal.io.PathIO
@@ -121,9 +122,44 @@ object MetadocCli extends CaseApp[MetadocOptions] {
         site.index.toByteArray
       )
     }
+
+    def assets(): Unit = {
+      val root = target.toNIO
+      val inputStream = MetadocCli.getClass.getClassLoader
+        .getResourceAsStream("metadoc-assets.zip")
+      if (inputStream == null)
+        sys.error("Failed to locate metadoc-assets.zip on the classpath")
+      val zipStream = new ZipInputStream(inputStream)
+      val bytes = new Array[Byte](8012)
+
+      Stream
+        .continually(zipStream.getNextEntry)
+        .takeWhile(_ != null)
+        .filterNot(_.isDirectory)
+        .foreach { entry =>
+          val path = root.resolve(entry.getName)
+          if (Files.notExists(path))
+            Files.createDirectories(path.getParent)
+          val out = Files.newOutputStream(path, StandardOpenOption.CREATE)
+
+          def copyLoop: Unit = {
+            val read = zipStream.read(bytes, 0, bytes.length)
+            if (read > 0) {
+              out.write(bytes, 0, read)
+              copyLoop
+            }
+          }
+
+          copyLoop
+          out.flush()
+          out.close()
+        }
+    }
+
     semanticdb()
     symbol()
     index()
+    assets()
   }
 
   def run(options: MetadocOptions, remainingArgs: RemainingArgs): Unit = {
