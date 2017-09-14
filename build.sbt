@@ -78,7 +78,16 @@ lazy val cli = project
     libraryDependencies ++= List(
       "com.github.alexarchambault" %% "case-app" % "1.2.0-M3",
       "com.github.pathikrit" %% "better-files" % "3.0.0"
-    )
+    ),
+    resourceGenerators in Compile += Def.task {
+      val zip = (resourceManaged in Compile).value / "metadoc-assets.zip"
+      val _ = (webpack in (js, Compile, fullOptJS)).value
+      val assetsDirectory = (target in js).value / "app"
+      val paths: PathFinder = (assetsDirectory.*** --- assetsDirectory)
+      val mappings = paths.get pair relativeTo(assetsDirectory)
+      IO.zip(mappings, zip)
+      Seq(zip)
+    }.taskValue
   )
   .dependsOn(coreJVM)
 
