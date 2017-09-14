@@ -83,11 +83,8 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
   private val filenames = new ConcurrentSkipListSet[String]()
   private val symbols =
     new ConcurrentHashMap[Symbol, AtomicReference[d.Symbol]]()
-  private val mappingFunction =
-    new JFunction[Symbol, AtomicReference[d.Symbol]] {
-      override def apply(t: Symbol): AtomicReference[schema.Symbol] =
-        new AtomicReference(d.Symbol(symbol = t))
-    }
+  private val mappingFunction: JFunction[Symbol, AtomicReference[d.Symbol]] =
+    t => new AtomicReference(d.Symbol(symbol = t))
   private def addDefinition(symbol: Symbol, position: d.Position): Unit = {
     val value = symbols.computeIfAbsent(symbol, mappingFunction)
     value.getAndUpdate(new UnaryOperator[d.Symbol] {
@@ -152,6 +149,7 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
           e.printStackTrace(new PrintStream(System.err))
       }
     }
+    display.completedTask(task, success = true)
   }
 
   private def overwrite(out: Path, bytes: Array[Byte]): Unit = {
@@ -184,6 +182,7 @@ class CliRunner(paths: GenSeq[AbsolutePath], options: MetadocOptions) {
           )
         }
     }
+    display.completedTask(task, success = true)
   }
 
   def writeAssets(): Unit = {

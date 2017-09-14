@@ -69,11 +69,11 @@ object Terminal {
 
 object TermDisplay {
   def defaultFallbackMode: Boolean = {
-    val env0 = sys.env.get("COURSIER_PROGRESS").map(_.toLowerCase).collect {
+    val env0 = sys.env.get("METADOC_PROGRESS").map(_.toLowerCase).collect {
       case "true" | "enable" | "1" => true
       case "false" | "disable" | "0" => false
     }
-    def compatibilityEnv = sys.env.get("COURSIER_NO_TERM").nonEmpty
+    def compatibilityEnv = sys.env.get("METADOC_NO_TERM").nonEmpty
 
     def nonInteractive = System.console() == null
 
@@ -422,11 +422,9 @@ object TermDisplay {
 
 object Cache {
   trait Logger {
-    def foundLocally(url: String, f: File): Unit = {}
     def startTask(url: String, file: File): Unit = {}
     def taskProgress(url: String, downloaded: Long): Unit = {}
     def completedTask(url: String, success: Boolean): Unit = {}
-    def checkingUpdates(url: String, currentTimeOpt: Option[Long]): Unit = {}
   }
 }
 
@@ -495,16 +493,6 @@ class TermDisplay(
   }
 
   override def completedTask(url: String, success: Boolean): Unit =
-    updateThread.removeEntry(url, success, s"Downloaded $url\n")(x => x)
-
-  override def checkingUpdates(
-      url: String,
-      currentTimeOpt: Option[Long]
-  ): Unit =
-    updateThread.newEntry(
-      url,
-      CheckUpdateInfo(currentTimeOpt, None, isDone = false),
-      s"Checking $url\n"
-    )
+    updateThread.removeEntry(url, success, s"Completed $url\n")(x => x)
 
 }
