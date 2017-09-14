@@ -13,11 +13,6 @@ import monaco.services.ITextModelService
 import monaco.services.ImmortalReference
 import org.langmeta.internal.semanticdb.{schema => s}
 
-case class EditorDocument(
-    document: s.Document,
-    model: IReference[ITextEditorModel]
-)
-
 object MetadocTextModelService extends ITextModelService {
   def modelReference(
       filename: String
@@ -27,20 +22,20 @@ object MetadocTextModelService extends ITextModelService {
   private val modelDocument = mutable.Map.empty[IModel, s.Document]
 
   private def document(model: IModel) =
-    EditorDocument(
+    MetadocMonacoDocument(
       modelDocument(model),
       new ImmortalReference(ITextEditorModel(model))
     )
 
   def modelReference(
       resource: Uri
-  ): Future[EditorDocument] = {
+  ): Future[MetadocMonacoDocument] = {
     val model = Editor.getModel(resource)
     if (model != null) {
       Future.successful(document(model))
     } else {
       for {
-        Some(doc) <- MetadocFetchService.fetchProtoDocument(resource.path)
+        Some(doc) <- MetadocFetch.document(resource.path)
       } yield {
         val model = Editor.createModel(doc.contents, "scala", resource)
         modelDocument(model) = doc

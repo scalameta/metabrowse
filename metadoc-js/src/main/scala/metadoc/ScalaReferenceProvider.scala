@@ -10,7 +10,8 @@ import monaco.languages.ReferenceProvider
 import monaco.CancellationToken
 import monaco.Position
 
-class ScalaReferenceProvider(root: MetadocRoot) extends ReferenceProvider {
+class ScalaReferenceProvider(index: MetadocSemanticdbIndex)
+    extends ReferenceProvider {
   override def provideReferences(
       model: IReadOnlyModel,
       position: Position,
@@ -19,7 +20,7 @@ class ScalaReferenceProvider(root: MetadocRoot) extends ReferenceProvider {
   ) = {
     val offset = model.getOffsetAt(position).toInt
     for {
-      sym <- root.fetchSymbol(offset)
+      sym <- index.fetchSymbol(offset)
       locations <- Future.sequence {
         val references = sym.map(_.references).getOrElse(Map.empty)
         references.map {
@@ -30,7 +31,7 @@ class ScalaReferenceProvider(root: MetadocRoot) extends ReferenceProvider {
             MetadocTextModelService
               .modelReference(createUri(filename))
               .map {
-                case EditorDocument(_, model) =>
+                case MetadocMonacoDocument(_, model) =>
                   ranges.ranges.map { range =>
                     model.`object`.textEditorModel.resolveLocation(
                       schema.Position(filename, range.start, range.end)

@@ -3,7 +3,6 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Promise
-import org.langmeta.internal.semanticdb.{schema => s}
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.TypedArrayBuffer
 import monaco.Uri
@@ -11,38 +10,19 @@ import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom
 import org.scalajs.dom.Event
-import metadoc.{schema => d}
-import org.langmeta.internal.semanticdb.schema.Document
-
-case class MetadocState(document: s.Document)
-
-class MetadocRoot(init: MetadocState) extends MetadocIndex {
-  // TODO(olafur) find way to avoid mutating root.
-  var state: MetadocState = init
-  def definition(symbol: String): Option[d.Position] =
-    state.document.names.collectFirst {
-      case s.ResolvedName(Some(s.Position(start, end)), `symbol`, true) =>
-        d.Position(state.document.filename, start, end)
-    }
-  override def document: Document = state.document
-  override def symbol(sym: String): Future[Option[schema.Symbol]] =
-    MetadocFetchService.fetchSymbol(sym)
-  override def semanticdb(sym: String): Future[Option[s.Document]] =
-    MetadocFetchService.fetchProtoDocument(sym)
-}
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {
     for {
       _ <- loadMonaco()
-      workspace <- MetadocFetchService.fetchWorkspace()
-      Some(document) <- MetadocFetchService.fetchProtoDocument(
+      workspace <- MetadocFetch.workspace()
+      Some(document) <- MetadocFetch.document(
         workspace.filenames.head
       )
     } {
-      val root = new MetadocRoot(MetadocState(document))
-      registerLanguageExtensions(root)
-      val editorService = new MetadocEditorService(root)
+      val index = new MutableBrowserIndex(MetadocState(document))
+      registerLanguageExtensions(index)
+      val editorService = new MetadocEditorService(index)
       val input = parseResourceInput(document.filename)
       openEditor(editorService, input)
     }
@@ -63,7 +43,7 @@ object MetadocApp {
     dom.window.location.hash = "#/" + uri.path
   }
 
-  def registerLanguageExtensions(root: MetadocRoot): Unit = {
+  def registerLanguageExtensions(index: MutableBrowserIndex): Unit = {
     monaco.languages.Languages.register(ScalaLanguageExtensionPoint)
     monaco.languages.Languages.setMonarchTokensProvider(
       ScalaLanguageExtensionPoint.id,
@@ -75,15 +55,15 @@ object MetadocApp {
     )
     monaco.languages.Languages.registerDefinitionProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaDefinitionProvider(root)
+      new ScalaDefinitionProvider(index)
     )
     monaco.languages.Languages.registerReferenceProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaReferenceProvider(root)
+      new ScalaReferenceProvider(index)
     )
     monaco.languages.Languages.registerDocumentSymbolProvider(
       ScalaLanguageExtensionPoint.id,
-      new ScalaDocumentSymbolProvider(root)
+      new ScalaDocumentSymbolProvider(index)
     )
   }
 

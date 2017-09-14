@@ -2,7 +2,6 @@ package metadoc
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
-import scala.scalajs.js.annotation._
 import monaco.CancellationToken
 import monaco.editor.IReadOnlyModel
 import monaco.languages.DocumentSymbolProvider
@@ -10,31 +9,24 @@ import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
 import org.langmeta.internal.semanticdb.{schema => s}
 import org.{langmeta => m}
-import metadoc.{schema => d}
 
-case class Info(
-    denotation: m.Denotation,
-    kind: SymbolKind,
-    definition: d.Position
-)
-
-class ScalaDocumentSymbolProvider(root: MetadocRoot)
+class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     extends DocumentSymbolProvider {
 
-  private def getInfos(doc: s.Document): Seq[Info] = {
+  private def getDocumentSymbols(doc: s.Document): Seq[DocumentSymbol] = {
     val denotations = doc.symbols.collect {
       case s.ResolvedSymbol(s, Some(d)) =>
         s -> m.Denotation(d.flags, d.name, d.signature, Nil)
     }.toMap
     val infos = for {
-      name <- root.state.document.names
+      name <- index.document.names
       if name.isDefinition
       symbol = m.Symbol(name.symbol)
       if symbol.isInstanceOf[m.Symbol.Global]
       denotation <- denotations.get(name.symbol)
       kind <- symbolKind(denotation)
-      definition <- root.definition(name.symbol)
-    } yield Info(denotation, kind, definition)
+      definition <- index.definition(name.symbol)
+    } yield DocumentSymbol(denotation, kind, definition)
     infos
   }
 
@@ -43,10 +35,10 @@ class ScalaDocumentSymbolProvider(root: MetadocRoot)
       token: CancellationToken
   ) = {
     for {
-      Some(doc) <- root.semanticdb(model.uri.path)
+      Some(doc) <- index.semanticdb(model.uri.path)
     } yield {
-      val symbols = getInfos(doc).map {
-        case Info(denotation, kind, definition) =>
+      val symbols = getDocumentSymbols(doc).map {
+        case DocumentSymbol(denotation, kind, definition) =>
           new SymbolInformation(
             name = denotation.name,
             containerName = denotation.signature,

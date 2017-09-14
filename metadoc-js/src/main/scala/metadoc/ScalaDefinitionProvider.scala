@@ -9,7 +9,8 @@ import monaco.languages.Location
 import monaco.CancellationToken
 import monaco.Position
 
-class ScalaDefinitionProvider(root: MetadocRoot) extends DefinitionProvider {
+class ScalaDefinitionProvider(index: MutableBrowserIndex)
+    extends DefinitionProvider {
   override def provideDefinition(
       model: IReadOnlyModel,
       position: Position,
@@ -18,7 +19,7 @@ class ScalaDefinitionProvider(root: MetadocRoot) extends DefinitionProvider {
     val offset = model.getOffsetAt(position).toInt
     def empty = Future.successful(js.Array[Location]())
     for {
-      symbol <- root.fetchSymbol(offset)
+      symbol <- index.fetchSymbol(offset)
       locations <- {
         symbol
           .map(_.definition)
