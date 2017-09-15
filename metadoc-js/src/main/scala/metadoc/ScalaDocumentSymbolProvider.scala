@@ -2,45 +2,55 @@ package metadoc
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
-import metadoc.schema.Index
 import monaco.CancellationToken
 import monaco.editor.IReadOnlyModel
 import monaco.languages.DocumentSymbolProvider
 import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
-import org.langmeta.Denotation
-import org.langmeta.semanticdb.ResolvedSymbol
+import org.langmeta.internal.semanticdb.{schema => s}
 import org.{langmeta => m}
 
-class ScalaDocumentSymbolProvider(index: Index)
+class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     extends DocumentSymbolProvider {
+
+  private def getDocumentSymbols(doc: s.Document): Seq[DocumentSymbol] = {
+    val denotations = doc.symbols.collect {
+      case s.ResolvedSymbol(s, Some(d)) =>
+        s -> m.Denotation(d.flags, d.name, d.signature, Nil)
+    }.toMap
+    val infos = for {
+      name <- index.document.names
+      if name.isDefinition
+      symbol = m.Symbol(name.symbol)
+      if symbol.isInstanceOf[m.Symbol.Global]
+      denotation <- denotations.get(name.symbol)
+      kind <- symbolKind(denotation)
+      definition <- index.definition(name.symbol)
+    } yield DocumentSymbol(denotation, kind, definition)
+    infos
+  }
+
   override def provideDocumentSymbols(
       model: IReadOnlyModel,
       token: CancellationToken
   ) = {
     for {
-      doc <- MetadocAttributeService.fetchDocument(model.uri.path)
+      Some(doc) <- index.semanticdb(model.uri.path)
     } yield {
-      val denotations = doc.symbols.map {
-        case ResolvedSymbol(s, d) => s -> d
-      }.toMap
-      val symbols = for {
-        sym <- index.symbols
-        denotation <- denotations.get(m.Symbol(sym.symbol))
-        kind <- symbolKind(denotation)
-      } yield {
-        new SymbolInformation(
-          name = denotation.name,
-          containerName = denotation.signature,
-          kind = kind,
-          location = model.resolveLocation(sym.definition.get)
-        )
+      val symbols = getDocumentSymbols(doc).map {
+        case DocumentSymbol(denotation, kind, definition) =>
+          new SymbolInformation(
+            name = denotation.name,
+            containerName = denotation.signature,
+            kind = kind,
+            location = model.resolveLocation(definition)
+          )
       }
       js.Array[SymbolInformation](symbols: _*)
     }
   }.toMonacoThenable
 
-  def symbolKind(denotation: Denotation): Option[SymbolKind] = {
+  def symbolKind(denotation: m.Denotation): Option[SymbolKind] = {
     import denotation._
 
     if (isParam || isTypeParam)

@@ -1,38 +1,52 @@
 package metadoc
 
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import monaco.Promise
 import monaco.Uri
 import monaco.editor.Editor
+import monaco.editor.IModel
 import monaco.services.IReference
 import monaco.services.ITextEditorModel
 import monaco.services.ITextModelService
 import monaco.services.ImmortalReference
+import org.langmeta.internal.semanticdb.{schema => s}
 
 object MetadocTextModelService extends ITextModelService {
   def modelReference(
       filename: String
   ): Future[IReference[ITextEditorModel]] =
-    modelReference(createUri(filename))
+    modelDocument(createUri(filename)).map(_.model)
 
-  def modelReference(
+  // TODO(olafur): Move this state out for easier testing.
+  private val modelDocumentCache = mutable.Map.empty[IModel, s.Document]
+
+  private def document(model: IModel) =
+    MetadocMonacoDocument(
+      modelDocumentCache(model),
+      new ImmortalReference(ITextEditorModel(model))
+    )
+
+  def modelDocument(
       resource: Uri
-  ): Future[IReference[ITextEditorModel]] = {
-    val existingModel = Editor.getModel(resource)
-    if (existingModel != null) {
-      Future.successful(new ImmortalReference(ITextEditorModel(existingModel)))
+  ): Future[MetadocMonacoDocument] = {
+    val model = Editor.getModel(resource)
+    if (model != null) {
+      Future.successful(document(model))
     } else {
       for {
-        doc <- MetadocAttributeService.fetchProtoDocument(resource.path)
+        Some(doc) <- MetadocFetch.document(resource.path)
       } yield {
         val model = Editor.createModel(doc.contents, "scala", resource)
-        new ImmortalReference(ITextEditorModel(model))
+        modelDocumentCache(model) = doc
+        document(model)
       }
     }
   }
+
   override def createModelReference(
       resource: Uri
   ): Promise[IReference[ITextEditorModel]] =
-    modelReference(resource).toMonacoPromise
+    modelDocument(resource).map(_.model).toMonacoPromise
 }

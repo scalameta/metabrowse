@@ -35,7 +35,7 @@ inThisBuild(
 lazy val Version = new {
   def scala = "2.12.3"
   def scala210 = "2.10.6"
-  def scalameta = "2.0.0-RC1"
+  def scalameta = "2.0.0"
 }
 
 lazy val allSettings = Seq(
@@ -158,6 +158,7 @@ commands += Command.command("metadoc-site") { s =>
   val cliRun = Array(
     "cli/run",
     "--clean-target-first",
+    "--non-interactive",
     "--target",
     "target/metadoc",
     classDirectory.in(example, Compile).value,
@@ -199,11 +200,23 @@ lazy val tests = project
   .settings(
     noPublish,
     buildInfoPackage := "metadoc.tests",
+    compileInputs.in(Test, compile) :=
+      compileInputs
+        .in(Test, compile)
+        .dependsOn(
+          compile.in(example, Compile),
+          compile.in(example, Test)
+        )
+        .value,
+    libraryDependencies += "org.scalameta" %% "testkit" % Version.scalameta % Test,
     buildInfoKeys := Seq[BuildInfoKey](
-      "exampleClassDirectory" -> classDirectory.in(example, Compile).value
+      "exampleClassDirectory" -> List(
+        classDirectory.in(example, Compile).value,
+        classDirectory.in(example, Test).value
+      )
     )
   )
-  .dependsOn(cli, example % Test)
+  .dependsOn(cli)
   .enablePlugins(BuildInfoPlugin)
 
 lazy val noPublish = allSettings ++ Seq(

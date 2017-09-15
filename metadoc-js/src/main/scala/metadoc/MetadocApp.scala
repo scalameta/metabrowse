@@ -3,30 +3,25 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Promise
-import org.langmeta._
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.TypedArrayBuffer
-import metadoc.schema.Index
 import monaco.Uri
 import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom
 import org.scalajs.dom.Event
+import org.langmeta.internal.semanticdb.{schema => s}
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {
     for {
       _ <- loadMonaco()
-      indexBytes <- fetchBytes("metadoc.index")
+      workspace <- MetadocFetch.workspace()
     } {
-      val index = Index.parseFrom(indexBytes)
-
+      val index = new MutableBrowserIndex(MetadocState(s.Document()))
       registerLanguageExtensions(index)
-
-      val editorService = new MetadocEditorService()
-      val input = parseResourceInput(
-        index.files.find(_.endsWith("Doc.scala")).get
-      )
+      val editorService = new MetadocEditorService(index)
+      val input = parseResourceInput(workspace.filenames.head)
       openEditor(editorService, input)
     }
   }
@@ -46,7 +41,7 @@ object MetadocApp {
     dom.window.location.hash = "#/" + uri.path
   }
 
-  def registerLanguageExtensions(index: Index): Unit = {
+  def registerLanguageExtensions(index: MetadocSemanticdbIndex): Unit = {
     monaco.languages.Languages.register(ScalaLanguageExtensionPoint)
     monaco.languages.Languages.setMonarchTokensProvider(
       ScalaLanguageExtensionPoint.id,
@@ -89,7 +84,7 @@ object MetadocApp {
   def fetchBytes(url: String): Future[Array[Byte]] = {
     for {
       response <- dom.experimental.Fetch.fetch(url).toFuture
-      if response.status == 200
+      _ = require(response.status == 200, s"${response.status} != 200")
       buffer <- response.arrayBuffer().toFuture
     } yield {
       val bytes = Array.ofDim[Byte](buffer.byteLength)
