@@ -10,20 +10,18 @@ import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom
 import org.scalajs.dom.Event
+import org.langmeta.internal.semanticdb.{schema => s}
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {
     for {
       _ <- loadMonaco()
       workspace <- MetadocFetch.workspace()
-      Some(document) <- MetadocFetch.document(
-        workspace.filenames.head
-      )
     } {
-      val index = new MutableBrowserIndex(MetadocState(document))
+      val index = new MutableBrowserIndex(MetadocState(s.Document()))
       registerLanguageExtensions(index)
       val editorService = new MetadocEditorService(index)
-      val input = parseResourceInput(document.filename)
+      val input = parseResourceInput(workspace.filenames.head)
       openEditor(editorService, input)
     }
   }
@@ -43,7 +41,7 @@ object MetadocApp {
     dom.window.location.hash = "#/" + uri.path
   }
 
-  def registerLanguageExtensions(index: MutableBrowserIndex): Unit = {
+  def registerLanguageExtensions(index: MetadocSemanticdbIndex): Unit = {
     monaco.languages.Languages.register(ScalaLanguageExtensionPoint)
     monaco.languages.Languages.setMonarchTokensProvider(
       ScalaLanguageExtensionPoint.id,

@@ -9,7 +9,7 @@ import monaco.languages.Location
 import monaco.CancellationToken
 import monaco.Position
 
-class ScalaDefinitionProvider(index: MutableBrowserIndex)
+class ScalaDefinitionProvider(index: MetadocSemanticdbIndex)
     extends DefinitionProvider {
   override def provideDefinition(
       model: IReadOnlyModel,

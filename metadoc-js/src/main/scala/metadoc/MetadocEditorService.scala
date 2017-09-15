@@ -13,7 +13,8 @@ import monaco.services.IResourceInput
 import monaco.services.IEditorService
 import org.scalajs.dom
 
-class MetadocEditorService(index: MutableBrowserIndex) extends IEditorService {
+class MetadocEditorService(index: MetadocSemanticdbIndex)
+    extends IEditorService {
   private lazy val editor: IStandaloneCodeEditor = {
     val app = dom.document.getElementById("editor")
     app.innerHTML = ""
@@ -38,12 +39,12 @@ class MetadocEditorService(index: MutableBrowserIndex) extends IEditorService {
     val selection = input.options.selection
     for {
       MetadocMonacoDocument(document, model) <- MetadocTextModelService
-        .modelReference(
+        .modelDocument(
           input.resource
         )
     } yield {
       editor.setModel(model.`object`.textEditorModel)
-      index.state = index.state.copy(document = document)
+      index.dispatch(MetadocEvent.SetDocument(document))
       selection.foreach {
         case range: Range =>
           val pos = range.getStartPosition()

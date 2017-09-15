@@ -29,7 +29,7 @@ class ScalaReferenceProvider(index: MetadocSemanticdbIndex)
             // another file, and we need that file's model in order to get
             // correct range selection.
             MetadocTextModelService
-              .modelReference(createUri(filename))
+              .modelDocument(createUri(filename))
               .map {
                 case MetadocMonacoDocument(_, model) =>
                   ranges.ranges.map { range =>

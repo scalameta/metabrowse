@@ -10,6 +10,7 @@ trait MetadocSemanticdbIndex {
   def document: s.Document
   def symbol(sym: String): Future[Option[d.Symbol]]
   def semanticdb(sym: String): Future[Option[s.Document]]
+  def dispatch(event: MetadocEvent): Unit
 
   def definition(symbol: String): Option[d.Position] =
     document.names.collectFirst {

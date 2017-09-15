@@ -203,11 +203,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
           if (symbol.definition.isDefined) {
             val url = MetadocCli.encodeSymbolName(symbol.symbol)
             val out = symbolRoot.resolve(url)
-            Files.write(
-              out.toNIO,
-              ref.get.toByteArray,
-              StandardOpenOption.CREATE
-            )
+            overwrite(out.toNIO, ref.get.toByteArray)
           }
       }
     }

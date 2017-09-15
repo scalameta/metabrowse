@@ -17,17 +17,18 @@ object MetadocTextModelService extends ITextModelService {
   def modelReference(
       filename: String
   ): Future[IReference[ITextEditorModel]] =
-    modelReference(createUri(filename)).map(_.model)
+    modelDocument(createUri(filename)).map(_.model)
 
-  private val modelDocument = mutable.Map.empty[IModel, s.Document]
+  // TODO(olafur): Move this state out for easier testing.
+  private val modelDocumentCache = mutable.Map.empty[IModel, s.Document]
 
   private def document(model: IModel) =
     MetadocMonacoDocument(
-      modelDocument(model),
+      modelDocumentCache(model),
       new ImmortalReference(ITextEditorModel(model))
     )
 
-  def modelReference(
+  def modelDocument(
       resource: Uri
   ): Future[MetadocMonacoDocument] = {
     val model = Editor.getModel(resource)
@@ -38,7 +39,7 @@ object MetadocTextModelService extends ITextModelService {
         Some(doc) <- MetadocFetch.document(resource.path)
       } yield {
         val model = Editor.createModel(doc.contents, "scala", resource)
-        modelDocument(model) = doc
+        modelDocumentCache(model) = doc
         document(model)
       }
     }
@@ -47,5 +48,5 @@ object MetadocTextModelService extends ITextModelService {
   override def createModelReference(
       resource: Uri
   ): Promise[IReference[ITextEditorModel]] =
-    modelReference(resource).map(_.model).toMonacoPromise
+    modelDocument(resource).map(_.model).toMonacoPromise
 }
