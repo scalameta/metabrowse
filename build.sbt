@@ -16,19 +16,20 @@ inThisBuild(
         "scm:git:git@github.com:scalameta/metadoc.git"
       )
     ),
-    pomExtra :=
-      <developers>
-      <developer>
-        <id>olafurpg</id>
-        <name>Ólafur Páll Geirsson</name>
-        <url>https://geirsson.com</url>
-      </developer>
-      <developer>
-        <id>jonas</id>
-        <name>Jonas Fonseca</name>
-        <url>https://github.com/jonas</url>
-      </developer>
-    </developers>
+    developers := List(
+      Developer(
+        "olafurpg",
+        "Ólafur Páll Geirsson",
+        "olafurpg@users.noreply.github.com",
+        url("https://geirsson.com")
+      ),
+      Developer(
+        "jonas",
+        "Jonas Fonseca",
+        "jonas@users.noreply.github.com",
+        url("https://github.com/jonas")
+      )
+    )
   )
 )
 
