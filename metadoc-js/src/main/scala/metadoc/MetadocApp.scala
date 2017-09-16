@@ -23,6 +23,7 @@ object MetadocApp {
       val editorService = new MetadocEditorService(index)
       val input = parseResourceInput(workspace.filenames.head)
       openEditor(editorService, input)
+      dom.window.addEventListener("resize", (_: dom.Event) => editorService.resize())
     }
   }
 
@@ -77,7 +78,6 @@ object MetadocApp {
         openEditor(editorService, parseResourceInput(editor.getModel.uri.path))
       }
 
-      dom.window.addEventListener("resize", (_: dom.Event) => editor.layout())
     }
   }
 
