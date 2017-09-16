@@ -9,7 +9,6 @@ import monaco.Uri
 import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom
-import org.scalajs.dom.Event
 import org.langmeta.internal.semanticdb.{schema => s}
 
 object MetadocApp {
@@ -21,25 +20,55 @@ object MetadocApp {
       val index = new MutableBrowserIndex(MetadocState(s.Document()))
       registerLanguageExtensions(index)
       val editorService = new MetadocEditorService(index)
-      val input = parseResourceInput(workspace.filenames.head)
-      openEditor(editorService, input)
+
+      def defaultInput = {
+        val input = parseResourceInput(workspace.filenames.head)
+        // Starting with any path, so add the file to the history
+        input.foreach(updateHistory)
+        input
+      }
+
+      /*
+       * Discovering the initial input state may update the history so resolve the
+       * input before registering the history popstate handler to avoid any event
+       * being triggered.
+       */
+      val input = parseResourceInput(Uri.parse(dom.window.location.hash).fragment)
+        .orElse(defaultInput)
+
+      dom.window.onpopstate = { e: dom.PopStateEvent =>
+        val input = Option(e.state.asInstanceOf[IResourceInput]).orElse(
+          // FIXME: history.replaceState?
+          parseResourceInput(Uri.parse(dom.window.location.hash).fragment)
+        )
+        input.foreach(openEditor(editorService))
+      }
+
       dom.window.addEventListener("resize", (_: dom.Event) => editorService.resize())
+
+      input.foreach(openEditor(editorService))
     }
   }
 
-  def parseResourceInput(defaultPath: String): IResourceInput = {
-    val path = Option(dom.window.location.hash.stripPrefix("#/"))
+  def parseResourceInput(location: String): Option[IResourceInput] = {
+    Option(location)
       .filter(_.nonEmpty)
-      .getOrElse(defaultPath)
-    val input = jsObject[IResourceInput]
-    input.resource = createUri(path)
-    input.options = jsObject[ITextEditorOptions]
-    input
+      .map { uri =>
+        val input = jsObject[IResourceInput]
+        input.resource = createUri(uri)
+        input.options = jsObject[ITextEditorOptions]
+        input
+      }
   }
 
-  def updateLocation(uri: Uri): Unit = {
-    dom.document.getElementById("title").textContent = uri.path
-    dom.window.location.hash = "#/" + uri.path
+  def updateHistory(input: IResourceInput): Unit = {
+    val uri = input.resource
+    dom.window.history.pushState(input, uri.path, "#/" + uri.path)
+  }
+
+  def updateTitle(input: IResourceInput): Unit = {
+    val title = input.resource.path.dropWhile(_ == '/')
+    dom.document.getElementById("title").textContent = title
   }
 
   def registerLanguageExtensions(index: MetadocSemanticdbIndex): Unit = {
@@ -67,17 +96,11 @@ object MetadocApp {
   }
 
   def openEditor(
-      editorService: MetadocEditorService,
+      editorService: MetadocEditorService)(
       input: IResourceInput
   ): Unit = {
-    updateLocation(input.resource)
     for (editor <- editorService.open(input)) {
-      editor.onDidChangeModel(event => updateLocation(event.newModelUrl))
-
-      dom.window.onhashchange = { e: Event =>
-        openEditor(editorService, parseResourceInput(editor.getModel.uri.path))
-      }
-
+      updateTitle(input)
     }
   }
 
