@@ -5,6 +5,7 @@ import scala.concurrent.Future
 import scala.scalajs.js
 import monaco.Range
 import monaco.Promise
+import monaco.Uri
 import monaco.editor.IEditor
 import monaco.editor.IEditorConstructionOptions
 import monaco.editor.IEditorOverrideServices
@@ -35,9 +36,11 @@ class MetadocEditorService(index: MetadocSemanticdbIndex)
     editor
   }
 
-  def resize(): Unit = {
+  def resize(): Unit =
     editor.layout()
-  }
+
+  def getModelUri(): Uri =
+    editor.getModel().uri
 
   def open(input: IResourceInput): Future[IStandaloneCodeEditor] = {
     val selection = input.options.selection
@@ -49,11 +52,11 @@ class MetadocEditorService(index: MetadocSemanticdbIndex)
     } yield {
       editor.setModel(model.`object`.textEditorModel)
       index.dispatch(MetadocEvent.SetDocument(document))
-      selection.foreach {
-        case range: Range =>
-          val pos = range.getStartPosition()
-          editor.setPosition(pos)
-          editor.revealPositionInCenter(pos)
+      selection.foreach { irange =>
+        val range = Range.lift(irange)
+        editor.setSelection(range)
+        editor.revealPositionInCenter(range.getStartPosition())
+        editor.focus()
       }
       editor
     }
