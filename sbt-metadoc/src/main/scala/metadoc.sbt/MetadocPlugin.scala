@@ -31,7 +31,7 @@ import sbt.Keys._
 object MetadocPlugin extends AutoPlugin {
 
   object autoImport {
-    val Metadoc = config("metadoc")
+    val Metadoc = config("metadoc").hide
     val metadocSettings = MetadocPlugin.metadocSettings
     val metadocScopeFilter =
       settingKey[ScopeFilter]("Control sources to be included in metadoc.")
@@ -65,14 +65,9 @@ object MetadocPlugin extends AutoPlugin {
     fullClasspath.all(metadocScopeFilter.value)
   }
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
+  override def projectSettings: Seq[Setting[_]] = Def.settings(
     ivyConfigurations += Metadoc,
-    libraryDependencies ++= List(
-      // Explicitly set the Scala version dependency so the resolution doesn't pick
-      // up the Scala version of the project the plugin is enabled in.
-      "org.scala-lang" % "scala-reflect" % BuildInfo.scalaVersion % Metadoc,
-      "org.scalameta" % s"metadoc-cli_${BuildInfo.scalaBinaryVersion}" % BuildInfo.version % Metadoc
-    ),
+    libraryDependencies += "org.scala-sbt" % "sbt-launch" % "1.0.0" % Metadoc,
     metadocClasspath := classpathTask.value,
     metadocScopeFilter := ScopeFilter(
       metadocProjectFilter.value,
@@ -81,10 +76,10 @@ object MetadocPlugin extends AutoPlugin {
     metadocProjectFilter := inAnyProject,
     metadocConfigurationFilter := inConfigurations(Compile, Test),
     target in metadoc := target.value / "metadoc",
-    mainClass in Metadoc := Some("metadoc.cli.MetadocCli"),
-    fullClasspath in Metadoc := Classpaths
-      .managedJars(Metadoc, classpathTypes.value, update.value),
-    runner in (Metadoc, run) := {
+    metadoc := {
+      val bootProperties = target.value / "metadoc.boot.properties"
+      val bootClasspath =
+        Classpaths.managedJars(Metadoc, classpathTypes.value, update.value)
       val forkOptions = ForkOptions(
         bootJars = Nil,
         javaHome = javaHome.value,
@@ -94,9 +89,6 @@ object MetadocPlugin extends AutoPlugin {
         workingDirectory = Some(baseDirectory.value),
         envVars = envVars.value
       )
-      new ForkRun(forkOptions)
-    },
-    metadoc := {
       val output = (target in metadoc).value
       val classpath = metadocClasspath.value.flatten
       val classDirectories = Attributed
@@ -105,18 +97,38 @@ object MetadocPlugin extends AutoPlugin {
           case entry if entry.isDirectory => entry.getAbsolutePath
         }
         .distinct
-      val options = Seq(
+      val arguments = Seq(
+        "-classpath",
+        Path.makeString(Attributed.data(bootClasspath)),
+        "xsbt.boot.Boot",
+        s"@$bootProperties",
         "--clean-target-first",
         "--target",
         output.getAbsolutePath
       ) ++ classDirectories
 
-      (runner in (Metadoc, run)).value.run(
-        (mainClass in Metadoc).value.get,
-        Attributed.data((fullClasspath in Metadoc).value),
-        options,
-        streams.value.log
+      // Write the configuration that will launch the metadoc CLI application
+      // http://www.scala-sbt.org/0.13/docs/Launcher-Configuration.html
+      IO.write(
+        bootProperties,
+        s"""[scala]
+           |  version: ${BuildInfo.scalaVersion}
+           |[app]
+           |  org: org.scalameta
+           |  name: metadoc-cli
+           |  version: ${BuildInfo.version}
+           |  class: ${BuildInfo.mainClass.get}
+           |  cross-versioned: binary
+           |[repositories]
+           |  local
+           |  maven-central
+           |[boot]
+           |  directory: ${target.value}/metadoc-boot
+           """.stripMargin
       )
+
+      if (Fork.java(forkOptions, arguments) != 0)
+        sys.error("Failed to run the metadoc CLI: " + arguments.mkString(" "))
 
       output
     }
