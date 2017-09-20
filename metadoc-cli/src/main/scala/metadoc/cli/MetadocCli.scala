@@ -209,8 +209,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
           tick()
           val symbolIndex = ref.get()
           val actualIndex = symbolIndex.definition match {
-            case Some(_) if symbolIndex.references.isEmpty => updateReferencesForType(symbolsMap, symbolIndex)
-            case Some(_) => symbolIndex
+            case Some(_) => updateReferencesForType(symbolsMap, symbolIndex)
             case None => updateDefinitionsForTerm(symbolsMap, symbolIndex)
           }
 
