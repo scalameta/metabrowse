@@ -11,6 +11,7 @@ import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardOpenOption
 import java.util.zip.{ZipEntry, ZipInputStream}
+
 import scala.collection.mutable
 import org.langmeta._
 import org.langmeta.internal.io.PathIO
@@ -24,6 +25,7 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
 import java.util.function.{Function => JFunction}
 import java.{util => ju}
+
 import scala.collection.GenSeq
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.mutable.ParArray
@@ -31,6 +33,7 @@ import scala.util.control.NonFatal
 import caseapp._
 import caseapp.{Name => _}
 import metadoc.schema
+import metadoc.schema.SymbolIndex
 import metadoc.{schema => d}
 import org.langmeta._
 import org.langmeta.internal.semanticdb.{schema => s}
@@ -83,9 +86,9 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   private type Symbol = String
   private val filenames = new ConcurrentSkipListSet[String]()
   private val symbols =
-    new ConcurrentHashMap[Symbol, AtomicReference[d.Symbol]]()
-  private val mappingFunction: JFunction[Symbol, AtomicReference[d.Symbol]] =
-    t => new AtomicReference(d.Symbol(symbol = t))
+    new ConcurrentHashMap[Symbol, AtomicReference[d.SymbolIndex]]()
+  private val mappingFunction: JFunction[Symbol, AtomicReference[d.SymbolIndex]] =
+    t => new AtomicReference(d.SymbolIndex(symbol = t))
   private def overwrite(out: Path, bytes: Array[Byte]): Unit = {
     Files.write(
       out,
@@ -96,8 +99,8 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   }
   private def addDefinition(symbol: Symbol, position: d.Position): Unit = {
     val value = symbols.computeIfAbsent(symbol, mappingFunction)
-    value.getAndUpdate(new UnaryOperator[d.Symbol] {
-      override def apply(t: schema.Symbol): schema.Symbol =
+    value.getAndUpdate(new UnaryOperator[d.SymbolIndex] {
+      override def apply(t: schema.SymbolIndex): schema.SymbolIndex =
         t.definition.fold(t.copy(definition = Some(position))) { _ =>
           // Do nothing, conflicting symbol definitions, for example js/jvm
           t
@@ -110,8 +113,8 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       symbol: Symbol
   ): Unit = {
     val value = symbols.computeIfAbsent(symbol, mappingFunction)
-    value.getAndUpdate(new UnaryOperator[d.Symbol] {
-      override def apply(t: d.Symbol): d.Symbol = {
+    value.getAndUpdate(new UnaryOperator[d.SymbolIndex] {
+      override def apply(t: d.SymbolIndex): d.SymbolIndex = {
         val ranges = t.references.getOrElse(filename, d.Ranges())
         val newRanges = ranges.copy(ranges.ranges :+ range)
         val newReferences = t.references + (filename -> newRanges)
@@ -196,14 +199,28 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
     phase("Writing symbol index", symbols.size()) { tick =>
       import scala.collection.JavaConverters._
       Files.createDirectory(symbolRoot.toNIO)
-      symbols.asScala.foreach {
+      val symbolsMap = symbols.asScala
+        symbolsMap.foreach {
         case (_, ref) =>
           tick()
-          val symbol = ref.get()
-          if (symbol.definition.isDefined) {
-            val url = MetadocCli.encodeSymbolName(symbol.symbol)
+          val symbolIndex = ref.get()
+          val actualIndex = symbolIndex.definition match {
+            case Some(_)  => symbolIndex
+            case None     =>
+              Symbol(symbolIndex.symbol) match {
+                case Symbol.Global(owner, Signature.Term(name)) =>
+                  (for {
+                    typeRef <- symbolsMap.get(Symbol.Global(owner, Signature.Type(name)).syntax)
+                    definition <- typeRef.get().definition
+                  } yield symbolIndex.copy(definition = Some(definition))).getOrElse(symbolIndex)
+                case _ => symbolIndex
+              }
+          }
+          
+          if (actualIndex.definition.isDefined) {
+            val url = MetadocCli.encodeSymbolName(actualIndex.symbol)
             val out = symbolRoot.resolve(url)
-            overwrite(out.toNIO, ref.get.toByteArray)
+            overwrite(out.toNIO, actualIndex.toByteArray)
           }
       }
     }

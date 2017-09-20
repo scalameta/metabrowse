@@ -8,7 +8,7 @@ message Position {
     int32 end = 3;
 }
 
-message Symbol {
+message SymbolIndex {
     string symbol = 1;
     Position definition = 2;
     reserved 3;

@@ -8,12 +8,12 @@ import metadoc.{schema => d}
 
 object MetadocFetch {
 
-  def symbol(symbolId: String): Future[Option[d.Symbol]] = {
+  def symbol(symbolId: String): Future[Option[d.SymbolIndex]] = {
     val url = "symbol/" + JSSha512.sha512(symbolId)
     for {
       bytes <- fetchBytes(url)
     } yield {
-      Some(d.Symbol.parseFrom(bytes))
+      Some(d.SymbolIndex.parseFrom(bytes))
     }
   }.recover(or404)
 

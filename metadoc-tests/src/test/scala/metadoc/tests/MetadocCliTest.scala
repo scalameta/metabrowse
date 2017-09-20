@@ -51,7 +51,7 @@ class MetadocCliTest
     val obtained = FileIO
       .listAllFilesRecursively(out.resolve("symbol"))
       .map { path =>
-        val sym = d.Symbol.parseFrom(path.readAllBytes)
+        val sym = d.SymbolIndex.parseFrom(path.readAllBytes)
         assert(sym.definition.isDefined)
         sym.symbol
       }

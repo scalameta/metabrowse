@@ -8,7 +8,7 @@ import org.langmeta.internal.semanticdb.{schema => s}
 /** Index to lookup symbol definitions and references. */
 trait MetadocSemanticdbIndex {
   def document: s.Document
-  def symbol(sym: String): Future[Option[d.Symbol]]
+  def symbol(sym: String): Future[Option[d.SymbolIndex]]
   def semanticdb(sym: String): Future[Option[s.Document]]
   def dispatch(event: MetadocEvent): Unit
 
@@ -27,8 +27,8 @@ trait MetadocSemanticdbIndex {
     }
   }
 
-  def fetchSymbol(offset: Int): Future[Option[d.Symbol]] =
-    resolve(offset).fold(Future.successful(Option.empty[d.Symbol])) {
+  def fetchSymbol(offset: Int): Future[Option[d.SymbolIndex]] =
+    resolve(offset).fold(Future.successful(Option.empty[d.SymbolIndex])) {
       case s.ResolvedName(_, sym, _) =>
         m.Symbol(sym) match {
           case m.Symbol.Global(_, _) =>
@@ -52,7 +52,7 @@ trait MetadocSemanticdbIndex {
                 }
               )
             )
-            val dsymbol = d.Symbol(sym, definition, references)
+            val dsymbol = d.SymbolIndex(sym, definition, references)
             Future.successful(Some(dsymbol))
         }
     }
