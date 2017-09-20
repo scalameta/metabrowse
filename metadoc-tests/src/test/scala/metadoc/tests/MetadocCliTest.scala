@@ -248,4 +248,67 @@ class MetadocCliTest
     }
   }
 
+  def checkSymbolIndex(id: String, expected: String) = {
+    test(id) {
+      val index = d.SymbolIndex.parseFrom(
+        out
+          .resolve("symbol")
+          .resolve(MetadocCli.encodeSymbolName(id))
+          .readAllBytes
+      )
+      val obtained = index.toString
+      println(obtained)
+      assertNoDiff(obtained, expected)
+    }
+  }
+
+  checkSymbolIndex(
+      "_root_.org.typelevel.paiges.Json.JArray.",
+      """
+        |symbol: "_root_.org.typelevel.paiges.Json.JArray."
+        |definition {
+        |  filename: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
+        |  start: 711
+        |  end: 717
+        |}
+        |references {
+        |  key: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
+        |  value {
+        |    ranges {
+        |      start: 1421
+        |      end: 1427
+        |    }
+        |    ranges {
+        |      start: 1345
+        |      end: 1351
+        |    }
+        |  }
+        |}
+      """.stripMargin
+    )
+
+  checkSymbolIndex(
+    "_root_.org.typelevel.paiges.Json.JArray#",
+    """
+      |symbol: "_root_.org.typelevel.paiges.Json.JArray#"
+      |definition {
+      |  filename: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
+      |  start: 711
+      |  end: 717
+      |}
+      |references {
+      |  key: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
+      |  value {
+      |    ranges {
+      |      start: 1421
+      |      end: 1427
+      |    }
+      |    ranges {
+      |      start: 1345
+      |      end: 1351
+      |    }
+      |  }
+      |}
+      |""".stripMargin
+  )
 }

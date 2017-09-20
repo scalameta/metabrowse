@@ -41,20 +41,20 @@ import org.langmeta.internal.semanticdb.{schema => s}
 @AppVersion("0.1.0-SNAPSHOT")
 @ProgName("metadoc")
 case class MetadocOptions(
-                           @HelpMessage("The output directory to generate the metadoc site.")
-                           target: Option[String] = None,
-                           @HelpMessage(
-                             "Clean the target directory before generating new site. " +
-                               "All files will be deleted so be careful."
-                           )
-                           cleanTargetFirst: Boolean = false,
-                           @HelpMessage(
-                             "Experimental. Emit metadoc.zip file instead of static files."
-                           )
-                           zip: Boolean = false,
-                           @HelpMessage("Disable fancy progress bar")
-                           nonInteractive: Boolean = false
-                         )
+    @HelpMessage("The output directory to generate the metadoc site.")
+    target: Option[String] = None,
+    @HelpMessage(
+      "Clean the target directory before generating new site. " +
+        "All files will be deleted so be careful."
+    )
+    cleanTargetFirst: Boolean = false,
+    @HelpMessage(
+      "Experimental. Emit metadoc.zip file instead of static files."
+    )
+    zip: Boolean = false,
+    @HelpMessage("Disable fancy progress bar")
+    nonInteractive: Boolean = false
+)
 
 case class Target(target: AbsolutePath, onClose: () => Unit)
 
@@ -86,7 +86,9 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   private val filenames = new ConcurrentSkipListSet[String]()
   private val symbols =
     new ConcurrentHashMap[Symbol, AtomicReference[d.SymbolIndex]]()
-  private val mappingFunction: JFunction[Symbol, AtomicReference[d.SymbolIndex]] =
+  private val mappingFunction: JFunction[Symbol, AtomicReference[
+    d.SymbolIndex
+  ]] =
     t => new AtomicReference(d.SymbolIndex(symbol = t))
 
   private def overwrite(out: Path, bytes: Array[Byte]): Unit = {
@@ -110,10 +112,10 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   }
 
   private def addReference(
-                            filename: String,
-                            range: d.Range,
-                            symbol: Symbol
-                          ): Unit = {
+      filename: String,
+      range: d.Range,
+      symbol: Symbol
+  ): Unit = {
     val value = symbols.computeIfAbsent(symbol, mappingFunction)
     value.getAndUpdate(new UnaryOperator[d.SymbolIndex] {
       override def apply(t: d.SymbolIndex): d.SymbolIndex = {
@@ -144,9 +146,9 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       val files = ParArray.newBuilder[AbsolutePath]
       val visitor = new SimpleFileVisitor[Path] {
         override def visitFile(
-                                file: Path,
-                                attrs: BasicFileAttributes
-                              ): FileVisitResult = {
+            file: Path,
+            attrs: BasicFileAttributes
+        ): FileVisitResult = {
           if (file.getFileName.toString.endsWith(".semanticdb")) {
             files += AbsolutePath(file)
           }
@@ -170,7 +172,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
           db.documents.foreach { document =>
             document.names.foreach {
               case s.ResolvedName(_, sym, _)
-                if !sym.endsWith(".") && !sym.endsWith("#") =>
+                  if !sym.endsWith(".") && !sym.endsWith("#") =>
               // Do nothing, local symbol.
               case s.ResolvedName(Some(s.Position(start, end)), sym, true) =>
                 addDefinition(sym, d.Position(document.filename, start, end))
@@ -221,24 +223,37 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       }
     }
 
-  private def updateReferencesForType(symbolsMap: concurrent.Map[Symbol, AtomicReference[SymbolIndex]], symbolIndex: SymbolIndex) = {
+  private def updateReferencesForType(
+      symbolsMap: concurrent.Map[Symbol, AtomicReference[SymbolIndex]],
+      symbolIndex: SymbolIndex
+  ) = {
     Symbol(symbolIndex.symbol) match {
       case Symbol.Global(owner, Signature.Type(name)) =>
         (for {
-          syntheticObjRef <- symbolsMap.get(Symbol.Global(owner, Signature.Term(name)).syntax)
+          syntheticObjRef <- symbolsMap.get(
+            Symbol.Global(owner, Signature.Term(name)).syntax
+          )
           if syntheticObjRef.get().definition.isEmpty
-        } yield symbolIndex.copy(references = syntheticObjRef.get().references)).getOrElse(symbolIndex)
+        } yield
+          symbolIndex.copy(references = syntheticObjRef.get().references))
+          .getOrElse(symbolIndex)
       case _ => symbolIndex
     }
   }
 
-  private def updateDefinitionsForTerm(symbolsMap: concurrent.Map[Symbol, AtomicReference[SymbolIndex]], symbolIndex: SymbolIndex) = {
+  private def updateDefinitionsForTerm(
+      symbolsMap: concurrent.Map[Symbol, AtomicReference[SymbolIndex]],
+      symbolIndex: SymbolIndex
+  ) = {
     Symbol(symbolIndex.symbol) match {
       case Symbol.Global(owner, Signature.Term(name)) =>
         (for {
-          typeRef <- symbolsMap.get(Symbol.Global(owner, Signature.Type(name)).syntax)
+          typeRef <- symbolsMap.get(
+            Symbol.Global(owner, Signature.Type(name)).syntax
+          )
           definition <- typeRef.get().definition
-        } yield symbolIndex.copy(definition = Some(definition))).getOrElse(symbolIndex)
+        } yield symbolIndex.copy(definition = Some(definition)))
+          .getOrElse(symbolIndex)
       case _ => symbolIndex
     }
   }
