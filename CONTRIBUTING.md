@@ -11,9 +11,17 @@ For ideas of how to contribute, take a look at the list of tickets with the
  [help-wanted]: https://github.com/scalameta/metadoc/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22
  [scalameta's contribution guidelines]: https://github.com/scalameta/scalameta/blob/master/CONTRIBUTING.md
 
+Remember to run
+
+```
+./bin/scalafmt
+```
+
+Before raising a PR to ensure the code is formatted correctly (otherwise it will fail the checks)
+
 ## Running locally
 
-To run metadoc locally,
+To run metadoc on corpus locally,
 
 ```
 git clone https://github.com/scalameta/metadoc.git
@@ -26,6 +34,13 @@ sbt
   > js/fastOptJS::startWebpackDevServer # spin up local file server that listens for changes.
   > ~js/fastOptJS                       # compiles Scala.js application, browser refreshes on edit.
 open http://localhost:8080
+```
+
+## Packaging CLI Locally
+
+```
+sbt cli/assembly
+java -jar ./metadoc-cli/target/scala-2.12/metadoc.jar ...
 ```
 
 ## Upgrading the Monaco Editor
