@@ -12,7 +12,7 @@ import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardOpenOption
 import java.util.zip.{ZipEntry, ZipInputStream}
 
-import scala.collection.mutable
+import scala.collection.{GenSeq, concurrent, mutable}
 import org.langmeta._
 import org.langmeta.internal.io.PathIO
 import caseapp.{Name => _, _}
@@ -26,7 +26,6 @@ import java.util.function.UnaryOperator
 import java.util.function.{Function => JFunction}
 import java.{util => ju}
 
-import scala.collection.GenSeq
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.mutable.ParArray
 import scala.util.control.NonFatal
@@ -42,20 +41,20 @@ import org.langmeta.internal.semanticdb.{schema => s}
 @AppVersion("0.1.0-SNAPSHOT")
 @ProgName("metadoc")
 case class MetadocOptions(
-    @HelpMessage("The output directory to generate the metadoc site.")
-    target: Option[String] = None,
-    @HelpMessage(
-      "Clean the target directory before generating new site. " +
-        "All files will be deleted so be careful."
-    )
-    cleanTargetFirst: Boolean = false,
-    @HelpMessage(
-      "Experimental. Emit metadoc.zip file instead of static files."
-    )
-    zip: Boolean = false,
-    @HelpMessage("Disable fancy progress bar")
-    nonInteractive: Boolean = false
-)
+                           @HelpMessage("The output directory to generate the metadoc site.")
+                           target: Option[String] = None,
+                           @HelpMessage(
+                             "Clean the target directory before generating new site. " +
+                               "All files will be deleted so be careful."
+                           )
+                           cleanTargetFirst: Boolean = false,
+                           @HelpMessage(
+                             "Experimental. Emit metadoc.zip file instead of static files."
+                           )
+                           zip: Boolean = false,
+                           @HelpMessage("Disable fancy progress bar")
+                           nonInteractive: Boolean = false
+                         )
 
 case class Target(target: AbsolutePath, onClose: () => Unit)
 
@@ -89,6 +88,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
     new ConcurrentHashMap[Symbol, AtomicReference[d.SymbolIndex]]()
   private val mappingFunction: JFunction[Symbol, AtomicReference[d.SymbolIndex]] =
     t => new AtomicReference(d.SymbolIndex(symbol = t))
+
   private def overwrite(out: Path, bytes: Array[Byte]): Unit = {
     Files.write(
       out,
@@ -97,6 +97,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       StandardOpenOption.CREATE
     )
   }
+
   private def addDefinition(symbol: Symbol, position: d.Position): Unit = {
     val value = symbols.computeIfAbsent(symbol, mappingFunction)
     value.getAndUpdate(new UnaryOperator[d.SymbolIndex] {
@@ -107,11 +108,12 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
         }
     })
   }
+
   private def addReference(
-      filename: String,
-      range: d.Range,
-      symbol: Symbol
-  ): Unit = {
+                            filename: String,
+                            range: d.Range,
+                            symbol: Symbol
+                          ): Unit = {
     val value = symbols.computeIfAbsent(symbol, mappingFunction)
     value.getAndUpdate(new UnaryOperator[d.SymbolIndex] {
       override def apply(t: d.SymbolIndex): d.SymbolIndex = {
@@ -122,7 +124,9 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       }
     })
   }
+
   type Tick = () => Unit
+
   private def phase[T](task: String, length: Int)(f: Tick => T): T = {
     display.startTask(task, new File("target"))
     display.taskLength(task, length, 0)
@@ -140,9 +144,9 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       val files = ParArray.newBuilder[AbsolutePath]
       val visitor = new SimpleFileVisitor[Path] {
         override def visitFile(
-            file: Path,
-            attrs: BasicFileAttributes
-        ): FileVisitResult = {
+                                file: Path,
+                                attrs: BasicFileAttributes
+                              ): FileVisitResult = {
           if (file.getFileName.toString.endsWith(".semanticdb")) {
             files += AbsolutePath(file)
           }
@@ -166,7 +170,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
           db.documents.foreach { document =>
             document.names.foreach {
               case s.ResolvedName(_, sym, _)
-                  if !sym.endsWith(".") && !sym.endsWith("#") =>
+                if !sym.endsWith(".") && !sym.endsWith("#") =>
               // Do nothing, local symbol.
               case s.ResolvedName(Some(s.Position(start, end)), sym, true) =>
                 addDefinition(sym, d.Position(document.filename, start, end))
@@ -200,23 +204,16 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       import scala.collection.JavaConverters._
       Files.createDirectory(symbolRoot.toNIO)
       val symbolsMap = symbols.asScala
-        symbolsMap.foreach {
+      symbolsMap.foreach {
         case (_, ref) =>
           tick()
           val symbolIndex = ref.get()
           val actualIndex = symbolIndex.definition match {
-            case Some(_)  => symbolIndex
-            case None     =>
-              Symbol(symbolIndex.symbol) match {
-                case Symbol.Global(owner, Signature.Term(name)) =>
-                  (for {
-                    typeRef <- symbolsMap.get(Symbol.Global(owner, Signature.Type(name)).syntax)
-                    definition <- typeRef.get().definition
-                  } yield symbolIndex.copy(definition = Some(definition))).getOrElse(symbolIndex)
-                case _ => symbolIndex
-              }
+            case Some(_) if symbolIndex.references.isEmpty => updateReferencesForType(symbolsMap, symbolIndex)
+            case Some(_) => symbolIndex
+            case None => updateDefinitionsForTerm(symbolsMap, symbolIndex)
           }
-          
+
           if (actualIndex.definition.isDefined) {
             val url = MetadocCli.encodeSymbolName(actualIndex.symbol)
             val out = symbolRoot.resolve(url)
@@ -224,6 +221,28 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
           }
       }
     }
+
+  private def updateReferencesForType(symbolsMap: concurrent.Map[Symbol, AtomicReference[SymbolIndex]], symbolIndex: SymbolIndex) = {
+    Symbol(symbolIndex.symbol) match {
+      case Symbol.Global(owner, Signature.Type(name)) =>
+        (for {
+          syntheticObjRef <- symbolsMap.get(Symbol.Global(owner, Signature.Term(name)).syntax)
+          if syntheticObjRef.get().definition.isEmpty
+        } yield symbolIndex.copy(references = syntheticObjRef.get().references)).getOrElse(symbolIndex)
+      case _ => symbolIndex
+    }
+  }
+
+  private def updateDefinitionsForTerm(symbolsMap: concurrent.Map[Symbol, AtomicReference[SymbolIndex]], symbolIndex: SymbolIndex) = {
+    Symbol(symbolIndex.symbol) match {
+      case Symbol.Global(owner, Signature.Term(name)) =>
+        (for {
+          typeRef <- symbolsMap.get(Symbol.Global(owner, Signature.Type(name)).syntax)
+          definition <- typeRef.get().definition
+        } yield symbolIndex.copy(definition = Some(definition))).getOrElse(symbolIndex)
+      case _ => symbolIndex
+    }
+  }
 
   def writeAssets(): Unit = {
     val root = target.toNIO
