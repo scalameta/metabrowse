@@ -263,8 +263,8 @@ class MetadocCliTest
   }
 
   checkSymbolIndex(
-      "_root_.org.typelevel.paiges.Json.JArray.",
-      """
+    "_root_.org.typelevel.paiges.Json.JArray.",
+    """
         |symbol: "_root_.org.typelevel.paiges.Json.JArray."
         |definition {
         |  filename: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
@@ -285,7 +285,7 @@ class MetadocCliTest
         |  }
         |}
       """.stripMargin
-    )
+  )
 
   checkSymbolIndex(
     "_root_.org.typelevel.paiges.Json.JArray#",
