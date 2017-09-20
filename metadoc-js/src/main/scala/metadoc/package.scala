@@ -1,6 +1,7 @@
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import metadoc.{schema => d}
 import monaco.Promise
 import monaco.Range
@@ -8,6 +9,8 @@ import monaco.Thenable
 import monaco.Uri
 import monaco.editor.IReadOnlyModel
 import monaco.languages.Location
+import monaco.services.IResourceInput
+import monaco.services.ITextEditorOptions
 
 package object metadoc {
 
@@ -34,6 +37,14 @@ package object metadoc {
 
   def createUri(filename: String): Uri =
     Uri.parse(s"semanticdb:$filename")
+
+  def createInputResource(uri: Uri, selection: Option[Range]): IResourceInput = {
+    val input = jsObject[IResourceInput]
+    input.resource = createUri(uri.path)
+    input.options = jsObject[ITextEditorOptions]
+    input.options.selection = selection.orUndefined
+    input
+  }
 
   implicit class XtensionFutureToThenable[T](future: Future[T]) {
     import scala.scalajs.js.JSConverters._
