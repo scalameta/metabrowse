@@ -58,8 +58,7 @@ class MetadocCliTest
       .sorted
       .mkString("\n")
     val expected =
-      """|
-         |_root_.org.typelevel.paiges.Chunk.
+      """|_root_.org.typelevel.paiges.Chunk.
          |_root_.org.typelevel.paiges.Chunk.best(ILorg/typelevel/paiges/Doc;)Lscala/collection/Iterator;.
          |_root_.org.typelevel.paiges.Chunk.indentMax.
          |_root_.org.typelevel.paiges.Chunk.indentTable.
@@ -105,19 +104,25 @@ class MetadocCliTest
          |_root_.org.typelevel.paiges.Doc.
          |_root_.org.typelevel.paiges.Doc.Align#
          |_root_.org.typelevel.paiges.Doc.Align#`<init>`(Lorg/typelevel/paiges/Doc;)V.
+         |_root_.org.typelevel.paiges.Doc.Align.
          |_root_.org.typelevel.paiges.Doc.Concat#
          |_root_.org.typelevel.paiges.Doc.Concat#`<init>`(Lorg/typelevel/paiges/Doc;Lorg/typelevel/paiges/Doc;)V.
+         |_root_.org.typelevel.paiges.Doc.Concat.
          |_root_.org.typelevel.paiges.Doc.Empty.
          |_root_.org.typelevel.paiges.Doc.Line#
          |_root_.org.typelevel.paiges.Doc.Line#`<init>`(Z)V.
          |_root_.org.typelevel.paiges.Doc.Line#asFlatDoc()Lorg/typelevel/paiges/Doc;.
+         |_root_.org.typelevel.paiges.Doc.Line.
          |_root_.org.typelevel.paiges.Doc.Nest#
          |_root_.org.typelevel.paiges.Doc.Nest#`<init>`(ILorg/typelevel/paiges/Doc;)V.
+         |_root_.org.typelevel.paiges.Doc.Nest.
          |_root_.org.typelevel.paiges.Doc.Text#
          |_root_.org.typelevel.paiges.Doc.Text#`<init>`(Ljava/lang/String;)V.
+         |_root_.org.typelevel.paiges.Doc.Text.
          |_root_.org.typelevel.paiges.Doc.Union#
          |_root_.org.typelevel.paiges.Doc.Union#`<init>`(Lorg/typelevel/paiges/Doc;Lscala/Function0;)V.
          |_root_.org.typelevel.paiges.Doc.Union#bDoc.
+         |_root_.org.typelevel.paiges.Doc.Union.
          |_root_.org.typelevel.paiges.Doc.cat(Lscala/collection/Iterable;)Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Doc.char(C)Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Doc.charTable.
@@ -196,6 +201,7 @@ class MetadocCliTest
          |_root_.org.typelevel.paiges.Json.JArray#
          |_root_.org.typelevel.paiges.Json.JArray#`<init>`(Lscala/collection/immutable/Vector;)V.
          |_root_.org.typelevel.paiges.Json.JArray#toDoc()Lorg/typelevel/paiges/Doc;.
+         |_root_.org.typelevel.paiges.Json.JArray.
          |_root_.org.typelevel.paiges.Json.JBool#
          |_root_.org.typelevel.paiges.Json.JBool#`<init>`(Z)V.
          |_root_.org.typelevel.paiges.Json.JBool#toDoc()Lorg/typelevel/paiges/Doc;.
@@ -204,12 +210,14 @@ class MetadocCliTest
          |_root_.org.typelevel.paiges.Json.JNumber#
          |_root_.org.typelevel.paiges.Json.JNumber#`<init>`(D)V.
          |_root_.org.typelevel.paiges.Json.JNumber#toDoc()Lorg/typelevel/paiges/Doc;.
+         |_root_.org.typelevel.paiges.Json.JNumber.
          |_root_.org.typelevel.paiges.Json.JObject#
          |_root_.org.typelevel.paiges.Json.JObject#`<init>`(Lscala/collection/immutable/Map;)V.
          |_root_.org.typelevel.paiges.Json.JObject#toDoc()Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Json.JString#
          |_root_.org.typelevel.paiges.Json.JString#`<init>`(Ljava/lang/String;)V.
          |_root_.org.typelevel.paiges.Json.JString#toDoc()Lorg/typelevel/paiges/Doc;.
+         |_root_.org.typelevel.paiges.Json.JString.
          |_root_.org.typelevel.paiges.Json.escape(Ljava/lang/String;)Ljava/lang/String;.
          |_root_.org.typelevel.paiges.JsonTest#
          |_root_.org.typelevel.paiges.JsonTest#`<init>`()V.
@@ -226,6 +234,7 @@ class MetadocCliTest
          |_root_.org.typelevel.paiges.package.call(Ljava/lang/Object;Lscala/collection/immutable/List;)Ljava/lang/Object;.
          |_root_.org.typelevel.paiges.package.call(Ljava/lang/Object;Lscala/collection/immutable/List;)Ljava/lang/Object;.A#
       """.stripMargin
+
     assertNoDiff(obtained, expected)
   }
 
