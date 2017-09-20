@@ -10,12 +10,9 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardOpenOption
-import java.util.zip.{ZipEntry, ZipInputStream}
+import java.util.zip.ZipInputStream
 
-import scala.collection.{GenSeq, concurrent, mutable}
-import org.langmeta._
-import org.langmeta.internal.io.PathIO
-import caseapp.{Name => _, _}
+import scala.collection.{GenSeq, concurrent}
 import java.nio.file.attribute.BasicFileAttributes
 import java.util
 import java.util.concurrent.ConcurrentHashMap
@@ -24,13 +21,11 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
 import java.util.function.{Function => JFunction}
-import java.{util => ju}
 
-import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.mutable.ParArray
 import scala.util.control.NonFatal
 import caseapp._
-import caseapp.{Name => _}
+import caseapp.core.Messages
 import metadoc.schema
 import metadoc.schema.SymbolIndex
 import metadoc.{schema => d}
@@ -41,7 +36,9 @@ import org.langmeta.internal.semanticdb.{schema => s}
 @AppVersion("0.1.0-SNAPSHOT")
 @ProgName("metadoc")
 case class MetadocOptions(
-    @HelpMessage("The output directory to generate the metadoc site.")
+    @HelpMessage(
+      "The output directory to generate the metadoc site. (required)"
+    )
     target: Option[String] = None,
     @HelpMessage(
       "Clean the target directory before generating new site. " +
@@ -59,7 +56,6 @@ case class MetadocOptions(
 case class Target(target: AbsolutePath, onClose: () => Unit)
 
 class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
-  require(options.target.isDefined, "--target is required")
   val Target(target, onClose) = if (options.zip) {
     // For large corpora (>1M LOC) writing the symbol/ directory is the
     // bottle-neck unless --zip is enabled.
@@ -314,6 +310,9 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
 
 object MetadocCli extends CaseApp[MetadocOptions] {
 
+  override val messages: Messages[MetadocOptions] =
+    Messages[MetadocOptions].copy(optionsDesc = "[options] classpath")
+
   def encodeSymbolName(name: String): String = {
     val md = java.security.MessageDigest.getInstance("SHA-512")
     val sha = md.digest(name.getBytes("UTF-8"))
@@ -322,6 +321,11 @@ object MetadocCli extends CaseApp[MetadocOptions] {
   }
 
   def run(options: MetadocOptions, remainingArgs: RemainingArgs): Unit = {
+
+    if (options.target.isEmpty) {
+      error("--target is required")
+    }
+
     val classpath = remainingArgs.remainingArgs.flatMap { cp =>
       cp.split(File.pathSeparator).map(AbsolutePath(_))
     }
