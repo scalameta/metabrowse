@@ -74,7 +74,8 @@ lazy val cli = project
   .settings(
     allSettings,
     moduleName := "metadoc-cli",
-    mainClass.in(assembly) := Some("metadoc.cli.MetadocCli"),
+    mainClass := Some("metadoc.cli.MetadocCli"),
+    mainClass.in(assembly) := mainClass.value,
     assemblyJarName.in(assembly) := "metadoc.jar",
     libraryDependencies ++= List(
       "com.github.alexarchambault" %% "case-app" % "1.2.0-M3",
@@ -191,8 +192,9 @@ val sbtPlugin = project
     buildInfoKeys := Seq[BuildInfoKey](
       version,
       "scalametaVersion" -> Version.scalameta,
-      scalaVersion.in(coreJVM),
-      scalaBinaryVersion.in(coreJVM)
+      scalaVersion in cli,
+      scalaBinaryVersion in cli,
+      mainClass in cli
     )
   )
 
