@@ -38,14 +38,6 @@ package object metadoc {
   def createUri(filename: String): Uri =
     Uri.parse(s"semanticdb:$filename")
 
-  def createInputResource(uri: Uri, selection: Option[Range]): IResourceInput = {
-    val input = jsObject[IResourceInput]
-    input.resource = createUri(uri.path)
-    input.options = jsObject[ITextEditorOptions]
-    input.options.selection = selection.orUndefined
-    input
-  }
-
   implicit class XtensionFutureToThenable[T](future: Future[T]) {
     import scala.scalajs.js.JSConverters._
     // This method allows us to work with Future[T] in metadoc and convert

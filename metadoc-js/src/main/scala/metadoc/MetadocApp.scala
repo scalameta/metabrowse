@@ -22,11 +22,11 @@ object MetadocApp {
       registerLanguageExtensions(index)
       val editorService = new MetadocEditorService(index)
 
-      def defaultInput = {
-        val input = parseResourceInput(workspace.filenames.head)
+      def defaultState = {
+        val state = Navigation.parseState(workspace.filenames.head)
         // Starting with any path, so add the file to the history
-        input.foreach(updateHistory)
-        input
+        state.foreach(updateHistory)
+        state
       }
 
       /*
@@ -34,87 +34,37 @@ object MetadocApp {
        * input before registering the history popstate handler to avoid any event
        * being triggered.
        */
-      val input =
-        parseResourceInput(Uri.parse(dom.window.location.hash).fragment)
-          .orElse(defaultInput)
+      val state =
+        Navigation
+          .parseState(Uri.parse(dom.window.location.hash).fragment)
+          .orElse(defaultState)
 
       dom.window.onpopstate = { e: dom.PopStateEvent =>
-        val input = Option(e.state.asInstanceOf[IResourceInput]).orElse(
-          parseResourceInput(Uri.parse(dom.window.location.hash).fragment)
-        )
-        input.foreach(openEditor(editorService))
+        for (state <- Navigation.currentState())
+          openEditor(editorService)(state)
       }
 
       dom.window.onresize = { _: dom.Event =>
         editorService.resize()
       }
 
-      input.foreach(openEditor(editorService))
+      state.foreach(openEditor(editorService))
     }
   }
 
-  val SelectionRegex = """L(\d+)(C(\d+))?(-L(\d+)(C(\d+))?)?""".r
+  def updateHistory(state: Navigation.State): Unit = {
+    val uri = "#/" + state.toString.dropWhile(_ == '/')
 
-  def parseResourceInput(location: String): Option[IResourceInput] = {
-    Option(location)
-      .filter(_.nonEmpty)
-      .map { location =>
-        val uri = Uri.parse(location)
-        val selection = Option(uri.fragment).flatMap(parseSelection)
-        createInputResource(uri, selection)
-      }
-  }
-
-  def parseSelection(selection: String): Option[Range] = {
-    selection match {
-      case SelectionRegex(fromLine, _, fromCol, _, toLine, _, toCol) =>
-        Some(
-          new Range(
-            fromLine.toInt,
-            Option(fromCol).map(_.toDouble).getOrElse(1),
-            Option(toLine).map(_.toDouble).getOrElse(fromLine.toInt + 1),
-            Option(toCol).map(_.toDouble).getOrElse(1)
-          )
-        )
+    Navigation.currentState() match {
+      case Some(cur) if cur.path == state.path =>
+        dom.window.history.replaceState(state, state.path, uri)
       case _ =>
-        None
+        dom.window.history.pushState(state, state.path, uri)
     }
   }
 
-  def selectionFragment(range: IRange): String = {
-    def position(lineNumber: Int, column: Int): String =
-      s"L$lineNumber${if (column > 1) s"C${column}" else ""}"
-
-    val start = position(range.startLineNumber.toInt, range.startColumn.toInt)
-    if (range.startLineNumber == range.endLineNumber && range.startColumn == range.endColumn)
-      start
-    else if (range.startLineNumber == range.endLineNumber - 1 && range.startColumn == 1 && range.endColumn == 1)
-      start
-    else
-      start + "-" + position(range.endLineNumber.toInt, range.endColumn.toInt)
-  }
-
-  def updateHistory(input: IResourceInput): Unit = {
-    val uri = input.resource
-    val selection = input.options.selection.toOption
-    val fragment = selection.map(selectionFragment).fold("")("#" + _)
-    val location = "#/" + uri.path.dropWhile(_ == '/') + fragment
-
-    val currentState = dom.window.history.state.asInstanceOf[IResourceInput]
-    val currentInput = Option(currentState).orElse(
-      parseResourceInput(Uri.parse(dom.window.location.hash).fragment)
-    )
-
-    currentInput match {
-      case Some(cur) if cur.resource.path == input.resource.path =>
-        dom.window.history.replaceState(input, uri.path, location)
-      case _ =>
-        dom.window.history.pushState(input, uri.path, location)
-    }
-  }
-
-  def updateTitle(input: IResourceInput): Unit = {
-    val title = input.resource.path.dropWhile(_ == '/')
+  def updateTitle(state: Navigation.State): Unit = {
+    val title = state.path.dropWhile(_ == '/')
     dom.document.getElementById("title").textContent = title
   }
 
@@ -143,15 +93,21 @@ object MetadocApp {
   }
 
   def openEditor(editorService: MetadocEditorService)(
-      input: IResourceInput
+      state: Navigation.State
   ): Unit = {
+    val input = jsObject[IResourceInput]
+    input.resource = createUri(state.path)
+    input.options = jsObject[ITextEditorOptions]
+    input.options.selection = state.selection.map(_.toRange).orUndefined
+
     for (editor <- editorService.open(input)) {
-      updateTitle(input)
+      updateTitle(state)
 
       editor.onDidChangeCursorSelection { cursor =>
-        val selection = Some(cursor.selection)
-        val input = createInputResource(editor.getModel().uri, selection)
-        updateHistory(input)
+        val selection = Navigation.Selection.fromRange(cursor.selection)
+        val state =
+          new Navigation.State(editor.getModel().uri.path, Some(selection))
+        updateHistory(state)
       }
     }
   }
