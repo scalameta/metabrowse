@@ -257,7 +257,6 @@ class MetadocCliTest
           .readAllBytes
       )
       val obtained = index.toString
-      println(obtained)
       assertNoDiff(obtained, expected)
     }
   }
