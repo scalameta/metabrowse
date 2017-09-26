@@ -7,7 +7,8 @@ import java.net.URI
 import monaco.Range
 
 object Navigation {
-  class State(val path: String, val selection: Option[Selection]) extends js.Object {
+  class State(val path: String, val selection: Option[Selection])
+      extends js.Object {
     override def toString: String =
       path + selection.map(_.toString).fold("")("#" + _)
   }
@@ -48,8 +49,10 @@ object Navigation {
   }
 
   def currentState(
-    state: Option[State] = Option(dom.window.history.state.asInstanceOf[Navigation.State]),
-    locationHash: => String = dom.window.location.hash.dropWhile(_ == '#')
+      state: Option[State] = Option(
+        dom.window.history.state.asInstanceOf[Navigation.State]
+      ),
+      locationHash: => String = dom.window.location.hash.dropWhile(_ == '#')
   ): Option[Navigation.State] =
     state.orElse(parseState(locationHash))
 

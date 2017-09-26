@@ -13,7 +13,11 @@ class NavigationTest extends FunSuite {
     val stateWithSelection = Navigation.parseState("/path2#L11")
     assert(stateWithSelection.isDefined)
     assert(stateWithSelection.get.path == "/path2")
-    assert(stateWithSelection.get.selection == Some(Navigation.Selection(11, 1, 12, 1)))
+    assert(
+      stateWithSelection.get.selection == Some(
+        Navigation.Selection(11, 1, 12, 1)
+      )
+    )
 
     assert(Navigation.parseState("").isEmpty)
     assert(Navigation.parseState("#/path2#L11").isEmpty)
@@ -25,12 +29,18 @@ class NavigationTest extends FunSuite {
     assert(stateFromHash.get.path == "/path")
     assert(stateFromHash.get.selection.isEmpty)
 
-    val stateFromHashWithSelection = Navigation.currentState(None, "/path2#L11")
+    val stateFromHashWithSelection =
+      Navigation.currentState(None, "/path2#L11")
     assert(stateFromHashWithSelection.isDefined)
     assert(stateFromHashWithSelection.get.path == "/path2")
-    assert(stateFromHashWithSelection.get.selection == Some(Navigation.Selection(11, 1, 12, 1)))
+    assert(
+      stateFromHashWithSelection.get.selection == Some(
+        Navigation.Selection(11, 1, 12, 1)
+      )
+    )
 
-    val stateFromHistory = Navigation.currentState(stateFromHash, "/other-path")
+    val stateFromHistory =
+      Navigation.currentState(stateFromHash, "/other-path")
     assert(stateFromHistory.isDefined)
     assert(stateFromHistory.get.path == "/path")
     assert(stateFromHistory.get.selection.isEmpty)
