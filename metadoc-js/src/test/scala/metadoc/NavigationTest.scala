@@ -5,7 +5,7 @@ import monaco.Range
 
 class NavigationTest extends FunSuite {
   test("Navigation.parseState") {
-    val state = Navigation.currentState(None, "/path")
+    val state = Navigation.parseState("/path")
     assert(state.isDefined)
     assert(state.get.path == "/path")
     assert(state.get.selection.isEmpty)
@@ -23,7 +23,7 @@ class NavigationTest extends FunSuite {
     assert(Navigation.parseState("#/path2#L11").isEmpty)
   }
 
-  test("Navigation.curentState") {
+  test("Navigation.currentState") {
     val stateFromHash = Navigation.currentState(None, "/path")
     assert(stateFromHash.isDefined)
     assert(stateFromHash.get.path == "/path")
@@ -48,7 +48,6 @@ class NavigationTest extends FunSuite {
 
   test("Navigation.Selection.toString") {
     assert(Navigation.Selection(11, 1, 12, 1).toString == "L11")
-    assert(Navigation.Selection(11, 1, 12, 4).toString == "L11-L12C4")
     assert(Navigation.Selection(11, 1, 12, 4).toString == "L11-L12C4")
     assert(Navigation.Selection(11, 2, 12, 4).toString == "L11C2-L12C4")
     assert(Navigation.Selection(11, 2, 12, 1).toString == "L11C2-L12")
