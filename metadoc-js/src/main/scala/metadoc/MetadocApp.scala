@@ -7,6 +7,13 @@ import scala.scalajs.js
 import scala.scalajs.js.typedarray.TypedArrayBuffer
 import scala.scalajs.js.JSConverters._
 import monaco.{IRange, Range, Uri}
+import monaco.Uri
+import monaco.editor.Editor
+import monaco.editor.IEditor
+import monaco.editor.IEditorConstructionOptions
+import monaco.editor.IEditorOptions
+import monaco.editor.IEditorOverrideServices
+import monaco.editor.IModelChangedEvent
 import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom
@@ -14,6 +21,26 @@ import org.langmeta.internal.semanticdb.{schema => s}
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {
+    val editorThemeMenuElement =
+      dom.document.querySelector("#editor-theme-menu");
+    val editorThemeMenu = new mdc.MDCSimpleMenu(editorThemeMenuElement);
+    val editorThemeIcon = dom.document.querySelector(".editor-theme");
+    editorThemeIcon.addEventListener("click", { (event: dom.Event) =>
+      event.preventDefault()
+      editorThemeMenu.open = !editorThemeMenu.open
+    })
+
+    for (theme <- Seq("vs", "vs-dark", "hc-black")) {
+      val themeControl = dom.document
+        .getElementById(s"theme:$theme")
+        .asInstanceOf[dom.html.Input]
+
+      themeControl.onclick = { (e: dom.MouseEvent) =>
+        Editor.setTheme(theme)
+        dom.ext.LocalStorage.update("editor-theme", theme)
+      }
+    }
+
     for {
       _ <- loadMonaco()
       workspace <- MetadocFetch.workspace()
@@ -21,6 +48,10 @@ object MetadocApp {
       val index = new MutableBrowserIndex(MetadocState(s.Document()))
       registerLanguageExtensions(index)
       val editorService = new MetadocEditorService(index)
+
+      dom.ext.LocalStorage("editor-theme").foreach { theme =>
+        Editor.setTheme(theme)
+      }
 
       def defaultState = {
         val state = Navigation.parseState(workspace.filenames.head)

@@ -8,11 +8,27 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="vs/loader.js"></script>
   </head>
-  <body>
-    <header>
-      <div id="title">Metadoc</div>
+  <body class="mdc-typography">
+    <header class="mdc-toolbar mdc-toolbar--fixed">
+      <div class="mdc-toolbar__row">
+        <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+          <span class="mdc-toolbar__title" id="title">Metadoc</span>
+        </section>
+        <section class="mdc-toolbar__section mdc-toolbar__section--align-end actions" role="toolbar">
+          <div class="mdc-menu-anchor">
+            <a href="#" class="material-icons mdc-toolbar__icon editor-theme" aria-label="Change the editor theme" alt="Change the editor theme">invert_colors</a>
+            <div class="mdc-simple-menu" tabindex="-1" id="editor-theme-menu" style="transform-origin: right top 0px; right: 0px; top: 0px; transform: scale(0, 0);">
+              <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true" style="transform: scale(1, 1);">
+                <li class="mdc-list-item" id="theme:vs" role="menuitem" tabindex="0">Light</li>
+                <li class="mdc-list-item" id="theme:vs-dark" role="menuitem" tabindex="0">Dark</li>
+                <li class="mdc-list-item" id="theme:hc-black" role="menuitem" tabindex="0">High Contrast Black</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
     </header>
-    <main>
+    <main class="mdc-toolbar-fixed-adjust">
       <div id="editor">Loading ..</div>
     </main>
   </body>
