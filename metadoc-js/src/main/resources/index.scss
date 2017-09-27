@@ -12,7 +12,7 @@
   font-style: normal;
 }
 
-$header-height: 40px;
+$header-height: 56px;
 
 body {
   margin: 0;
@@ -23,18 +23,20 @@ body {
 }
 
 header {
-  background-color: #002b36;
-  color: white;
-  height: $header-height;
-  padding: 10px 10px;
+  .mdc-toolbar__row {
+    min-height: $header-height;
+    background-color: #002b36;
+    color: white;
+  }
 
   #title {
-    line-height: $header-height;
     font-size: 16px;
-    padding-left: 50px;
+    padding-left: $header-height;
+    margin-left: 0;
     background-image: url('images/favicon.png');
     background-repeat: no-repeat;
-    background-size: contain;
+    background-size: 40px;
+    background-position: 8px center;
     display: block;
     font-weight: bold;
 
@@ -45,12 +47,20 @@ header {
     overflow: hidden;
     white-space: nowrap;
   }
+
+  .actions {
+    max-width: $header-height;
+  }
 }
 
 main {
+  &.mdc-toolbar-fixed-adjust {
+    margin-top: $header-height;
+  }
+
   #editor {
-    // Header height + padding-{top,bottom} = 40px + 2 * 10px
-    height: calc(100vh - 60px);
+    // Header height ($header-height) is 56px
+    height: calc(100vh - 56px);
     margin: 0;
   }
 }
