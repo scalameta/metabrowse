@@ -2,13 +2,13 @@ language: scala
 scala: 2.12.3
 jdk: oraclejdk8
 
-script: ./bin/runci.sh $CI_TEST
+script: ./bin/runci.sh "$CI_TEST"
 env:
   global:
     - TRAVIS_NODE_VERSION="8"
     - TRAVIS_YARN_VERSION="1.1.0"
   matrix:
-    - CI_TEST: test
+    - CI_TEST: ;compile;test
     - CI_TEST: scripted
     - CI_TEST: scalafmt
 
