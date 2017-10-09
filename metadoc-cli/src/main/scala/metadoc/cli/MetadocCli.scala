@@ -330,7 +330,8 @@ object MetadocCli extends CaseApp[MetadocOptions] {
 
     if (options.cleanTargetFirst) {
       import better.files._
-      options.targetPath.toFile.toScala.delete()
+      val file = options.targetPath.toFile.toScala
+      if (file.exists) file.delete()
     }
 
     val classpath = remainingArgs.remainingArgs.flatMap { cp =>
