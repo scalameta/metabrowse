@@ -51,7 +51,9 @@ case class MetadocOptions(
     zip: Boolean = false,
     @HelpMessage("Disable fancy progress bar")
     nonInteractive: Boolean = false
-)
+) {
+  def targetPath: AbsolutePath = AbsolutePath(target.get)
+}
 
 case class Target(target: AbsolutePath, onClose: () => Unit)
 
@@ -59,7 +61,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   val Target(target, onClose) = if (options.zip) {
     // For large corpora (>1M LOC) writing the symbol/ directory is the
     // bottle-neck unless --zip is enabled.
-    val out = AbsolutePath(options.target.get).resolve("metadoc.zip")
+    val out = options.targetPath.resolve("metadoc.zip")
     Files.createDirectories(out.toNIO.getParent)
     val zipfs = FileSystems.newFileSystem(
       URI.create(s"jar:file:${out.toURI.getPath}"), {
@@ -70,7 +72,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
     )
     Target(AbsolutePath(zipfs.getPath("/")), () => zipfs.close())
   } else {
-    Target(AbsolutePath(options.target.get), () => ())
+    Target(options.targetPath, () => ())
   }
   private val display = new TermDisplay(
     new OutputStreamWriter(System.out),
@@ -324,6 +326,12 @@ object MetadocCli extends CaseApp[MetadocOptions] {
 
     if (options.target.isEmpty) {
       error("--target is required")
+    }
+
+    if (options.cleanTargetFirst) {
+      import better.files._
+      val file = options.targetPath.toFile.toScala
+      if (file.exists) file.delete()
     }
 
     val classpath = remainingArgs.remainingArgs.flatMap { cp =>

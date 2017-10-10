@@ -16,17 +16,19 @@ class MetadocCliTest
     with BeforeAndAfterAll
     with DiffAssertions {
   var out: AbsolutePath = _
+  def options = MetadocOptions(
+    Some(out.toString()),
+    cleanTargetFirst = true,
+    nonInteractive = true
+  )
+  def files = BuildInfo.exampleClassDirectory.map(_.getAbsolutePath)
+
+  def runCli(): Unit = MetadocCli.run(options, RemainingArgs(files, Nil))
+
   override def beforeAll(): Unit = {
     out = AbsolutePath(Files.createTempDirectory("metadoc"))
     out.toFile.deleteOnExit()
-
-    val options = MetadocOptions(
-      Some(out.toString()),
-      cleanTargetFirst = true,
-      nonInteractive = true
-    )
-    val files = BuildInfo.exampleClassDirectory.map(_.getAbsolutePath)
-    MetadocCli.run(options, RemainingArgs(files, Nil))
+    runCli()
   }
 
   val expectedFiles =
@@ -310,4 +312,7 @@ class MetadocCliTest
       |}
       |""".stripMargin
   )
+  test("--clean-target-first") {
+    runCli() // assert no error
+  }
 }
