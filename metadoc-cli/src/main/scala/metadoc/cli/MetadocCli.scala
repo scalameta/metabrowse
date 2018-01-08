@@ -4,6 +4,7 @@ import java.io.File
 import java.io.OutputStreamWriter
 import java.io.PrintStream
 import java.net.URI
+import java.nio.charset.StandardCharsets
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -11,7 +12,6 @@ import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardOpenOption
 import java.util.zip.ZipInputStream
-
 import scala.collection.{GenSeq, concurrent}
 import java.nio.file.attribute.BasicFileAttributes
 import java.util
@@ -21,11 +21,11 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
 import java.util.function.{Function => JFunction}
-
 import scala.collection.parallel.mutable.ParArray
 import scala.util.control.NonFatal
 import caseapp._
 import caseapp.core.Messages
+import com.trueaccord.scalapb.json.JsonFormat
 import metadoc.schema
 import metadoc.schema.SymbolIndex
 import metadoc.{schema => d}
@@ -147,7 +147,9 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
             file: Path,
             attrs: BasicFileAttributes
         ): FileVisitResult = {
-          if (file.getFileName.toString.endsWith(".semanticdb")) {
+          val filename = file.getFileName.toString
+          if (filename.endsWith(".semanticdb") ||
+            filename.endsWith(".semanticdb.json")) {
             files += AbsolutePath(file)
           }
           FileVisitResult.CONTINUE
@@ -160,13 +162,25 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       files.result()
     }
 
+  private def parseDatabase(path: AbsolutePath): s.Database = {
+    val filename = path.toNIO.getFileName.toString
+    val bytes = path.readAllBytes
+    if (filename.endsWith(".semanticdb")) {
+      s.Database.parseFrom(bytes)
+    } else if (filename.endsWith(".semanticdb.json")) {
+      val string = new String(bytes, StandardCharsets.UTF_8)
+      JsonFormat.fromJsonString[s.Database](string)
+    } else {
+      throw new IllegalArgumentException(s"Unexpected filename $filename")
+    }
+  }
+
   def buildSymbolIndex(paths: GenSeq[AbsolutePath]): Unit =
     phase("Building symbol index", paths.length) { tick =>
       paths.foreach { path =>
         try {
           tick()
-          val bytes = path.readAllBytes
-          val db = s.Database.parseFrom(bytes)
+          val db = parseDatabase(path)
           db.documents.foreach { document =>
             document.names.foreach {
               case s.ResolvedName(_, sym, _)
