@@ -9,6 +9,7 @@ env:
     - TRAVIS_YARN_VERSION="1.1.0"
   matrix:
     - CI_TEST: ;compile;test
+      CI_PUBLISH: true
     - CI_TEST: scripted
     - CI_TEST: scalafmt
 
