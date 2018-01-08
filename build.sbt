@@ -3,6 +3,11 @@ import scalajsbundler.util.JSON._
 
 inThisBuild(
   List(
+    version ~= { old =>
+      val suffix =
+        if (sys.props.contains("metadoc.snapshot")) "-SNAPSHOT" else ""
+      old.replace('+', '-') + suffix
+    },
     organization := "org.scalameta",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -16,6 +21,10 @@ inThisBuild(
         "scm:git:git@github.com:scalameta/metadoc.git"
       )
     ),
+    commands += Command.command("ci-release") { s =>
+      "very publishSigned" ::
+        s
+    },
     developers := List(
       Developer(
         "olafurpg",
@@ -233,3 +242,19 @@ lazy val noPublish = allSettings ++ Seq(
 )
 
 noPublish
+
+inScope(Global)(
+  Seq(
+    credentials ++= (for {
+      username <- sys.env.get("SONATYPE_USERNAME")
+      password <- sys.env.get("SONATYPE_PASSWORD")
+    } yield
+      Credentials(
+        "Sonatype Nexus Repository Manager",
+        "oss.sonatype.org",
+        username,
+        password
+      )).toSeq,
+    PgpKeys.pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray())
+  )
+)
