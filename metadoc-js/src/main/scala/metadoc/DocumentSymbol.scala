@@ -1,12 +1,12 @@
 package metadoc
 
 import monaco.languages.SymbolKind
-import org.{langmeta => m}
+import scala.meta.internal.{semanticdb3 => s}
 import metadoc.{schema => d}
 
 /** "Go to symbol" eligible definition */
 case class DocumentSymbol(
-    denotation: m.Denotation,
+    info: s.SymbolInformation,
     kind: SymbolKind,
     definition: d.Position
 )

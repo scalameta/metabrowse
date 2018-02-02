@@ -16,12 +16,14 @@ class ScalaDefinitionProvider(index: MetadocSemanticdbIndex)
       position: Position,
       token: CancellationToken
   ) = {
-    val offset = model.getOffsetAt(position).toInt
     def empty = Future.successful(js.Array[Location]())
     for {
-      symbol <- index.fetchSymbol(offset)
+      sym <- index.fetchSymbol(
+        position.lineNumber.toInt,
+        position.column.toInt
+      )
       locations <- {
-        symbol
+        sym
           .map(_.definition)
           .fold(empty) {
             case Some(defn) =>

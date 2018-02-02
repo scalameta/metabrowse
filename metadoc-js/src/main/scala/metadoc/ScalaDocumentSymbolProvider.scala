@@ -7,27 +7,24 @@ import monaco.editor.IReadOnlyModel
 import monaco.languages.DocumentSymbolProvider
 import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
-import org.langmeta.internal.semanticdb.{schema => s}
+import scala.meta.internal.{semanticdb3 => s}
 import org.{langmeta => m}
 
 class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     extends DocumentSymbolProvider {
 
-  private def getDocumentSymbols(doc: s.Document): Seq[DocumentSymbol] = {
-    val denotations = doc.symbols.collect {
-      case s.ResolvedSymbol(s, Some(d)) =>
-        s -> m.Denotation(d.flags, d.name, d.signature, Nil)
-    }.toMap
-    val infos = for {
-      name <- index.document.names
-      if name.isDefinition
-      symbol = m.Symbol(name.symbol)
+  private def getDocumentSymbols(doc: s.TextDocument): Seq[DocumentSymbol] = {
+    val infos = doc.symbols.map(info => (info.symbol, info)).toMap
+    val documentSymbols = for {
+      occ <- index.document.occurrences
+      if occ.role.isDefinition
+      symbol = m.Symbol(occ.symbol)
       if symbol.isInstanceOf[m.Symbol.Global]
-      denotation <- denotations.get(name.symbol)
-      kind <- symbolKind(denotation)
-      definition <- index.definition(name.symbol)
-    } yield DocumentSymbol(denotation, kind, definition)
-    infos
+      info <- infos.get(occ.symbol)
+      kind <- symbolKind(info)
+      definition <- index.definition(occ.symbol)
+    } yield DocumentSymbol(info, kind, definition)
+    documentSymbols
   }
 
   override def provideDocumentSymbols(
@@ -38,10 +35,10 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
       Some(doc) <- index.semanticdb(model.uri.path)
     } yield {
       val symbols = getDocumentSymbols(doc).map {
-        case DocumentSymbol(denotation, kind, definition) =>
+        case DocumentSymbol(info, kind, definition) =>
           new SymbolInformation(
-            name = denotation.name,
-            containerName = denotation.signature,
+            name = info.name,
+            containerName = info.signature.map(_.text).getOrElse(""),
             kind = kind,
             location = model.resolveLocation(definition)
           )
@@ -50,16 +47,16 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     }
   }.toMonacoThenable
 
-  def symbolKind(denotation: m.Denotation): Option[SymbolKind] = {
-    import denotation._
+  def symbolKind(info: s.SymbolInformation): Option[SymbolKind] = {
+    import info.kind._
 
-    if (isParam || isTypeParam)
+    if (isParameter || isTypeParameter)
       None
     else if (isVal || isVar)
       Some(SymbolKind.Variable)
     else if (isDef)
       Some(SymbolKind.Function)
-    else if (isPrimaryCtor || isSecondaryCtor)
+    else if (isPrimaryConstructor || isSecondaryConstructor)
       Some(SymbolKind.Constructor)
     else if (isClass)
       Some(SymbolKind.Class)

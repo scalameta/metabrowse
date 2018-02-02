@@ -149,20 +149,17 @@ class MetadocCliTest
          |_root_.org.typelevel.paiges.Doc.spread(Lscala/collection/Iterable;)Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Doc.stack(Lscala/collection/Iterable;)Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Doc.str(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.str(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.T#
          |_root_.org.typelevel.paiges.Doc.tabulate(CLjava/lang/String;Lscala/collection/Iterable;)Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Doc.tabulate(Lscala/collection/immutable/List;)Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Doc.text(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Document#
          |_root_.org.typelevel.paiges.Document#$init$()V.
          |_root_.org.typelevel.paiges.Document#contramap(Lscala/Function1;)Lorg/typelevel/paiges/Document;.
-         |_root_.org.typelevel.paiges.Document#contramap(Lscala/Function1;)Lorg/typelevel/paiges/Document;.Z#
          |_root_.org.typelevel.paiges.Document#document(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Document.
          |_root_.org.typelevel.paiges.Document.FromToString.
          |_root_.org.typelevel.paiges.Document.FromToString.document(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Document.apply(Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Document;.
-         |_root_.org.typelevel.paiges.Document.apply(Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Document;.A#
          |_root_.org.typelevel.paiges.Document.documentBoolean.
          |_root_.org.typelevel.paiges.Document.documentByte.
          |_root_.org.typelevel.paiges.Document.documentChar.
@@ -170,19 +167,15 @@ class MetadocCliTest
          |_root_.org.typelevel.paiges.Document.documentFloat.
          |_root_.org.typelevel.paiges.Document.documentInt.
          |_root_.org.typelevel.paiges.Document.documentIterable(Ljava/lang/String;Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Document;.
-         |_root_.org.typelevel.paiges.Document.documentIterable(Ljava/lang/String;Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Document;.A#
          |_root_.org.typelevel.paiges.Document.documentLong.
          |_root_.org.typelevel.paiges.Document.documentShort.
          |_root_.org.typelevel.paiges.Document.documentString.
          |_root_.org.typelevel.paiges.Document.documentUnit.
          |_root_.org.typelevel.paiges.Document.instance(Lscala/Function1;)Lorg/typelevel/paiges/Document;.
-         |_root_.org.typelevel.paiges.Document.instance(Lscala/Function1;)Lorg/typelevel/paiges/Document;.A#
          |_root_.org.typelevel.paiges.Document.useToString()Lorg/typelevel/paiges/Document;.
-         |_root_.org.typelevel.paiges.Document.useToString()Lorg/typelevel/paiges/Document;.A#
          |_root_.org.typelevel.paiges.DocumentTest#
          |_root_.org.typelevel.paiges.DocumentTest#`<init>`()V.
          |_root_.org.typelevel.paiges.DocumentTest#document(Ljava/lang/Object;Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.DocumentTest#document(Ljava/lang/Object;Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Doc;.A#
          |_root_.org.typelevel.paiges.DocumentTest#generatorDrivenConfig.
          |_root_.org.typelevel.paiges.Generators.
          |_root_.org.typelevel.paiges.Generators.arbDoc.
@@ -234,7 +227,6 @@ class MetadocCliTest
          |_root_.org.typelevel.paiges.PaigesTest.docEquiv.$anon#equiv(Lorg/typelevel/paiges/Doc;Lorg/typelevel/paiges/Doc;)Z.
          |_root_.org.typelevel.paiges.package.
          |_root_.org.typelevel.paiges.package.call(Ljava/lang/Object;Lscala/collection/immutable/List;)Ljava/lang/Object;.
-         |_root_.org.typelevel.paiges.package.call(Ljava/lang/Object;Lscala/collection/immutable/List;)Ljava/lang/Object;.A#
       """.stripMargin
 
     assertNoDiff(obtained, expected)
@@ -265,52 +257,12 @@ class MetadocCliTest
 
   checkSymbolIndex(
     "_root_.org.typelevel.paiges.Json.JArray.",
-    """
-        |symbol: "_root_.org.typelevel.paiges.Json.JArray."
-        |definition {
-        |  filename: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
-        |  start: 711
-        |  end: 717
-        |}
-        |references {
-        |  key: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
-        |  value {
-        |    ranges {
-        |      start: 1421
-        |      end: 1427
-        |    }
-        |    ranges {
-        |      start: 1345
-        |      end: 1351
-        |    }
-        |  }
-        |}
-      """.stripMargin
+    "SymbolIndex(_root_.org.typelevel.paiges.Json.JArray.,Some(Position(paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala,34,13,34,19)),Map(paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala -> Ranges(Vector(Range(56,16,56,22), Range(55,16,55,22)))))"
   )
 
   checkSymbolIndex(
     "_root_.org.typelevel.paiges.Json.JArray#",
-    """
-      |symbol: "_root_.org.typelevel.paiges.Json.JArray#"
-      |definition {
-      |  filename: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
-      |  start: 711
-      |  end: 717
-      |}
-      |references {
-      |  key: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
-      |  value {
-      |    ranges {
-      |      start: 1421
-      |      end: 1427
-      |    }
-      |    ranges {
-      |      start: 1345
-      |      end: 1351
-      |    }
-      |  }
-      |}
-      |""".stripMargin
+    "SymbolIndex(_root_.org.typelevel.paiges.Json.JArray#,Some(Position(paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala,34,13,34,19)),Map(paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala -> Ranges(Vector(Range(56,16,56,22), Range(55,16,55,22)))))"
   )
   test("--clean-target-first") {
     runCli() // assert no error
