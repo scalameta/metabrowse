@@ -48,13 +48,51 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
     val index = symbols
       .map(path => SymbolIndex.parseFrom(path.readAllBytes))
       .sortBy(_.symbol)
+      .map(_.toProtoString)
       .mkString("\n\n")
     assertNoDiff(
       index,
       """
-        |SymbolIndex(_root_.com.bar.Main.,Some(Position(interactive.scala,2,7,2,11)),Map(interactive.scala -> Ranges(Vector(Range(4,2,4,6)))))
+        |symbol: "_root_.com.bar.Main."
+        |definition {
+        |  filename: "interactive.scala"
+        |  start_line: 2
+        |  start_character: 7
+        |  end_line: 2
+        |  end_character: 11
+        |}
+        |references {
+        |  key: "interactive.scala"
+        |  value {
+        |    ranges {
+        |      start_line: 4
+        |      start_character: 2
+        |      end_line: 4
+        |      end_character: 6
+        |    }
+        |  }
+        |}
         |
-        |SymbolIndex(_root_.com.bar.Main.future.,Some(Position(interactive.scala,3,6,3,12)),Map(interactive.scala -> Ranges(Vector(Range(4,7,4,13)))))
+        |
+        |symbol: "_root_.com.bar.Main.future."
+        |definition {
+        |  filename: "interactive.scala"
+        |  start_line: 3
+        |  start_character: 6
+        |  end_line: 3
+        |  end_character: 12
+        |}
+        |references {
+        |  key: "interactive.scala"
+        |  value {
+        |    ranges {
+        |      start_line: 4
+        |      start_character: 7
+        |      end_line: 4
+        |      end_character: 13
+        |    }
+        |  }
+        |}
         |
       """.stripMargin
     )

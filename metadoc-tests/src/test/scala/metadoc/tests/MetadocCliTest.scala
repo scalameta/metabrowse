@@ -250,19 +250,71 @@ class MetadocCliTest
           .resolve(MetadocCli.encodeSymbolName(id))
           .readAllBytes
       )
-      val obtained = index.toString
+      val obtained = index.toProtoString
       assertNoDiff(obtained, expected)
     }
   }
 
   checkSymbolIndex(
     "_root_.org.typelevel.paiges.Json.JArray.",
-    "SymbolIndex(_root_.org.typelevel.paiges.Json.JArray.,Some(Position(paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala,34,13,34,19)),Map(paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala -> Ranges(Vector(Range(56,16,56,22), Range(55,16,55,22)))))"
+    """
+        |symbol: "_root_.org.typelevel.paiges.Json.JArray."
+        |definition {
+        |  filename: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
+        |  start_line: 34
+        |  start_character: 13
+        |  end_line: 34
+        |  end_character: 19
+        |}
+        |references {
+        |  key: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
+        |  value {
+        |    ranges {
+        |      start_line: 56
+        |      start_character: 16
+        |      end_line: 56
+        |      end_character: 22
+        |    }
+        |    ranges {
+        |      start_line: 55
+        |      start_character: 16
+        |      end_line: 55
+        |      end_character: 22
+        |    }
+        |  }
+        |}
+      """.stripMargin
   )
 
   checkSymbolIndex(
     "_root_.org.typelevel.paiges.Json.JArray#",
-    "SymbolIndex(_root_.org.typelevel.paiges.Json.JArray#,Some(Position(paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala,34,13,34,19)),Map(paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala -> Ranges(Vector(Range(56,16,56,22), Range(55,16,55,22)))))"
+    """
+      |symbol: "_root_.org.typelevel.paiges.Json.JArray#"
+      |definition {
+      |  filename: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
+      |  start_line: 34
+      |  start_character: 13
+      |  end_line: 34
+      |  end_character: 19
+      |}
+      |references {
+      |  key: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
+      |  value {
+      |    ranges {
+      |      start_line: 56
+      |      start_character: 16
+      |      end_line: 56
+      |      end_character: 22
+      |    }
+      |    ranges {
+      |      start_line: 55
+      |      start_character: 16
+      |      end_line: 55
+      |      end_character: 22
+      |    }
+      |  }
+      |}
+      |""".stripMargin
   )
   test("--clean-target-first") {
     runCli() // assert no error
