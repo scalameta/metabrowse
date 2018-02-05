@@ -45,7 +45,7 @@ inThisBuild(
 lazy val Version = new {
   def scala = "2.12.4"
   def scala210 = "2.10.6"
-  def scalameta = "3.1.0"
+  def scalameta = "3.2.0"
 }
 
 lazy val allSettings = Seq(
