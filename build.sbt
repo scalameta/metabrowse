@@ -45,7 +45,7 @@ inThisBuild(
 lazy val Version = new {
   def scala = "2.12.4"
   def scala210 = "2.10.6"
-  def scalameta = "3.0.0"
+  def scalameta = "3.1.0"
 }
 
 lazy val allSettings = Seq(
@@ -223,10 +223,7 @@ lazy val tests = project
         .value,
     libraryDependencies ++= List(
       "org.scalameta" %% "testkit" % Version.scalameta % Test,
-      // TODO: This is a bug in Scalameta 3.0.0.
-      // See https://github.com/scalameta/scalameta/pull/1245.
-      // "org.scalameta" % "interactive" % Version.scalameta % Test cross CrossVersion.full
-      "org.scalameta" %% "interactive" % Version.scalameta % Test
+      "org.scalameta" % "interactive" % Version.scalameta % Test cross CrossVersion.full
     ),
     buildInfoKeys := Seq[BuildInfoKey](
       "exampleClassDirectory" -> List(
