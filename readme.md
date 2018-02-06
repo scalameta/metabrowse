@@ -36,7 +36,7 @@ An up-to-date list of contributors is available here: https://github.com/scalame
 
 ## License
 
-Copyright 2017 Ólafur Páll Geirsson and Jonas Fonseca
+Copyright 2017-2018 Ólafur Páll Geirsson and Jonas Fonseca
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
