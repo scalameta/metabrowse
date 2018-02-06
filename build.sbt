@@ -38,7 +38,12 @@ inThisBuild(
         "jonas@users.noreply.github.com",
         url("https://github.com/jonas")
       )
-    )
+    ),
+    commands += Command.command("ci-test") { s =>
+      "compile" ::
+        "test" ::
+        s
+    }
   )
 )
 
