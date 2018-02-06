@@ -10,7 +10,7 @@ addSbtPlugin(
 addSbtPlugin(
   "io.get-coursier" % "sbt-coursier" % coursier.util.Properties.version
 )
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.20")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.22")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "1.1")
 libraryDependencies += "com.trueaccord.scalapb" %% "compilerplugin-shaded" % "0.6.0-pre5"
 libraryDependencies += "org.scala-sbt" % "scripted-plugin" % sbtVersion.value
