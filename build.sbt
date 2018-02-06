@@ -100,8 +100,8 @@ lazy val cli = project
       val paths: PathFinder =
         (
           targetDir./("assets").*** +++
-          targetDir./("vs").*** +++
-          targetDir.*(includes)
+            targetDir./("vs").*** +++
+            targetDir.*(includes)
         ) --- targetDir
       val mappings = paths.get pair relativeTo(targetDir)
       IO.zip(mappings, zip)
