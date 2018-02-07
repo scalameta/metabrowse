@@ -8,7 +8,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const ExtractSass = new ExtractTextPlugin({
-  filename: "[name].[contenthash].css",
+  filename: 'metadoc.[contenthash].css',
   disable: process.env.NODE_ENV === "development"
 });
 
@@ -19,9 +19,6 @@ const MonacoEditorBaseDir = path.resolve(__dirname, 'node_modules/monaco-editor/
 module.exports = merge(config, {
   entry: {
     'index': path.resolve(ResourcesDir, 'index.js')
-  },
-  output: {
-    path: path.resolve(RootDir, 'target/app')
   },
   resolve: {
     alias: {
@@ -54,13 +51,13 @@ module.exports = merge(config, {
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
         loaders: [
-          'file-loader?hash=sha512&digest=hex&name=[hash].[ext]',
+          'file-loader?hash=sha512&digest=hex&name=assets/[hash].[ext]',
           'image-webpack-loader?bypassOnDebug'
         ]
       },
-      { test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, loader: 'file-loader?name=[name].[hash].[ext]' },
-      { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'file-loader?name=[name].[hash].[ext]' },
-      { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'file-loader?name=[name].[hash].[ext]' },
+      { test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, loader: 'file-loader?name=assets/[name].[hash].[ext]' },
+      { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'file-loader?name=assets/[name].[hash].[ext]' },
+      { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'file-loader?name=assets/[name].[hash].[ext]' },
     ]
   },
   plugins: [
