@@ -10,7 +10,8 @@ env:
   matrix:
     - CI_TEST: ci-test
       CI_PUBLISH: true
-    - CI_TEST: scripted
+    - CI_TEST: ";^^0.13.17; scripted"
+    - CI_TEST: ";^^1.0.4; scripted"
     - CI_TEST: scalafmt
 
 cache:

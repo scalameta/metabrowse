@@ -85,16 +85,7 @@ object MetadocPlugin extends AutoPlugin {
     fullClasspath in Metadoc := Classpaths
       .managedJars(Metadoc, classpathTypes.value, update.value),
     runner in (Metadoc, run) := {
-      val forkOptions = ForkOptions(
-        bootJars = Nil,
-        javaHome = javaHome.value,
-        connectInput = connectInput.value,
-        outputStrategy = outputStrategy.value,
-        runJVMOptions = javaOptions.value,
-        workingDirectory = Some(baseDirectory.value),
-        envVars = envVars.value
-      )
-      new ForkRun(forkOptions)
+      new ForkRun(Compat.forkOptions.value)
     },
     metadoc := {
       val output = (target in metadoc).value

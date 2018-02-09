@@ -202,8 +202,13 @@ val sbtPlugin = project
   .settings(
     name := "sbt-metadoc",
     allSettings,
-    scalaVersion := Version.scala210,
-    crossScalaVersions := Seq(Version.scala210),
+    crossSbtVersions := List("0.13.16", "1.0.2"),
+    scalaVersion := {
+      (sbtBinaryVersion in pluginCrossBuild).value match {
+        case "0.13" => Version.scala210
+        case _ => Version.scala
+      }
+    },
     publishLocal := publishLocal
       .dependsOn(publishLocal in coreJVM)
       .dependsOn(publishLocal in cli)
