@@ -1,4 +1,4 @@
-import com.trueaccord.scalapb.compiler.Version.scalapbVersion
+import scalapb.compiler.Version.scalapbVersion
 import scalajsbundler.util.JSON._
 
 inThisBuild(
@@ -50,7 +50,7 @@ inThisBuild(
 lazy val Version = new {
   def scala = "2.12.4"
   def scala210 = "2.10.6"
-  def scalameta = "2.1.5"
+  def scalameta = "3.2.0"
 }
 
 lazy val allSettings = Seq(
@@ -91,7 +91,7 @@ lazy val cli = project
     mainClass.in(assembly) := Some("metadoc.cli.MetadocCli"),
     assemblyJarName.in(assembly) := "metadoc.jar",
     libraryDependencies ++= List(
-      "com.trueaccord.scalapb" %% "scalapb-json4s" % "0.3.2",
+      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.7.0-rc2",
       "com.github.alexarchambault" %% "case-app" % "1.2.0-M3",
       "com.github.pathikrit" %% "better-files" % "3.0.0"
     ),
@@ -174,7 +174,7 @@ lazy val core = crossProject
     ),
     libraryDependencies ++= List(
       "org.scalameta" %%% "langmeta" % Version.scalameta,
-      "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion
+      "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion
     )
   )
 lazy val coreJVM = core.jvm
@@ -241,7 +241,7 @@ lazy val tests = project
         .value,
     libraryDependencies ++= List(
       "org.scalameta" %% "testkit" % Version.scalameta % Test,
-      "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta % Test cross CrossVersion.full
+      "org.scalameta" % "interactive" % Version.scalameta % Test cross CrossVersion.full
     ),
     buildInfoKeys := Seq[BuildInfoKey](
       "exampleClassDirectory" -> List(

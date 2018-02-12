@@ -18,9 +18,11 @@ class ScalaReferenceProvider(index: MetadocSemanticdbIndex)
       context: ReferenceContext,
       token: CancellationToken
   ) = {
-    val offset = model.getOffsetAt(position).toInt
     for {
-      sym <- index.fetchSymbol(offset)
+      sym <- index.fetchSymbol(
+        position.lineNumber.toInt,
+        position.column.toInt
+      )
       locations <- Future.sequence {
         val references = sym.map(_.references).getOrElse(Map.empty)
         references.map {
@@ -34,7 +36,13 @@ class ScalaReferenceProvider(index: MetadocSemanticdbIndex)
                 case MetadocMonacoDocument(_, model) =>
                   ranges.ranges.map { range =>
                     model.`object`.textEditorModel.resolveLocation(
-                      schema.Position(filename, range.start, range.end)
+                      schema.Position(
+                        filename,
+                        range.startLine,
+                        range.startCharacter,
+                        range.endLine,
+                        range.endCharacter
+                      )
                     )
                   }
               }

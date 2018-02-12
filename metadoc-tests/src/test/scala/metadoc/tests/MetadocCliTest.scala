@@ -258,7 +258,7 @@ class MetadocCliTest
           .resolve(MetadocCli.encodeSymbolName(id))
           .readAllBytes
       )
-      val obtained = index.toString
+      val obtained = index.toProtoString
       assertNoDiff(obtained, expected)
     }
   }
@@ -269,19 +269,25 @@ class MetadocCliTest
         |symbol: "_root_.org.typelevel.paiges.Json.JArray."
         |definition {
         |  filename: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
-        |  start: 711
-        |  end: 717
+        |  start_line: 34
+        |  start_character: 13
+        |  end_line: 34
+        |  end_character: 19
         |}
         |references {
         |  key: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
         |  value {
         |    ranges {
-        |      start: 1421
-        |      end: 1427
+        |      start_line: 56
+        |      start_character: 16
+        |      end_line: 56
+        |      end_character: 22
         |    }
         |    ranges {
-        |      start: 1345
-        |      end: 1351
+        |      start_line: 55
+        |      start_character: 16
+        |      end_line: 55
+        |      end_character: 22
         |    }
         |  }
         |}
@@ -294,19 +300,25 @@ class MetadocCliTest
       |symbol: "_root_.org.typelevel.paiges.Json.JArray#"
       |definition {
       |  filename: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
-      |  start: 711
-      |  end: 717
+      |  start_line: 34
+      |  start_character: 13
+      |  end_line: 34
+      |  end_character: 19
       |}
       |references {
       |  key: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
       |  value {
       |    ranges {
-      |      start: 1421
-      |      end: 1427
+      |      start_line: 56
+      |      start_character: 16
+      |      end_line: 56
+      |      end_character: 22
       |    }
       |    ranges {
-      |      start: 1345
-      |      end: 1351
+      |      start_line: 55
+      |      start_character: 16
+      |      end_line: 55
+      |      end_character: 22
       |    }
       |  }
       |}

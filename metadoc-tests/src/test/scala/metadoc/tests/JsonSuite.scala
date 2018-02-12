@@ -8,7 +8,6 @@ import scala.meta.interactive._
 import scala.meta.testkit.DiffAssertions
 import scala.tools.nsc.interactive.Global
 import caseapp.RemainingArgs
-import com.trueaccord.scalapb.json.JsonFormat
 import metadoc.cli.MetadocCli
 import metadoc.cli.MetadocOptions
 import metadoc.schema.SymbolIndex
@@ -17,6 +16,7 @@ import org.langmeta.internal.io.PathIO
 import org.langmeta.io.AbsolutePath
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
+import scalapb.json4s.JsonFormat
 
 class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
   val compiler: Global = InteractiveSemanticdb.newCompiler()
@@ -48,6 +48,7 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
     val index = symbols
       .map(path => SymbolIndex.parseFrom(path.readAllBytes))
       .sortBy(_.symbol)
+      .map(_.toProtoString)
       .mkString("\n\n")
     assertNoDiff(
       index,
@@ -55,15 +56,19 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
         |symbol: "_root_.com.bar.Main."
         |definition {
         |  filename: "interactive.scala"
-        |  start: 54
-        |  end: 58
+        |  start_line: 2
+        |  start_character: 7
+        |  end_line: 2
+        |  end_character: 11
         |}
         |references {
         |  key: "interactive.scala"
         |  value {
         |    ranges {
-        |      start: 99
-        |      end: 103
+        |      start_line: 4
+        |      start_character: 2
+        |      end_line: 4
+        |      end_character: 6
         |    }
         |  }
         |}
@@ -72,15 +77,19 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
         |symbol: "_root_.com.bar.Main.future."
         |definition {
         |  filename: "interactive.scala"
-        |  start: 67
-        |  end: 73
+        |  start_line: 3
+        |  start_character: 6
+        |  end_line: 3
+        |  end_character: 12
         |}
         |references {
         |  key: "interactive.scala"
         |  value {
         |    ranges {
-        |      start: 104
-        |      end: 110
+        |      start_line: 4
+        |      start_character: 7
+        |      end_line: 4
+        |      end_character: 13
         |    }
         |  }
         |}
