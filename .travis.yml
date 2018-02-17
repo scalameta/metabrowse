@@ -11,6 +11,9 @@ matrix:
   include:
     - script: sbt ci-test
       env: CI_PUBLISH=true
+      deploy:
+        provider: script
+        script: bash bin/ci-publish.sh
     - script: sbt ";^^$SCRIPTED_SBT_VERSION; scripted"
       env: SCRIPTED_SBT_VERSION="0.13.17"
     - script: sbt ";^^$SCRIPTED_SBT_VERSION; scripted"
@@ -40,6 +43,3 @@ before_cache:
   - find $HOME/.sbt -name "*.lock" -type f -delete
   - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
   - rm -rf $HOME/.ivy2/local
-
-after_success:
-  - "./bin/ci-publish.sh"
