@@ -28,11 +28,6 @@ inThisBuild(
       else
         Some("releases" at nexus + "service/local/staging/deploy/maven2")
     },
-    commands += Command.command("ci-release") { s =>
-      s";^ publishSigned" ::
-        s";^^ ${Version.sbt013}; sbtPlugin/publishSigned" ::
-        s
-    },
     developers := List(
       Developer(
         "olafurpg",
@@ -47,11 +42,6 @@ inThisBuild(
         url("https://github.com/jonas")
       )
     ),
-    commands += Command.command("ci-test") { s =>
-      "compile" ::
-        "test" ::
-        s
-    }
   )
 )
 
@@ -274,6 +264,11 @@ lazy val noPublish = allSettings ++ Seq(
   publishArtifact := false
 )
 
+addCommandAlias("ci-test", ";compile ;test")
+addCommandAlias(
+  "ci-release",
+  s";+publishSigned ;^^${Version.sbt013} ;sbtPlugin/publishSigned"
+)
 noPublish
 disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
 
