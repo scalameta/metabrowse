@@ -165,6 +165,7 @@ lazy val core = crossProject
   .crossType(CrossType.Pure)
   .in(file("metadoc-core"))
   .disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
+  .jsSettings(noPublish)
   .settings(
     allSettings,
     moduleName := "metadoc-core",
