@@ -26,7 +26,7 @@ inThisBuild(
       if (isSnapshot.value)
         Some("snapshots" at nexus + "content/repositories/snapshots")
       else
-        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+        Some("releases" at nexus + "service/local/staging/deploy/maven2")
     },
     commands += Command.command("ci-release") { s =>
       s";^ publishSigned" ::
