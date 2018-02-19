@@ -21,9 +21,11 @@ inThisBuild(
         "scm:git:git@github.com:scalameta/metadoc.git"
       )
     ),
-    commands += Command.command("ci-release") { s =>
-      "very publishSigned" ::
-        s
+    publishTo := Some {
+      if (isSnapshot.value)
+        Opts.resolver.sonatypeSnapshots
+      else
+        Opts.resolver.sonatypeStaging
     },
     developers := List(
       Developer(
@@ -39,11 +41,6 @@ inThisBuild(
         url("https://github.com/jonas")
       )
     ),
-    commands += Command.command("ci-test") { s =>
-      "compile" ::
-        "test" ::
-        s
-    }
   )
 )
 
@@ -51,11 +48,14 @@ lazy val Version = new {
   def scala = "2.12.4"
   def scala210 = "2.10.6"
   def scalameta = "2.1.5"
+  def sbt = "1.0.4"
+  def sbt013 = "0.13.17"
 }
 
 lazy val allSettings = Seq(
   scalaVersion := Version.scala,
   crossScalaVersions := Seq(Version.scala),
+  crossSbtVersions := Nil,
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -71,6 +71,7 @@ lazy val allSettings = Seq(
 
 lazy val example = project
   .in(file("paiges") / "core")
+  .disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
   .settings(
     noPublish,
     addCompilerPlugin(
@@ -85,6 +86,7 @@ lazy val example = project
 
 lazy val cli = project
   .in(file("metadoc-cli"))
+  .disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
   .settings(
     allSettings,
     moduleName := "metadoc-cli",
@@ -104,11 +106,11 @@ lazy val cli = project
       val includes: FileFilter = "index.html" | "metadoc.*.css" | "*-bundle.js" | "favicon.png"
       val paths: PathFinder =
         (
-          targetDir./("assets").*** +++
-            targetDir./("vs").*** +++
+          targetDir./("assets").allPaths +++
+            targetDir./("vs").allPaths +++
             targetDir.*(includes)
         ) --- targetDir
-      val mappings = paths.get pair relativeTo(targetDir)
+      val mappings = paths.get pair Path.relativeTo(targetDir)
       IO.zip(mappings, zip)
       Seq(zip)
     }.taskValue
@@ -117,6 +119,7 @@ lazy val cli = project
 
 lazy val js = project
   .in(file("metadoc-js"))
+  .disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
   .settings(
     noPublish,
     moduleName := "metadoc-js",
@@ -160,6 +163,8 @@ lazy val js = project
 lazy val core = crossProject
   .crossType(CrossType.Pure)
   .in(file("metadoc-core"))
+  .disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
+  .jsSettings(noPublish)
   .settings(
     allSettings,
     moduleName := "metadoc-core",
@@ -202,7 +207,7 @@ val sbtPlugin = project
   .settings(
     name := "sbt-metadoc",
     allSettings,
-    crossSbtVersions := List("0.13.16", "1.0.2"),
+    crossSbtVersions := List(Version.sbt, Version.sbt013),
     scalaVersion := {
       (sbtBinaryVersion in pluginCrossBuild).value match {
         case "0.13" => Version.scala210
@@ -214,7 +219,6 @@ val sbtPlugin = project
       .dependsOn(publishLocal in cli)
       .value,
     sbt.Keys.sbtPlugin := true,
-    scriptedSettings,
     // scriptedBufferLog := false,
     scriptedLaunchOpts += "-Dproject.version=" + version.value,
     buildInfoPackage := "metadoc.sbt",
@@ -228,6 +232,7 @@ val sbtPlugin = project
 
 lazy val tests = project
   .in(file("metadoc-tests"))
+  .disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
   .settings(
     noPublish,
     buildInfoPackage := "metadoc.tests",
@@ -259,20 +264,16 @@ lazy val noPublish = allSettings ++ Seq(
   publishArtifact := false
 )
 
+addCommandAlias("ci-test", ";compile ;test")
+addCommandAlias(
+  "ci-release",
+  s";+publishSigned ;^^${Version.sbt013} ;sbtPlugin/publishSigned"
+)
 noPublish
+disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
 
 inScope(Global)(
   Seq(
-    credentials ++= (for {
-      username <- sys.env.get("SONATYPE_USERNAME")
-      password <- sys.env.get("SONATYPE_PASSWORD")
-    } yield
-      Credentials(
-        "Sonatype Nexus Repository Manager",
-        "oss.sonatype.org",
-        username,
-        password
-      )).toSeq,
     PgpKeys.pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray())
   )
 )
