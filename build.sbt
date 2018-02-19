@@ -141,7 +141,7 @@ lazy val js = project
       "extract-text-webpack-plugin" -> "3.0.2",
       "file-loader" -> "1.1.6",
       "html-webpack-plugin" -> "2.30.1",
-      "image-webpack-loader" -> "4.0.0",
+      "image-webpack-loader" -> "4.1.0",
       "material-design-icons" -> "3.0.1",
       "material-components-web" -> "0.21.1",
       "node-sass" -> "4.7.2",
