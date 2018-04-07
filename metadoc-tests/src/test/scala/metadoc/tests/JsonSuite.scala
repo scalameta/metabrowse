@@ -8,7 +8,7 @@ import scala.meta.interactive._
 import scala.meta.testkit.DiffAssertions
 import scala.tools.nsc.interactive.Global
 import caseapp.RemainingArgs
-import com.trueaccord.scalapb.json.JsonFormat
+import scalapb.json4s.JsonFormat
 import metadoc.cli.MetadocCli
 import metadoc.cli.MetadocOptions
 import metadoc.schema.SymbolIndex

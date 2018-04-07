@@ -25,7 +25,7 @@ import scala.collection.parallel.mutable.ParArray
 import scala.util.control.NonFatal
 import caseapp._
 import caseapp.core.Messages
-import com.trueaccord.scalapb.json.JsonFormat
+import scalapb.json4s.JsonFormat
 import metadoc.schema
 import metadoc.schema.SymbolIndex
 import metadoc.{schema => d}
