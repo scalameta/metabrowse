@@ -2,7 +2,7 @@ package metadoc
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import org.langmeta.internal.semanticdb.{schema => s}
+import scala.meta.internal.{ semanticdb3 => s}
 import metadoc.MetadocApp._
 import metadoc.{schema => d}
 
@@ -17,12 +17,12 @@ object MetadocFetch {
     }
   }.recover(or404)
 
-  def document(filename: String): Future[Option[s.Document]] = {
+  def document(filename: String): Future[Option[s.TextDocument]] = {
     val url = "semanticdb/" + filename + ".semanticdb"
     for {
       bytes <- fetchBytes(url)
     } yield {
-      Some(s.Database.parseFrom(bytes).documents.head)
+      Some(s.TextDocuments.parseFrom(bytes).documents.head)
     }
   }.recover(or404)
 

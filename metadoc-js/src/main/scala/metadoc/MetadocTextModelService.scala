@@ -11,7 +11,7 @@ import monaco.services.IReference
 import monaco.services.ITextEditorModel
 import monaco.services.ITextModelService
 import monaco.services.ImmortalReference
-import org.langmeta.internal.semanticdb.{schema => s}
+import scala.meta.internal.{ semanticdb3 => s}
 
 object MetadocTextModelService extends ITextModelService {
   def modelReference(
@@ -20,7 +20,7 @@ object MetadocTextModelService extends ITextModelService {
     modelDocument(createUri(filename)).map(_.model)
 
   // TODO(olafur): Move this state out for easier testing.
-  private val modelDocumentCache = mutable.Map.empty[IModel, s.Document]
+  private val modelDocumentCache = mutable.Map.empty[IModel, s.TextDocument]
 
   private def document(model: IModel) =
     MetadocMonacoDocument(
@@ -38,7 +38,7 @@ object MetadocTextModelService extends ITextModelService {
       for {
         Some(doc) <- MetadocFetch.document(resource.path)
       } yield {
-        val model = Editor.createModel(doc.contents, "scala", resource)
+        val model = Editor.createModel(doc.text, "scala", resource)
         modelDocumentCache(model) = doc
         document(model)
       }

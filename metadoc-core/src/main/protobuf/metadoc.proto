@@ -4,8 +4,10 @@ package metadoc.schema;
 
 message Position {
     string filename = 1;
-    int32 start = 2;
-    int32 end = 3;
+    int32 startLine = 2;
+    int32 startCharacter = 3;
+    int32 endLine = 4;
+    int32 endCharacter = 5;
 }
 
 message SymbolIndex {
@@ -16,8 +18,10 @@ message SymbolIndex {
 }
 
 message Range {
-    int32 start = 2;
-    int32 end = 3;
+    int32 startLine = 1;
+    int32 startCharacter = 2;
+    int32 endLine = 3;
+    int32 endCharacter = 4;
 }
 
 message Ranges {

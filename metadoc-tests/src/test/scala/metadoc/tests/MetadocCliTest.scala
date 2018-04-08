@@ -34,9 +34,9 @@ class MetadocCliTest
   val expectedFiles =
     """paiges/core/src/main/scala/org/typelevel/paiges/Chunk.scala.semanticdb
       |paiges/core/src/main/scala/org/typelevel/paiges/Doc.scala.semanticdb
-      |paiges/core/src/main/scala/org/typelevel/paiges/Document.scala.semanticdb
+      |paiges/core/src/main/scala/org/typelevel/paiges.TextDocument.scala.semanticdb
       |paiges/core/src/main/scala/org/typelevel/paiges/package.scala.semanticdb
-      |paiges/core/src/test/scala/org/typelevel/paiges/DocumentTests.scala.semanticdb
+      |paiges/core/src/test/scala/org/typelevel/paiges.TextDocumentTests.scala.semanticdb
       |paiges/core/src/test/scala/org/typelevel/paiges/Generators.scala.semanticdb
       |paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala.semanticdb
       |paiges/core/src/test/scala/org/typelevel/paiges/PaigesTest.scala.semanticdb
@@ -153,37 +153,37 @@ class MetadocCliTest
          |_root_.org.typelevel.paiges.Doc.tabulate(CLjava/lang/String;Lscala/collection/Iterable;)Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Doc.tabulate(Lscala/collection/immutable/List;)Lorg/typelevel/paiges/Doc;.
          |_root_.org.typelevel.paiges.Doc.text(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Document#
-         |_root_.org.typelevel.paiges.Document#$init$()V.
-         |_root_.org.typelevel.paiges.Document#contramap(Lscala/Function1;)Lorg/typelevel/paiges/Document;.
-         |_root_.org.typelevel.paiges.Document#contramap(Lscala/Function1;)Lorg/typelevel/paiges/Document;.Z#
-         |_root_.org.typelevel.paiges.Document#document(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Document.
-         |_root_.org.typelevel.paiges.Document.FromToString.
-         |_root_.org.typelevel.paiges.Document.FromToString.document(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Document.apply(Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Document;.
-         |_root_.org.typelevel.paiges.Document.apply(Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Document;.A#
-         |_root_.org.typelevel.paiges.Document.documentBoolean.
-         |_root_.org.typelevel.paiges.Document.documentByte.
-         |_root_.org.typelevel.paiges.Document.documentChar.
-         |_root_.org.typelevel.paiges.Document.documentDouble.
-         |_root_.org.typelevel.paiges.Document.documentFloat.
-         |_root_.org.typelevel.paiges.Document.documentInt.
-         |_root_.org.typelevel.paiges.Document.documentIterable(Ljava/lang/String;Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Document;.
-         |_root_.org.typelevel.paiges.Document.documentIterable(Ljava/lang/String;Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Document;.A#
-         |_root_.org.typelevel.paiges.Document.documentLong.
-         |_root_.org.typelevel.paiges.Document.documentShort.
-         |_root_.org.typelevel.paiges.Document.documentString.
-         |_root_.org.typelevel.paiges.Document.documentUnit.
-         |_root_.org.typelevel.paiges.Document.instance(Lscala/Function1;)Lorg/typelevel/paiges/Document;.
-         |_root_.org.typelevel.paiges.Document.instance(Lscala/Function1;)Lorg/typelevel/paiges/Document;.A#
-         |_root_.org.typelevel.paiges.Document.useToString()Lorg/typelevel/paiges/Document;.
-         |_root_.org.typelevel.paiges.Document.useToString()Lorg/typelevel/paiges/Document;.A#
-         |_root_.org.typelevel.paiges.DocumentTest#
-         |_root_.org.typelevel.paiges.DocumentTest#`<init>`()V.
-         |_root_.org.typelevel.paiges.DocumentTest#document(Ljava/lang/Object;Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.DocumentTest#document(Ljava/lang/Object;Lorg/typelevel/paiges/Document;)Lorg/typelevel/paiges/Doc;.A#
-         |_root_.org.typelevel.paiges.DocumentTest#generatorDrivenConfig.
+         |_root_.org.typelevel.paiges.TextDocument#
+         |_root_.org.typelevel.paiges.TextDocument#$init$()V.
+         |_root_.org.typelevel.paiges.TextDocument#contramap(Lscala/Function1;)Lorg/typelevel/paiges.TextDocument;.
+         |_root_.org.typelevel.paiges.TextDocument#contramap(Lscala/Function1;)Lorg/typelevel/paiges.TextDocument;.Z#
+         |_root_.org.typelevel.paiges.TextDocument#document(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.
+         |_root_.org.typelevel.paiges.TextDocument.
+         |_root_.org.typelevel.paiges.TextDocument.FromToString.
+         |_root_.org.typelevel.paiges.TextDocument.FromToString.document(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.
+         |_root_.org.typelevel.paiges.TextDocument.apply(Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges.TextDocument;.
+         |_root_.org.typelevel.paiges.TextDocument.apply(Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges.TextDocument;.A#
+         |_root_.org.typelevel.paiges.TextDocument.documentBoolean.
+         |_root_.org.typelevel.paiges.TextDocument.documentByte.
+         |_root_.org.typelevel.paiges.TextDocument.documentChar.
+         |_root_.org.typelevel.paiges.TextDocument.documentDouble.
+         |_root_.org.typelevel.paiges.TextDocument.documentFloat.
+         |_root_.org.typelevel.paiges.TextDocument.documentInt.
+         |_root_.org.typelevel.paiges.TextDocument.documentIterable(Ljava/lang/String;Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges.TextDocument;.
+         |_root_.org.typelevel.paiges.TextDocument.documentIterable(Ljava/lang/String;Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges.TextDocument;.A#
+         |_root_.org.typelevel.paiges.TextDocument.documentLong.
+         |_root_.org.typelevel.paiges.TextDocument.documentShort.
+         |_root_.org.typelevel.paiges.TextDocument.documentString.
+         |_root_.org.typelevel.paiges.TextDocument.documentUnit.
+         |_root_.org.typelevel.paiges.TextDocument.instance(Lscala/Function1;)Lorg/typelevel/paiges.TextDocument;.
+         |_root_.org.typelevel.paiges.TextDocument.instance(Lscala/Function1;)Lorg/typelevel/paiges.TextDocument;.A#
+         |_root_.org.typelevel.paiges.TextDocument.useToString()Lorg/typelevel/paiges.TextDocument;.
+         |_root_.org.typelevel.paiges.TextDocument.useToString()Lorg/typelevel/paiges.TextDocument;.A#
+         |_root_.org.typelevel.paiges.TextDocumentTest#
+         |_root_.org.typelevel.paiges.TextDocumentTest#`<init>`()V.
+         |_root_.org.typelevel.paiges.TextDocumentTest#document(Ljava/lang/Object;Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges/Doc;.
+         |_root_.org.typelevel.paiges.TextDocumentTest#document(Ljava/lang/Object;Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges/Doc;.A#
+         |_root_.org.typelevel.paiges.TextDocumentTest#generatorDrivenConfig.
          |_root_.org.typelevel.paiges.Generators.
          |_root_.org.typelevel.paiges.Generators.arbDoc.
          |_root_.org.typelevel.paiges.Generators.asciiString.

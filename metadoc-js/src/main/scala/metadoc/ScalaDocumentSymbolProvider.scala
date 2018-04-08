@@ -7,20 +7,19 @@ import monaco.editor.IReadOnlyModel
 import monaco.languages.DocumentSymbolProvider
 import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
-import org.langmeta.internal.semanticdb.{schema => s}
+import scala.meta.internal.{semanticdb3 => s}
 import org.{langmeta => m}
 
 class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     extends DocumentSymbolProvider {
 
-  private def getDocumentSymbols(doc: s.Document): Seq[DocumentSymbol] = {
-    val denotations = doc.symbols.collect {
-      case s.ResolvedSymbol(s, Some(d)) =>
-        s -> m.Denotation(d.flags, d.name, d.signature, Nil)
+  private def getDocumentSymbols(doc: s.TextDocument): Seq[DocumentSymbol] = {
+    val denotations = doc.symbols.map { info =>
+      info.symbol -> info
     }.toMap
     val infos = for {
-      name <- index.document.names
-      if name.isDefinition
+      name <- index.document.occurrences
+      if name.role.isDefinition
       symbol = m.Symbol(name.symbol)
       if symbol.isInstanceOf[m.Symbol.Global]
       denotation <- denotations.get(name.symbol)
@@ -41,7 +40,8 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
         case DocumentSymbol(denotation, kind, definition) =>
           new SymbolInformation(
             name = denotation.name,
-            containerName = denotation.signature,
+            // TODO: pretty print `.tpe`
+            containerName = denotation.symbol,
             kind = kind,
             location = model.resolveLocation(definition)
           )
@@ -50,16 +50,19 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     }
   }.toMonacoThenable
 
-  def symbolKind(denotation: m.Denotation): Option[SymbolKind] = {
-    import denotation._
+  def symbolKind(denotation: s.SymbolInformation): Option[SymbolKind] = {
+    import denotation.kind._
+    import s.SymbolInformation.Property
+    def hasProperty(flag: Int): Boolean =
+      (denotation.properties & flag) != 0
 
-    if (isParam || isTypeParam)
+    if (isParameter || isTypeParameter)
       None
-    else if (isVal || isVar)
+    else if (isField || hasProperty(Property.VAL.value | Property.VAR.value))
       Some(SymbolKind.Variable)
-    else if (isDef)
+    else if (isMethod)
       Some(SymbolKind.Function)
-    else if (isPrimaryCtor || isSecondaryCtor)
+    else if (isConstructor)
       Some(SymbolKind.Constructor)
     else if (isClass)
       Some(SymbolKind.Class)

@@ -2253,7 +2253,7 @@ package languages {
   sealed trait DocumentHighlightKind extends js.Object {}
 
   @js.native
-  @JSGlobal("monaco.languages.DocumentHighlightKind")
+  @JSGlobal("monaco.languages.TextDocumentHighlightKind")
   object DocumentHighlightKind extends js.Object {
     var Text: DocumentHighlightKind = js.native
     var Read: DocumentHighlightKind = js.native

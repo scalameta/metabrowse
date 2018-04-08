@@ -17,7 +17,7 @@ import monaco.editor.IModelChangedEvent
 import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom
-import org.langmeta.internal.semanticdb.{schema => s}
+import scala.meta.internal.{ semanticdb3 => s}
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {
@@ -45,7 +45,7 @@ object MetadocApp {
       _ <- loadMonaco()
       workspace <- MetadocFetch.workspace()
     } {
-      val index = new MutableBrowserIndex(MetadocState(s.Document()))
+      val index = new MutableBrowserIndex(MetadocState(s.TextDocument()))
       registerLanguageExtensions(index)
       val editorService = new MetadocEditorService(index)
 

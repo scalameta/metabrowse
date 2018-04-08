@@ -2,7 +2,7 @@ package metadoc
 
 import monaco.services.IReference
 import monaco.services.ITextEditorModel
-import org.langmeta.internal.semanticdb.{schema => s}
+import scala.meta.internal.{ semanticdb3 => s}
 
 /** Logicless wrapper around a metadoc+monaco document/model.
   *
@@ -10,6 +10,6 @@ import org.langmeta.internal.semanticdb.{schema => s}
   * @param model Monaco model for a document.
   */
 case class MetadocMonacoDocument(
-    document: s.Document,
+    document: s.TextDocument,
     model: IReference[ITextEditorModel]
 )

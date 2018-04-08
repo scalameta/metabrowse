@@ -9,6 +9,7 @@ import monaco.languages.ReferenceContext
 import monaco.languages.ReferenceProvider
 import monaco.CancellationToken
 import monaco.Position
+import MetadocEnrichments._
 
 class ScalaReferenceProvider(index: MetadocSemanticdbIndex)
     extends ReferenceProvider {
@@ -32,9 +33,9 @@ class ScalaReferenceProvider(index: MetadocSemanticdbIndex)
               .modelDocument(createUri(filename))
               .map {
                 case MetadocMonacoDocument(_, model) =>
-                  ranges.ranges.map { range =>
+                  ranges.ranges.map { r =>
                     model.`object`.textEditorModel.resolveLocation(
-                      schema.Position(filename, range.start, range.end)
+                      r.toPosition(filename)
                     )
                   }
               }
