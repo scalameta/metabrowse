@@ -2,7 +2,7 @@ package metadoc
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.meta.internal.{ semanticdb3 => s}
+import scala.meta.internal.{semanticdb3 => s}
 import metadoc.MetadocApp._
 import metadoc.{schema => d}
 

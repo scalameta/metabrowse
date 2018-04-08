@@ -255,7 +255,8 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
             Symbol.Global(owner, Signature.Term(name)).syntax
           )
           if syntheticObjRef.get().definition.isEmpty
-        } yield symbolIndex.copy(references = syntheticObjRef.get().references))
+        } yield
+          symbolIndex.copy(references = syntheticObjRef.get().references))
           .getOrElse(symbolIndex)
       case _ => symbolIndex
     }

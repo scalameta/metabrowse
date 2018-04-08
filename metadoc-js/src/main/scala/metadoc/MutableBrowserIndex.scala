@@ -2,7 +2,7 @@ package metadoc
 
 import scala.concurrent.Future
 import scala.meta.internal.semanticdb3.TextDocument
-import scala.meta.internal.{ semanticdb3 => s}
+import scala.meta.internal.{semanticdb3 => s}
 
 class MutableBrowserIndex(init: MetadocState) extends MetadocSemanticdbIndex {
   private var state: MetadocState = init
