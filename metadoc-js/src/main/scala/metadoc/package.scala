@@ -52,10 +52,10 @@ package object metadoc {
       extends AnyVal {
     def resolveLocation(pos: d.Position): Location = {
       val range = new Range(
-        pos.startLine,
-        pos.startCharacter,
-        pos.endLine,
-        pos.endCharacter
+        pos.startLine + 1,
+        pos.startCharacter + 1,
+        pos.endLine + 1,
+        pos.endCharacter + 1
       )
       val uri = createUri(pos.filename)
       val location = new Location(uri, range)
