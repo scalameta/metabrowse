@@ -8,7 +8,7 @@ import scala.meta.interactive._
 import scala.meta.testkit.DiffAssertions
 import scala.tools.nsc.interactive.Global
 import caseapp.RemainingArgs
-import com.trueaccord.scalapb.json.JsonFormat
+import scalapb.json4s.JsonFormat
 import metadoc.cli.MetadocCli
 import metadoc.cli.MetadocOptions
 import metadoc.schema.SymbolIndex
@@ -48,43 +48,51 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
     val index = symbols
       .map(path => SymbolIndex.parseFrom(path.readAllBytes))
       .sortBy(_.symbol)
+      .map(_.toProtoString)
       .mkString("\n\n")
     assertNoDiff(
       index,
       """
-        |symbol: "_root_.com.bar.Main."
+        |symbol: "com.bar.Main."
         |definition {
         |  filename: "interactive.scala"
-        |  start: 54
-        |  end: 58
+        |  startLine: 2
+        |  startCharacter: 7
+        |  endLine: 2
+        |  endCharacter: 11
         |}
         |references {
         |  key: "interactive.scala"
         |  value {
         |    ranges {
-        |      start: 99
-        |      end: 103
+        |      startLine: 4
+        |      startCharacter: 2
+        |      endLine: 4
+        |      endCharacter: 6
         |    }
         |  }
         |}
         |
         |
-        |symbol: "_root_.com.bar.Main.future."
+        |symbol: "com.bar.Main.future()."
         |definition {
         |  filename: "interactive.scala"
-        |  start: 67
-        |  end: 73
+        |  startLine: 3
+        |  startCharacter: 6
+        |  endLine: 3
+        |  endCharacter: 12
         |}
         |references {
         |  key: "interactive.scala"
         |  value {
         |    ranges {
-        |      start: 104
-        |      end: 110
+        |      startLine: 4
+        |      startCharacter: 7
+        |      endLine: 4
+        |      endCharacter: 13
         |    }
         |  }
         |}
-        |
       """.stripMargin
     )
   }

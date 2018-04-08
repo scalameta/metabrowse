@@ -25,12 +25,13 @@ import scala.collection.parallel.mutable.ParArray
 import scala.util.control.NonFatal
 import caseapp._
 import caseapp.core.Messages
-import com.trueaccord.scalapb.json.JsonFormat
+import scalapb.json4s.JsonFormat
 import metadoc.schema
 import metadoc.schema.SymbolIndex
 import metadoc.{schema => d}
 import org.langmeta._
-import org.langmeta.internal.semanticdb.{schema => s}
+import scala.meta.internal.{semanticdb3 => s}
+import metadoc.MetadocEnrichments._
 
 @AppName("metadoc")
 @AppVersion("0.1.0-SNAPSHOT")
@@ -162,14 +163,14 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       files.result()
     }
 
-  private def parseDatabase(path: AbsolutePath): s.Database = {
+  private def parseDatabase(path: AbsolutePath): s.TextDocuments = {
     val filename = path.toNIO.getFileName.toString
     val bytes = path.readAllBytes
     if (filename.endsWith(".semanticdb")) {
-      s.Database.parseFrom(bytes)
+      s.TextDocuments.parseFrom(bytes)
     } else if (filename.endsWith(".semanticdb.json")) {
       val string = new String(bytes, StandardCharsets.UTF_8)
-      JsonFormat.fromJsonString[s.Database](string)
+      JsonFormat.fromJsonString[s.TextDocuments](string)
     } else {
       throw new IllegalArgumentException(s"Unexpected filename $filename")
     }
@@ -182,26 +183,34 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
           tick()
           val db = parseDatabase(path)
           db.documents.foreach { document =>
-            document.names.foreach {
-              case s.ResolvedName(_, sym, _)
+            document.occurrences.foreach {
+              case s.SymbolOccurrence(_, sym, _)
                   if !sym.endsWith(".") && !sym.endsWith("#") =>
               // Do nothing, local symbol.
-              case s.ResolvedName(Some(s.Position(start, end)), sym, true) =>
-                addDefinition(sym, d.Position(document.filename, start, end))
-              case s.ResolvedName(Some(s.Position(start, end)), sym, false) =>
-                addReference(document.filename, d.Range(start, end), sym)
+              case s.SymbolOccurrence(
+                  Some(r),
+                  sym,
+                  s.SymbolOccurrence.Role.DEFINITION
+                  ) =>
+                addDefinition(sym, r.toPosition(document.uri))
+              case s.SymbolOccurrence(
+                  Some(r),
+                  sym,
+                  s.SymbolOccurrence.Role.REFERENCE
+                  ) =>
+                addReference(document.uri, r.toDocRange, sym)
               case _ =>
             }
-            val out = semanticdb.resolve(document.filename)
+            val out = semanticdb.resolve(document.uri)
             Files.createDirectories(out.toNIO.getParent)
             overwrite(
               out.toNIO
                 .resolveSibling(
                   out.toNIO.getFileName.toString + ".semanticdb"
                 ),
-              s.Database(document :: Nil).toByteArray
+              s.TextDocuments(document :: Nil).toByteArray
             )
-            filenames.add(document.filename)
+            filenames.add(document.uri)
           }
         } catch {
           case NonFatal(e) =>
