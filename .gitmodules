@@ -1,3 +1,4 @@
 [submodule "paiges"]
 	path = paiges
+	branch = three-lines
 	url = https://github.com/olafurpg/paiges.git
