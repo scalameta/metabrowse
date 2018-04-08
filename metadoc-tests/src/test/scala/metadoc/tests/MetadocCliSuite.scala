@@ -11,7 +11,7 @@ import org.langmeta.io.AbsolutePath
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 
-class MetadocCliTest
+class MetadocCliSuite
     extends FunSuite
     with BeforeAndAfterAll
     with DiffAssertions {
@@ -62,7 +62,7 @@ class MetadocCliTest
     val expected =
       """|
          |org.typelevel.paiges.Chunk.
-         |org.typelevel.paiges.Chunk.best(Int,Doc).
+         |org.typelevel.paiges.Chunk.best(Int,Doc,Boolean).
          |org.typelevel.paiges.Chunk.indentMax.
          |org.typelevel.paiges.Chunk.indentTable.
          |org.typelevel.paiges.Chunk.lineToStr(Int).
@@ -95,7 +95,10 @@ class MetadocCliTest
          |org.typelevel.paiges.Doc#nested(Int).
          |org.typelevel.paiges.Doc#nonEmpty().
          |org.typelevel.paiges.Doc#render(Int).
+         |org.typelevel.paiges.Doc#renderGen(Int,Boolean).
          |org.typelevel.paiges.Doc#renderStream(Int).
+         |org.typelevel.paiges.Doc#renderStreamTrim(Int).
+         |org.typelevel.paiges.Doc#renderTrim(Int).
          |org.typelevel.paiges.Doc#renderWideStream().
          |org.typelevel.paiges.Doc#repeat(Int).
          |org.typelevel.paiges.Doc#representation(Boolean).
@@ -104,6 +107,8 @@ class MetadocCliTest
          |org.typelevel.paiges.Doc#tightBracketBy(Doc,Doc,Int).
          |org.typelevel.paiges.Doc#toString().
          |org.typelevel.paiges.Doc#writeTo(Int,PrintWriter).
+         |org.typelevel.paiges.Doc#writeToGen(Int,PrintWriter,Boolean).
+         |org.typelevel.paiges.Doc#writeToTrim(Int,PrintWriter).
          |org.typelevel.paiges.Doc.
          |org.typelevel.paiges.Doc.Align#
          |org.typelevel.paiges.Doc.Align#`<init>`(Doc).
@@ -169,6 +174,14 @@ class MetadocCliTest
          |org.typelevel.paiges.Document.
          |org.typelevel.paiges.Document.FromToString.
          |org.typelevel.paiges.Document.FromToString.document(Any).
+         |org.typelevel.paiges.Document.Ops#
+         |org.typelevel.paiges.Document.Ops#$init$().
+         |org.typelevel.paiges.Document.Ops#doc().
+         |org.typelevel.paiges.Document.Ops#instance().
+         |org.typelevel.paiges.Document.Ops#self().
+         |org.typelevel.paiges.Document.ToDocumentOps#
+         |org.typelevel.paiges.Document.ToDocumentOps#$init$().
+         |org.typelevel.paiges.Document.ToDocumentOps#toDocumentOps(A,Document).
          |org.typelevel.paiges.Document.apply(Document).
          |org.typelevel.paiges.Document.documentBoolean().
          |org.typelevel.paiges.Document.documentByte().
@@ -182,6 +195,7 @@ class MetadocCliTest
          |org.typelevel.paiges.Document.documentString().
          |org.typelevel.paiges.Document.documentUnit().
          |org.typelevel.paiges.Document.instance(Function1).
+         |org.typelevel.paiges.Document.ops.
          |org.typelevel.paiges.Document.useToString().
          |org.typelevel.paiges.DocumentTest#
          |org.typelevel.paiges.DocumentTest#`<init>`().
@@ -234,6 +248,7 @@ class MetadocCliTest
          |org.typelevel.paiges.PaigesTest#
          |org.typelevel.paiges.PaigesTest#`<init>`().
          |org.typelevel.paiges.PaigesTest#generatorDrivenConfig().
+         |org.typelevel.paiges.PaigesTest#slowRenderTrim(Doc,Int).
          |org.typelevel.paiges.PaigesTest.
          |org.typelevel.paiges.PaigesTest.EquivSyntax#
          |org.typelevel.paiges.PaigesTest.EquivSyntax#`<init>`(Doc).
@@ -267,8 +282,6 @@ class MetadocCliTest
           .readAllBytes
       )
       val obtained = index.toProtoString
-      println(obtained)
-      println()
       assertNoDiff(obtained, expected)
     }
   }
