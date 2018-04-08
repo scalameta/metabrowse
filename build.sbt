@@ -246,7 +246,7 @@ lazy val tests = project
         .value,
     libraryDependencies ++= List(
       "org.scalameta" %% "testkit" % Version.scalameta % Test,
-      "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta % Test cross CrossVersion.full
+      "org.scalameta" % "interactive" % Version.scalameta % Test cross CrossVersion.full
     ),
     buildInfoKeys := Seq[BuildInfoKey](
       "exampleClassDirectory" -> List(

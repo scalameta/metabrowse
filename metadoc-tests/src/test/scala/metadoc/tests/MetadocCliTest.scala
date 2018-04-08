@@ -34,9 +34,9 @@ class MetadocCliTest
   val expectedFiles =
     """paiges/core/src/main/scala/org/typelevel/paiges/Chunk.scala.semanticdb
       |paiges/core/src/main/scala/org/typelevel/paiges/Doc.scala.semanticdb
-      |paiges/core/src/main/scala/org/typelevel/paiges.TextDocument.scala.semanticdb
+      |paiges/core/src/main/scala/org/typelevel/paiges/Document.scala.semanticdb
       |paiges/core/src/main/scala/org/typelevel/paiges/package.scala.semanticdb
-      |paiges/core/src/test/scala/org/typelevel/paiges.TextDocumentTests.scala.semanticdb
+      |paiges/core/src/test/scala/org/typelevel/paiges/DocumentTests.scala.semanticdb
       |paiges/core/src/test/scala/org/typelevel/paiges/Generators.scala.semanticdb
       |paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala.semanticdb
       |paiges/core/src/test/scala/org/typelevel/paiges/PaigesTest.scala.semanticdb
@@ -60,181 +60,189 @@ class MetadocCliTest
       .sorted
       .mkString("\n")
     val expected =
-      """|_root_.org.typelevel.paiges.Chunk.
-         |_root_.org.typelevel.paiges.Chunk.best(ILorg/typelevel/paiges/Doc;)Lscala/collection/Iterator;.
-         |_root_.org.typelevel.paiges.Chunk.indentMax.
-         |_root_.org.typelevel.paiges.Chunk.indentTable.
-         |_root_.org.typelevel.paiges.Chunk.lineToStr(I)Ljava/lang/String;.
-         |_root_.org.typelevel.paiges.Chunk.makeIndentStr(I)Ljava/lang/String;.
-         |_root_.org.typelevel.paiges.Doc#
-         |_root_.org.typelevel.paiges.Doc#`&:`(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#`&`(Lorg/typelevel/paiges/Doc;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#`*`(I)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#`+:`(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#`+`(Lorg/typelevel/paiges/Doc;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#`/:`(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#`/`(Lorg/typelevel/paiges/Doc;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#`:&`(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#`:+`(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#`:/`(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#`<init>`()V.
-         |_root_.org.typelevel.paiges.Doc#aligned()Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#bracketBy(Lorg/typelevel/paiges/Doc;Lorg/typelevel/paiges/Doc;I)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#flatten()Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#flattenBoolean()Lscala/Tuple2;.
-         |_root_.org.typelevel.paiges.Doc#flattenOption()Lscala/Option;.
-         |_root_.org.typelevel.paiges.Doc#grouped()Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#hashCode.
-         |_root_.org.typelevel.paiges.Doc#isEmpty()Z.
-         |_root_.org.typelevel.paiges.Doc#line(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#line(Lorg/typelevel/paiges/Doc;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#lineOrSpace(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#lineOrSpace(Lorg/typelevel/paiges/Doc;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#maxWidth()I.
-         |_root_.org.typelevel.paiges.Doc#nested(I)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#nonEmpty()Z.
-         |_root_.org.typelevel.paiges.Doc#render(I)Ljava/lang/String;.
-         |_root_.org.typelevel.paiges.Doc#renderStream(I)Lscala/collection/immutable/Stream;.
-         |_root_.org.typelevel.paiges.Doc#renderWideStream()Lscala/collection/immutable/Stream;.
-         |_root_.org.typelevel.paiges.Doc#repeat(I)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#representation(Z)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#space(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#space(Lorg/typelevel/paiges/Doc;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#tightBracketBy(Lorg/typelevel/paiges/Doc;Lorg/typelevel/paiges/Doc;I)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc#toString()Ljava/lang/String;.
-         |_root_.org.typelevel.paiges.Doc#writeTo(ILjava/io/PrintWriter;)V.
-         |_root_.org.typelevel.paiges.Doc.
-         |_root_.org.typelevel.paiges.Doc.Align#
-         |_root_.org.typelevel.paiges.Doc.Align#`<init>`(Lorg/typelevel/paiges/Doc;)V.
-         |_root_.org.typelevel.paiges.Doc.Align.
-         |_root_.org.typelevel.paiges.Doc.Concat#
-         |_root_.org.typelevel.paiges.Doc.Concat#`<init>`(Lorg/typelevel/paiges/Doc;Lorg/typelevel/paiges/Doc;)V.
-         |_root_.org.typelevel.paiges.Doc.Concat.
-         |_root_.org.typelevel.paiges.Doc.Empty.
-         |_root_.org.typelevel.paiges.Doc.Line#
-         |_root_.org.typelevel.paiges.Doc.Line#`<init>`(Z)V.
-         |_root_.org.typelevel.paiges.Doc.Line#asFlatDoc()Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.Line.
-         |_root_.org.typelevel.paiges.Doc.Nest#
-         |_root_.org.typelevel.paiges.Doc.Nest#`<init>`(ILorg/typelevel/paiges/Doc;)V.
-         |_root_.org.typelevel.paiges.Doc.Nest.
-         |_root_.org.typelevel.paiges.Doc.Text#
-         |_root_.org.typelevel.paiges.Doc.Text#`<init>`(Ljava/lang/String;)V.
-         |_root_.org.typelevel.paiges.Doc.Text.
-         |_root_.org.typelevel.paiges.Doc.Union#
-         |_root_.org.typelevel.paiges.Doc.Union#`<init>`(Lorg/typelevel/paiges/Doc;Lscala/Function0;)V.
-         |_root_.org.typelevel.paiges.Doc.Union#bDoc.
-         |_root_.org.typelevel.paiges.Doc.Union.
-         |_root_.org.typelevel.paiges.Doc.cat(Lscala/collection/Iterable;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.char(C)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.charTable.
-         |_root_.org.typelevel.paiges.Doc.comma.
-         |_root_.org.typelevel.paiges.Doc.empty.
-         |_root_.org.typelevel.paiges.Doc.equivAtWidths(Lscala/collection/immutable/List;)Lscala/math/Equiv;.
-         |_root_.org.typelevel.paiges.Doc.fill(Lorg/typelevel/paiges/Doc;Lscala/collection/Iterable;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.foldDocs(Lscala/collection/Iterable;Lscala/Function2;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.intercalate(Lorg/typelevel/paiges/Doc;Lscala/collection/Iterable;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.line.
-         |_root_.org.typelevel.paiges.Doc.lineBreak.
-         |_root_.org.typelevel.paiges.Doc.lineOrEmpty.
-         |_root_.org.typelevel.paiges.Doc.lineOrSpace.
-         |_root_.org.typelevel.paiges.Doc.maxSpaceTable.
-         |_root_.org.typelevel.paiges.Doc.orderingAtWidth(I)Lscala/math/Ordering;.
-         |_root_.org.typelevel.paiges.Doc.paragraph(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.space.
-         |_root_.org.typelevel.paiges.Doc.spaceArray.
-         |_root_.org.typelevel.paiges.Doc.spaces(I)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.split(Ljava/lang/String;Lscala/util/matching/Regex;Lorg/typelevel/paiges/Doc;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.splitWhitespace.
-         |_root_.org.typelevel.paiges.Doc.spread(Lscala/collection/Iterable;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.stack(Lscala/collection/Iterable;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.str(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.str(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.T#
-         |_root_.org.typelevel.paiges.Doc.tabulate(CLjava/lang/String;Lscala/collection/Iterable;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.tabulate(Lscala/collection/immutable/List;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Doc.text(Ljava/lang/String;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.TextDocument#
-         |_root_.org.typelevel.paiges.TextDocument#$init$()V.
-         |_root_.org.typelevel.paiges.TextDocument#contramap(Lscala/Function1;)Lorg/typelevel/paiges.TextDocument;.
-         |_root_.org.typelevel.paiges.TextDocument#contramap(Lscala/Function1;)Lorg/typelevel/paiges.TextDocument;.Z#
-         |_root_.org.typelevel.paiges.TextDocument#document(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.TextDocument.
-         |_root_.org.typelevel.paiges.TextDocument.FromToString.
-         |_root_.org.typelevel.paiges.TextDocument.FromToString.document(Ljava/lang/Object;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.TextDocument.apply(Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges.TextDocument;.
-         |_root_.org.typelevel.paiges.TextDocument.apply(Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges.TextDocument;.A#
-         |_root_.org.typelevel.paiges.TextDocument.documentBoolean.
-         |_root_.org.typelevel.paiges.TextDocument.documentByte.
-         |_root_.org.typelevel.paiges.TextDocument.documentChar.
-         |_root_.org.typelevel.paiges.TextDocument.documentDouble.
-         |_root_.org.typelevel.paiges.TextDocument.documentFloat.
-         |_root_.org.typelevel.paiges.TextDocument.documentInt.
-         |_root_.org.typelevel.paiges.TextDocument.documentIterable(Ljava/lang/String;Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges.TextDocument;.
-         |_root_.org.typelevel.paiges.TextDocument.documentIterable(Ljava/lang/String;Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges.TextDocument;.A#
-         |_root_.org.typelevel.paiges.TextDocument.documentLong.
-         |_root_.org.typelevel.paiges.TextDocument.documentShort.
-         |_root_.org.typelevel.paiges.TextDocument.documentString.
-         |_root_.org.typelevel.paiges.TextDocument.documentUnit.
-         |_root_.org.typelevel.paiges.TextDocument.instance(Lscala/Function1;)Lorg/typelevel/paiges.TextDocument;.
-         |_root_.org.typelevel.paiges.TextDocument.instance(Lscala/Function1;)Lorg/typelevel/paiges.TextDocument;.A#
-         |_root_.org.typelevel.paiges.TextDocument.useToString()Lorg/typelevel/paiges.TextDocument;.
-         |_root_.org.typelevel.paiges.TextDocument.useToString()Lorg/typelevel/paiges.TextDocument;.A#
-         |_root_.org.typelevel.paiges.TextDocumentTest#
-         |_root_.org.typelevel.paiges.TextDocumentTest#`<init>`()V.
-         |_root_.org.typelevel.paiges.TextDocumentTest#document(Ljava/lang/Object;Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.TextDocumentTest#document(Ljava/lang/Object;Lorg/typelevel/paiges.TextDocument;)Lorg/typelevel/paiges/Doc;.A#
-         |_root_.org.typelevel.paiges.TextDocumentTest#generatorDrivenConfig.
-         |_root_.org.typelevel.paiges.Generators.
-         |_root_.org.typelevel.paiges.Generators.arbDoc.
-         |_root_.org.typelevel.paiges.Generators.asciiString.
-         |_root_.org.typelevel.paiges.Generators.cogenDoc.
-         |_root_.org.typelevel.paiges.Generators.combinators.
-         |_root_.org.typelevel.paiges.Generators.doc0Gen.
-         |_root_.org.typelevel.paiges.Generators.folds.
-         |_root_.org.typelevel.paiges.Generators.genDoc.
-         |_root_.org.typelevel.paiges.Generators.genTree(I)Lorg/scalacheck/Gen;.
-         |_root_.org.typelevel.paiges.Generators.generalString.
-         |_root_.org.typelevel.paiges.Generators.maxDepth.
-         |_root_.org.typelevel.paiges.Generators.unary.
-         |_root_.org.typelevel.paiges.Json#
-         |_root_.org.typelevel.paiges.Json#`<init>`()V.
-         |_root_.org.typelevel.paiges.Json#toDoc()Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Json.
-         |_root_.org.typelevel.paiges.Json.JArray#
-         |_root_.org.typelevel.paiges.Json.JArray#`<init>`(Lscala/collection/immutable/Vector;)V.
-         |_root_.org.typelevel.paiges.Json.JArray#toDoc()Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Json.JArray.
-         |_root_.org.typelevel.paiges.Json.JBool#
-         |_root_.org.typelevel.paiges.Json.JBool#`<init>`(Z)V.
-         |_root_.org.typelevel.paiges.Json.JBool#toDoc()Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Json.JNull.
-         |_root_.org.typelevel.paiges.Json.JNull.toDoc()Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Json.JNumber#
-         |_root_.org.typelevel.paiges.Json.JNumber#`<init>`(D)V.
-         |_root_.org.typelevel.paiges.Json.JNumber#toDoc()Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Json.JNumber.
-         |_root_.org.typelevel.paiges.Json.JObject#
-         |_root_.org.typelevel.paiges.Json.JObject#`<init>`(Lscala/collection/immutable/Map;)V.
-         |_root_.org.typelevel.paiges.Json.JObject#toDoc()Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Json.JString#
-         |_root_.org.typelevel.paiges.Json.JString#`<init>`(Ljava/lang/String;)V.
-         |_root_.org.typelevel.paiges.Json.JString#toDoc()Lorg/typelevel/paiges/Doc;.
-         |_root_.org.typelevel.paiges.Json.JString.
-         |_root_.org.typelevel.paiges.Json.escape(Ljava/lang/String;)Ljava/lang/String;.
-         |_root_.org.typelevel.paiges.JsonTest#
-         |_root_.org.typelevel.paiges.JsonTest#`<init>`()V.
-         |_root_.org.typelevel.paiges.PaigesTest#
-         |_root_.org.typelevel.paiges.PaigesTest#`<init>`()V.
-         |_root_.org.typelevel.paiges.PaigesTest#generatorDrivenConfig.
-         |_root_.org.typelevel.paiges.PaigesTest.
-         |_root_.org.typelevel.paiges.PaigesTest.EquivSyntax#
-         |_root_.org.typelevel.paiges.PaigesTest.EquivSyntax#`<init>`(Lorg/typelevel/paiges/Doc;)V.
-         |_root_.org.typelevel.paiges.PaigesTest.EquivSyntax#`===`(Lorg/typelevel/paiges/Doc;)Z.
-         |_root_.org.typelevel.paiges.PaigesTest.docEquiv.
-         |_root_.org.typelevel.paiges.PaigesTest.docEquiv.$anon#equiv(Lorg/typelevel/paiges/Doc;Lorg/typelevel/paiges/Doc;)Z.
-         |_root_.org.typelevel.paiges.package.
-         |_root_.org.typelevel.paiges.package.call(Ljava/lang/Object;Lscala/collection/immutable/List;)Ljava/lang/Object;.
-         |_root_.org.typelevel.paiges.package.call(Ljava/lang/Object;Lscala/collection/immutable/List;)Ljava/lang/Object;.A#
+      """|
+         |org.typelevel.paiges.Chunk.
+         |org.typelevel.paiges.Chunk.best(Int,Doc).
+         |org.typelevel.paiges.Chunk.indentMax.
+         |org.typelevel.paiges.Chunk.indentTable.
+         |org.typelevel.paiges.Chunk.lineToStr(Int).
+         |org.typelevel.paiges.Chunk.makeIndentStr(Int).
+         |org.typelevel.paiges.Doc#
+         |org.typelevel.paiges.Doc#`&:`(String).
+         |org.typelevel.paiges.Doc#`&`(Doc).
+         |org.typelevel.paiges.Doc#`*`(Int).
+         |org.typelevel.paiges.Doc#`+:`(String).
+         |org.typelevel.paiges.Doc#`+`(Doc).
+         |org.typelevel.paiges.Doc#`/:`(String).
+         |org.typelevel.paiges.Doc#`/`(Doc).
+         |org.typelevel.paiges.Doc#`:&`(String).
+         |org.typelevel.paiges.Doc#`:+`(String).
+         |org.typelevel.paiges.Doc#`:/`(String).
+         |org.typelevel.paiges.Doc#`<init>`().
+         |org.typelevel.paiges.Doc#aligned().
+         |org.typelevel.paiges.Doc#bracketBy(Doc,Doc,Int).
+         |org.typelevel.paiges.Doc#flatten().
+         |org.typelevel.paiges.Doc#flattenBoolean().
+         |org.typelevel.paiges.Doc#flattenOption().
+         |org.typelevel.paiges.Doc#grouped().
+         |org.typelevel.paiges.Doc#hashCode().
+         |org.typelevel.paiges.Doc#isEmpty().
+         |org.typelevel.paiges.Doc#line(Doc).
+         |org.typelevel.paiges.Doc#line(String).
+         |org.typelevel.paiges.Doc#lineOrSpace(Doc).
+         |org.typelevel.paiges.Doc#lineOrSpace(String).
+         |org.typelevel.paiges.Doc#maxWidth().
+         |org.typelevel.paiges.Doc#nested(Int).
+         |org.typelevel.paiges.Doc#nonEmpty().
+         |org.typelevel.paiges.Doc#render(Int).
+         |org.typelevel.paiges.Doc#renderStream(Int).
+         |org.typelevel.paiges.Doc#renderWideStream().
+         |org.typelevel.paiges.Doc#repeat(Int).
+         |org.typelevel.paiges.Doc#representation(Boolean).
+         |org.typelevel.paiges.Doc#space(Doc).
+         |org.typelevel.paiges.Doc#space(String).
+         |org.typelevel.paiges.Doc#tightBracketBy(Doc,Doc,Int).
+         |org.typelevel.paiges.Doc#toString().
+         |org.typelevel.paiges.Doc#writeTo(Int,PrintWriter).
+         |org.typelevel.paiges.Doc.
+         |org.typelevel.paiges.Doc.Align#
+         |org.typelevel.paiges.Doc.Align#`<init>`(Doc).
+         |org.typelevel.paiges.Doc.Align#doc().
+         |org.typelevel.paiges.Doc.Align.
+         |org.typelevel.paiges.Doc.Concat#
+         |org.typelevel.paiges.Doc.Concat#`<init>`(Doc,Doc).
+         |org.typelevel.paiges.Doc.Concat#a().
+         |org.typelevel.paiges.Doc.Concat#b().
+         |org.typelevel.paiges.Doc.Concat.
+         |org.typelevel.paiges.Doc.Empty.
+         |org.typelevel.paiges.Doc.Line#
+         |org.typelevel.paiges.Doc.Line#`<init>`(Boolean).
+         |org.typelevel.paiges.Doc.Line#asFlatDoc().
+         |org.typelevel.paiges.Doc.Line#flattenToSpace().
+         |org.typelevel.paiges.Doc.Line.
+         |org.typelevel.paiges.Doc.Nest#
+         |org.typelevel.paiges.Doc.Nest#`<init>`(Int,Doc).
+         |org.typelevel.paiges.Doc.Nest#doc().
+         |org.typelevel.paiges.Doc.Nest#indent().
+         |org.typelevel.paiges.Doc.Nest.
+         |org.typelevel.paiges.Doc.Text#
+         |org.typelevel.paiges.Doc.Text#`<init>`(String).
+         |org.typelevel.paiges.Doc.Text#str().
+         |org.typelevel.paiges.Doc.Text.
+         |org.typelevel.paiges.Doc.Union#
+         |org.typelevel.paiges.Doc.Union#`<init>`(Doc,Function0).
+         |org.typelevel.paiges.Doc.Union#a().
+         |org.typelevel.paiges.Doc.Union#b().
+         |org.typelevel.paiges.Doc.Union#bDoc().
+         |org.typelevel.paiges.Doc.Union.
+         |org.typelevel.paiges.Doc.cat(Iterable).
+         |org.typelevel.paiges.Doc.char(Char).
+         |org.typelevel.paiges.Doc.charTable.
+         |org.typelevel.paiges.Doc.comma().
+         |org.typelevel.paiges.Doc.empty().
+         |org.typelevel.paiges.Doc.equivAtWidths(List).
+         |org.typelevel.paiges.Doc.fill(Doc,Iterable).
+         |org.typelevel.paiges.Doc.foldDocs(Iterable,Function2).
+         |org.typelevel.paiges.Doc.intercalate(Doc,Iterable).
+         |org.typelevel.paiges.Doc.line().
+         |org.typelevel.paiges.Doc.lineBreak().
+         |org.typelevel.paiges.Doc.lineOrEmpty().
+         |org.typelevel.paiges.Doc.lineOrSpace().
+         |org.typelevel.paiges.Doc.maxSpaceTable.
+         |org.typelevel.paiges.Doc.orderingAtWidth(Int).
+         |org.typelevel.paiges.Doc.paragraph(String).
+         |org.typelevel.paiges.Doc.space().
+         |org.typelevel.paiges.Doc.spaceArray.
+         |org.typelevel.paiges.Doc.spaces(Int).
+         |org.typelevel.paiges.Doc.split(String,Regex,Doc).
+         |org.typelevel.paiges.Doc.splitWhitespace().
+         |org.typelevel.paiges.Doc.spread(Iterable).
+         |org.typelevel.paiges.Doc.stack(Iterable).
+         |org.typelevel.paiges.Doc.str(T).
+         |org.typelevel.paiges.Doc.tabulate(Char,String,Iterable).
+         |org.typelevel.paiges.Doc.tabulate(List).
+         |org.typelevel.paiges.Doc.text(String).
+         |org.typelevel.paiges.Document#
+         |org.typelevel.paiges.Document#$init$().
+         |org.typelevel.paiges.Document#contramap(Function1).
+         |org.typelevel.paiges.Document#document(A).
+         |org.typelevel.paiges.Document.
+         |org.typelevel.paiges.Document.FromToString.
+         |org.typelevel.paiges.Document.FromToString.document(Any).
+         |org.typelevel.paiges.Document.apply(Document).
+         |org.typelevel.paiges.Document.documentBoolean().
+         |org.typelevel.paiges.Document.documentByte().
+         |org.typelevel.paiges.Document.documentChar().
+         |org.typelevel.paiges.Document.documentDouble().
+         |org.typelevel.paiges.Document.documentFloat().
+         |org.typelevel.paiges.Document.documentInt().
+         |org.typelevel.paiges.Document.documentIterable(String,Document).
+         |org.typelevel.paiges.Document.documentLong().
+         |org.typelevel.paiges.Document.documentShort().
+         |org.typelevel.paiges.Document.documentString().
+         |org.typelevel.paiges.Document.documentUnit().
+         |org.typelevel.paiges.Document.instance(Function1).
+         |org.typelevel.paiges.Document.useToString().
+         |org.typelevel.paiges.DocumentTest#
+         |org.typelevel.paiges.DocumentTest#`<init>`().
+         |org.typelevel.paiges.DocumentTest#document(A,Document).
+         |org.typelevel.paiges.DocumentTest#generatorDrivenConfig().
+         |org.typelevel.paiges.Generators.
+         |org.typelevel.paiges.Generators.arbDoc().
+         |org.typelevel.paiges.Generators.asciiString().
+         |org.typelevel.paiges.Generators.cogenDoc().
+         |org.typelevel.paiges.Generators.combinators().
+         |org.typelevel.paiges.Generators.doc0Gen().
+         |org.typelevel.paiges.Generators.folds().
+         |org.typelevel.paiges.Generators.genDoc().
+         |org.typelevel.paiges.Generators.genTree(Int).
+         |org.typelevel.paiges.Generators.generalString().
+         |org.typelevel.paiges.Generators.maxDepth().
+         |org.typelevel.paiges.Generators.unary().
+         |org.typelevel.paiges.Json#
+         |org.typelevel.paiges.Json#`<init>`().
+         |org.typelevel.paiges.Json#toDoc().
+         |org.typelevel.paiges.Json.
+         |org.typelevel.paiges.Json.JArray#
+         |org.typelevel.paiges.Json.JArray#`<init>`(Vector).
+         |org.typelevel.paiges.Json.JArray#toDoc().
+         |org.typelevel.paiges.Json.JArray#toVector().
+         |org.typelevel.paiges.Json.JArray.
+         |org.typelevel.paiges.Json.JBool#
+         |org.typelevel.paiges.Json.JBool#`<init>`(Boolean).
+         |org.typelevel.paiges.Json.JBool#toBoolean().
+         |org.typelevel.paiges.Json.JBool#toDoc().
+         |org.typelevel.paiges.Json.JNull.
+         |org.typelevel.paiges.Json.JNull.toDoc().
+         |org.typelevel.paiges.Json.JNumber#
+         |org.typelevel.paiges.Json.JNumber#`<init>`(Double).
+         |org.typelevel.paiges.Json.JNumber#toDoc().
+         |org.typelevel.paiges.Json.JNumber#toDouble().
+         |org.typelevel.paiges.Json.JNumber.
+         |org.typelevel.paiges.Json.JObject#
+         |org.typelevel.paiges.Json.JObject#`<init>`(Map).
+         |org.typelevel.paiges.Json.JObject#toDoc().
+         |org.typelevel.paiges.Json.JObject#toMap().
+         |org.typelevel.paiges.Json.JString#
+         |org.typelevel.paiges.Json.JString#`<init>`(String).
+         |org.typelevel.paiges.Json.JString#str().
+         |org.typelevel.paiges.Json.JString#toDoc().
+         |org.typelevel.paiges.Json.JString.
+         |org.typelevel.paiges.Json.escape(String).
+         |org.typelevel.paiges.JsonTest#
+         |org.typelevel.paiges.JsonTest#`<init>`().
+         |org.typelevel.paiges.PaigesTest#
+         |org.typelevel.paiges.PaigesTest#`<init>`().
+         |org.typelevel.paiges.PaigesTest#generatorDrivenConfig().
+         |org.typelevel.paiges.PaigesTest.
+         |org.typelevel.paiges.PaigesTest.EquivSyntax#
+         |org.typelevel.paiges.PaigesTest.EquivSyntax#`<init>`(Doc).
+         |org.typelevel.paiges.PaigesTest.EquivSyntax#`===`(Doc).
+         |org.typelevel.paiges.PaigesTest.EquivSyntax#lhs.
+         |org.typelevel.paiges.PaigesTest.docEquiv().
+         |org.typelevel.paiges.PaigesTest.docEquiv.$anon#equiv(Doc,Doc).
+         |org.typelevel.paiges.package.
+         |org.typelevel.paiges.package.call(A,List).
       """.stripMargin
 
     assertNoDiff(obtained, expected)
@@ -258,30 +266,38 @@ class MetadocCliTest
           .resolve(MetadocCli.encodeSymbolName(id))
           .readAllBytes
       )
-      val obtained = index.toString
+      val obtained = index.toProtoString
+      println(obtained)
+      println()
       assertNoDiff(obtained, expected)
     }
   }
 
   checkSymbolIndex(
-    "_root_.org.typelevel.paiges.Json.JArray.",
+    "org.typelevel.paiges.Json.JArray.",
     """
-        |symbol: "_root_.org.typelevel.paiges.Json.JArray."
+        |symbol: "org.typelevel.paiges.Json.JArray."
         |definition {
         |  filename: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
-        |  start: 711
-        |  end: 717
+        |  startLine: 34
+        |  startCharacter: 13
+        |  endLine: 34
+        |  endCharacter: 19
         |}
         |references {
         |  key: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
         |  value {
         |    ranges {
-        |      start: 1421
-        |      end: 1427
+        |      startLine: 56
+        |      startCharacter: 16
+        |      endLine: 56
+        |      endCharacter: 22
         |    }
         |    ranges {
-        |      start: 1345
-        |      end: 1351
+        |      startLine: 55
+        |      startCharacter: 16
+        |      endLine: 55
+        |      endCharacter: 22
         |    }
         |  }
         |}
@@ -289,29 +305,36 @@ class MetadocCliTest
   )
 
   checkSymbolIndex(
-    "_root_.org.typelevel.paiges.Json.JArray#",
+    "org.typelevel.paiges.Json.JArray#",
     """
-      |symbol: "_root_.org.typelevel.paiges.Json.JArray#"
+      |symbol: "org.typelevel.paiges.Json.JArray#"
       |definition {
       |  filename: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
-      |  start: 711
-      |  end: 717
+      |  startLine: 34
+      |  startCharacter: 13
+      |  endLine: 34
+      |  endCharacter: 19
       |}
       |references {
       |  key: "paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala"
       |  value {
       |    ranges {
-      |      start: 1421
-      |      end: 1427
+      |      startLine: 56
+      |      startCharacter: 16
+      |      endLine: 56
+      |      endCharacter: 22
       |    }
       |    ranges {
-      |      start: 1345
-      |      end: 1351
+      |      startLine: 55
+      |      startCharacter: 16
+      |      endLine: 55
+      |      endCharacter: 22
       |    }
       |  }
       |}
       |""".stripMargin
   )
+
   test("--clean-target-first") {
     runCli() // assert no error
   }
