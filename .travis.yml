@@ -9,9 +9,6 @@ env:
     - TRAVIS_NODE_VERSION="8"
     - TRAVIS_YARN_VERSION="1.3.2"
 
-before_script:
-  git clone https://github.com/typelevel/paiges.git
-
 matrix:
   include:
     - script: sbt ci-test

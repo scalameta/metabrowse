@@ -1,0 +1,4 @@
+[submodule "paiges"]
+	path = paiges
+	branch = b39af293549f806dc7ab0d6c172b41373e5068d5
+	url = https://github.com/typelevel/paiges.git
