@@ -1,5 +1,6 @@
 import scalapb.compiler.Version.scalapbVersion
 import scalajsbundler.util.JSON._
+import sbtcrossproject.{crossProject, CrossType}
 
 inThisBuild(
   List(
@@ -45,9 +46,9 @@ inThisBuild(
 )
 
 lazy val Version = new {
-  def scala = "2.12.4"
+  def scala = "2.12.6"
   def scala210 = "2.10.6"
-  def scalameta = "3.7.0"
+  def scalameta = "4.0.0-M11"
   def sbt = "1.1.1"
   def sbt013 = "0.13.17"
 }
@@ -71,7 +72,6 @@ lazy val allSettings = Seq(
 
 lazy val example = project
   .in(file("paiges") / "core")
-  .disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
   .settings(
     noPublish,
     addCompilerPlugin(
@@ -86,7 +86,6 @@ lazy val example = project
 
 lazy val cli = project
   .in(file("metadoc-cli"))
-  .disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
   .settings(
     allSettings,
     moduleName := "metadoc-cli",
@@ -119,7 +118,6 @@ lazy val cli = project
 
 lazy val js = project
   .in(file("metadoc-js"))
-  .disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
   .settings(
     noPublish,
     moduleName := "metadoc-js",
@@ -160,10 +158,9 @@ lazy val js = project
   .dependsOn(coreJS)
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
 
-lazy val core = crossProject
+lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("metadoc-core"))
-  .disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
   .jsSettings(noPublish)
   .settings(
     allSettings,
@@ -178,7 +175,7 @@ lazy val core = crossProject
       baseDirectory.value./("../src/main/protobuf")
     ),
     libraryDependencies ++= List(
-      "org.scalameta" %%% "langmeta" % Version.scalameta,
+      "org.scalameta" %%% "scalameta" % Version.scalameta,
       "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion
     )
   )
@@ -229,6 +226,7 @@ val sbtPlugin = project
       scalaBinaryVersion.in(coreJVM)
     )
   )
+  .enablePlugins(ScriptedPlugin)
 
 lazy val tests = project
   .in(file("metadoc-tests"))

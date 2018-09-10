@@ -7,7 +7,7 @@ import monaco.editor.IReadOnlyModel
 import monaco.languages.DocumentSymbolProvider
 import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
-import scala.meta.internal.{semanticdb3 => s}
+import scala.meta.internal.{semanticdb => s}
 import org.{langmeta => m}
 
 class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)

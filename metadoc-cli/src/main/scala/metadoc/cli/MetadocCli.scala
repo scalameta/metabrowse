@@ -29,8 +29,8 @@ import scalapb.json4s.JsonFormat
 import metadoc.schema
 import metadoc.schema.SymbolIndex
 import metadoc.{schema => d}
-import org.langmeta._
-import scala.meta.internal.{semanticdb3 => s}
+import scala.meta._
+import scala.meta.internal.{semanticdb => s}
 import metadoc.MetadocEnrichments._
 
 @AppName("metadoc")

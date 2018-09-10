@@ -2,8 +2,8 @@ package metadoc
 
 import scala.concurrent.Future
 import metadoc.{schema => d}
-import org.{langmeta => m}
-import scala.meta.internal.{semanticdb3 => s}
+import scala.{meta => m}
+import scala.meta.internal.{semanticdb => s}
 import MetadocEnrichments._
 
 /** Index to lookup symbol definitions and references. */

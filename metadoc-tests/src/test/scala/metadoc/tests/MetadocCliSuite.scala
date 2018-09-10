@@ -6,8 +6,8 @@ import caseapp.RemainingArgs
 import metadoc.cli.MetadocCli
 import metadoc.cli.MetadocOptions
 import metadoc.{schema => d}
-import org.langmeta.internal.io.FileIO
-import org.langmeta.io.AbsolutePath
+import scala.meta.internal.io.FileIO
+import scala.meta.io.AbsolutePath
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 

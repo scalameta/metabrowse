@@ -17,7 +17,7 @@ import monaco.editor.IModelChangedEvent
 import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom
-import scala.meta.internal.{semanticdb3 => s}
+import scala.meta.internal.{semanticdb => s}
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {

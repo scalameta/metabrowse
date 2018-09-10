@@ -12,9 +12,9 @@ import scalapb.json4s.JsonFormat
 import metadoc.cli.MetadocCli
 import metadoc.cli.MetadocOptions
 import metadoc.schema.SymbolIndex
-import org.langmeta.internal.io.FileIO
-import org.langmeta.internal.io.PathIO
-import org.langmeta.io.AbsolutePath
+import scala.meta.internal.io.FileIO
+import scala.meta.internal.io.PathIO
+import scala.meta.io.AbsolutePath
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 
