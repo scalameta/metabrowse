@@ -1,8 +1,7 @@
 package metadoc
 
 import metadoc.{schema => d}
-import org.{langmeta => m}
-import scala.meta.internal.{semanticdb3 => s}
+import scala.meta.internal.{semanticdb => s}
 
 object MetadocEnrichments {
   implicit class XtensionMetadocRange(val r: d.Range) extends AnyVal {

@@ -1,6 +1,6 @@
 package metadoc
 
-import scala.meta.internal.{semanticdb3 => s}
+import scala.meta.internal.{semanticdb => s}
 
 sealed abstract class MetadocEvent
 object MetadocEvent {

@@ -2,9 +2,10 @@ package metadoc
 
 import scala.concurrent.Future
 import metadoc.{schema => d}
-import org.{langmeta => m}
-import scala.meta.internal.{semanticdb3 => s}
+import scala.meta.{inputs => m}
+import scala.meta.internal.{semanticdb => s}
 import MetadocEnrichments._
+import scala.meta.internal.semanticdb.Scala._
 
 /** Index to lookup symbol definitions and references. */
 trait MetadocSemanticdbIndex {
@@ -42,34 +43,35 @@ trait MetadocSemanticdbIndex {
   def fetchSymbol(offset: Int): Future[Option[d.SymbolIndex]] =
     resolve(offset).fold(Future.successful(Option.empty[d.SymbolIndex])) {
       case s.SymbolOccurrence(_, sym, _) =>
-        m.Symbol(sym) match {
-          case m.Symbol.Global(_, _) =>
-            symbol(sym)
-          case _ =>
-            // Resolve from local open document.
-            val names = document.occurrences.filter(_.symbol == sym)
-            val definition = names.collectFirst {
-              case s.SymbolOccurrence(
-                  Some(r),
-                  _,
-                  s.SymbolOccurrence.Role.DEFINITION
-                  ) =>
-                r.toPosition(document.uri)
-            }
-            val references = Map(
-              document.uri -> d.Ranges(
-                names.collect {
-                  case s.SymbolOccurrence(
-                      Some(r),
-                      _,
-                      s.SymbolOccurrence.Role.REFERENCE
-                      ) =>
-                    r.toDocRange
-                }
-              )
+        if (sym.isGlobal) {
+          symbol(sym)
+        } else if (sym.isLocal) {
+          // Resolve from local open document.
+          val names = document.occurrences.filter(_.symbol == sym)
+          val definition = names.collectFirst {
+            case s.SymbolOccurrence(
+                Some(r),
+                _,
+                s.SymbolOccurrence.Role.DEFINITION
+                ) =>
+              r.toPosition(document.uri)
+          }
+          val references = Map(
+            document.uri -> d.Ranges(
+              names.collect {
+                case s.SymbolOccurrence(
+                    Some(r),
+                    _,
+                    s.SymbolOccurrence.Role.REFERENCE
+                    ) =>
+                  r.toDocRange
+              }
             )
-            val dsymbol = d.SymbolIndex(sym, definition, references)
-            Future.successful(Some(dsymbol))
+          )
+          val dsymbol = d.SymbolIndex(sym, definition, references)
+          Future.successful(Some(dsymbol))
+        } else {
+          Future.successful(None)
         }
     }
 }

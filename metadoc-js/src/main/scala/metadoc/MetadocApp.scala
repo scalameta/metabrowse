@@ -17,7 +17,7 @@ import monaco.editor.IModelChangedEvent
 import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom
-import scala.meta.internal.{semanticdb3 => s}
+import scala.meta.internal.{semanticdb => s}
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {
@@ -53,7 +53,7 @@ object MetadocApp {
         Editor.setTheme(theme)
       }
 
-      def defaultState = {
+      def defaultState: Option[Navigation.State] = {
         val state = Navigation.parseState(workspace.filenames.head)
         // Starting with any path, so add the file to the history
         state.foreach(updateHistory)

@@ -7,8 +7,9 @@ import monaco.editor.IReadOnlyModel
 import monaco.languages.DocumentSymbolProvider
 import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
-import scala.meta.internal.{semanticdb3 => s}
-import org.{langmeta => m}
+import scala.meta.internal.{semanticdb => s}
+import scala.{meta => m}
+import scala.meta.internal.semanticdb.Scala._
 
 class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     extends DocumentSymbolProvider {
@@ -20,8 +21,7 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     val infos = for {
       name <- index.document.occurrences
       if name.role.isDefinition
-      symbol = m.Symbol(name.symbol)
-      if symbol.isInstanceOf[m.Symbol.Global]
+      if name.symbol.isGlobal
       denotation <- denotations.get(name.symbol)
       kind <- symbolKind(denotation)
       definition <- index.definition(name.symbol)
@@ -39,7 +39,7 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
       val symbols = getDocumentSymbols(doc).map {
         case DocumentSymbol(denotation, kind, definition) =>
           new SymbolInformation(
-            name = denotation.name,
+            name = denotation.displayName,
             // TODO: pretty print `.tpe`: https://github.com/scalameta/scalameta/issues/1479
             containerName = denotation.symbol,
             kind = kind,

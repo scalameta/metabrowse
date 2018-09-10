@@ -11,7 +11,7 @@ import monaco.services.IReference
 import monaco.services.ITextEditorModel
 import monaco.services.ITextModelService
 import monaco.services.ImmortalReference
-import scala.meta.internal.{semanticdb3 => s}
+import scala.meta.internal.{semanticdb => s}
 
 object MetadocTextModelService extends ITextModelService {
   def modelReference(
