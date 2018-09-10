@@ -1,7 +1,6 @@
 package metadoc
 
 import metadoc.{schema => d}
-import org.{langmeta => m}
 import scala.meta.internal.{semanticdb => s}
 
 object MetadocEnrichments {

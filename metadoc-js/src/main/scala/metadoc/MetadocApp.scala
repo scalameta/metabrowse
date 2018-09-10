@@ -53,7 +53,7 @@ object MetadocApp {
         Editor.setTheme(theme)
       }
 
-      def defaultState = {
+      def defaultState: Option[Navigation.State] = {
         val state = Navigation.parseState(workspace.filenames.head)
         // Starting with any path, so add the file to the history
         state.foreach(updateHistory)

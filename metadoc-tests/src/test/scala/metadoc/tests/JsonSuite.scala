@@ -2,7 +2,6 @@ package metadoc.tests
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
-import scala.meta.Database
 import scala.meta.internal.semanticdb._
 import scala.meta.interactive._
 import scala.meta.testkit.DiffAssertions
@@ -13,7 +12,6 @@ import metadoc.cli.MetadocCli
 import metadoc.cli.MetadocOptions
 import metadoc.schema.SymbolIndex
 import scala.meta.internal.io.FileIO
-import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
@@ -22,7 +20,7 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
   val compiler: Global = InteractiveSemanticdb.newCompiler()
   override def afterAll(): Unit = compiler.askShutdown()
   test(".semanticdb.json") {
-    val doc = InteractiveSemanticdb.toDocument(
+    val doc = InteractiveSemanticdb.toTextDocument(
       compiler,
       """package com.bar
         |import scala.concurrent.Future
@@ -32,7 +30,7 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
         |}
       """.stripMargin
     )
-    val db = Database(doc :: Nil).toSchema(PathIO.workingDirectory)
+    val db = TextDocuments(doc :: Nil)
     val dbJson = JsonFormat.toJsonString(db)
     val jsonFile = Files.createTempFile("metadoc", ".semanticdb.json")
     val out = Files.createTempDirectory("metadoc")
@@ -53,7 +51,7 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
     assertNoDiff(
       index,
       """
-        |symbol: "com.bar.Main."
+        |symbol: "com/bar/Main."
         |definition {
         |  filename: "interactive.scala"
         |  startLine: 2
@@ -74,7 +72,7 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
         |}
         |
         |
-        |symbol: "com.bar.Main.future()."
+        |symbol: "com/bar/Main.future."
         |definition {
         |  filename: "interactive.scala"
         |  startLine: 3

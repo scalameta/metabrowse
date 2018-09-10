@@ -31,16 +31,25 @@ import metadoc.schema.SymbolIndex
 import metadoc.{schema => d}
 import scala.meta._
 import scala.meta.internal.{semanticdb => s}
+import scala.meta.internal.semanticdb.Scala._
 import metadoc.MetadocEnrichments._
+import scala.meta.internal.io.FileIO
+import scala.meta.internal.io.PathIO
+import scala.meta.internal.metadoc.ScalametaInternals
 
 @AppName("metadoc")
-@AppVersion("0.1.0-SNAPSHOT")
+@AppVersion("<version>")
 @ProgName("metadoc")
 case class MetadocOptions(
     @HelpMessage(
       "The output directory to generate the metadoc site. (required)"
     )
     target: Option[String] = None,
+    @HelpMessage(
+      "The SemanticDB sourceroot used to compiled sources, must match the compiler option -P:semanticdb:sourceroot:<value>. " +
+        "Defaults to the working directory if empty."
+    )
+    sourceroot: Option[String] = None,
     @HelpMessage(
       "Clean the target directory before generating new site. " +
         "All files will be deleted so be careful."
@@ -51,7 +60,11 @@ case class MetadocOptions(
     )
     zip: Boolean = false,
     @HelpMessage("Disable fancy progress bar")
-    nonInteractive: Boolean = false
+    nonInteractive: Boolean = false,
+    @HelpMessage(
+      "The working directory used to relativize file directories, default to sys.props('user.dir') if empty."
+    )
+    cwd: Option[String] = None,
 ) {
   def targetPath: AbsolutePath = AbsolutePath(target.get)
 }
@@ -59,6 +72,10 @@ case class MetadocOptions(
 case class Target(target: AbsolutePath, onClose: () => Unit)
 
 class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
+  private implicit val cwd: AbsolutePath =
+    options.cwd.fold(PathIO.workingDirectory)(AbsolutePath(_))
+  private val sourceroot: AbsolutePath =
+    options.sourceroot.fold(PathIO.workingDirectory)(AbsolutePath(_))
   val Target(target, onClose) = if (options.zip) {
     // For large corpora (>1M LOC) writing the symbol/ directory is the
     // bottle-neck unless --zip is enabled.
@@ -163,6 +180,29 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       files.result()
     }
 
+  private def updateText(doc: s.TextDocument): s.TextDocument = {
+    if (doc.text.isEmpty) {
+      val abspath = sourceroot.resolve(doc.uri)
+      if (abspath.isFile) {
+        val text = FileIO.slurp(abspath, StandardCharsets.UTF_8)
+        val md5 = FingerprintOps.md5(text)
+        if (md5 != doc.md5) {
+          System.err.println(
+            s"error: md5 fingerprint mismatch for document ${doc.uri}"
+          )
+        }
+        doc.withText(text)
+      } else {
+        System.err.println(
+          s"error: No file on disc for document ${doc.uri}"
+        )
+        doc
+      }
+    } else {
+      doc
+    }
+  }
+
   private def parseDatabase(path: AbsolutePath): s.TextDocuments = {
     val filename = path.toNIO.getFileName.toString
     val bytes = path.readAllBytes
@@ -182,7 +222,8 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
         try {
           tick()
           val db = parseDatabase(path)
-          db.documents.foreach { document =>
+          db.documents.foreach { noTextDocument =>
+            val document = updateText(noTextDocument)
             document.occurrences.foreach {
               case s.SymbolOccurrence(_, sym, _)
                   if !sym.endsWith(".") && !sym.endsWith("#") =>
@@ -247,35 +288,41 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   private def updateReferencesForType(
       symbolsMap: concurrent.Map[Symbol, AtomicReference[SymbolIndex]],
       symbolIndex: SymbolIndex
-  ) = {
-    Symbol(symbolIndex.symbol) match {
-      case Symbol.Global(owner, Signature.Type(name)) =>
-        (for {
+  ): SymbolIndex = {
+    if (symbolIndex.symbol.isType) {
+      try {
+        val (owner, desc) = ScalametaInternals.ownerAndDesc(symbolIndex.symbol)
+        val maybeTermInfo = for {
           syntheticObjRef <- symbolsMap.get(
-            Symbol.Global(owner, Signature.Term(name)).syntax
+            Symbols.Global(owner, Descriptor.Term(desc.name.value))
           )
           if syntheticObjRef.get().definition.isEmpty
-        } yield
-          symbolIndex.copy(references = syntheticObjRef.get().references))
-          .getOrElse(symbolIndex)
-      case _ => symbolIndex
+        } yield symbolIndex.copy(references = syntheticObjRef.get().references)
+        maybeTermInfo.getOrElse(symbolIndex)
+      } catch {
+        case NonFatal(e) =>
+          symbolIndex
+      }
+    } else {
+      symbolIndex
     }
   }
 
   private def updateDefinitionsForTerm(
       symbolsMap: concurrent.Map[Symbol, AtomicReference[SymbolIndex]],
       symbolIndex: SymbolIndex
-  ) = {
-    Symbol(symbolIndex.symbol) match {
-      case Symbol.Global(owner, Signature.Term(name)) =>
-        (for {
-          typeRef <- symbolsMap.get(
-            Symbol.Global(owner, Signature.Type(name)).syntax
-          )
-          definition <- typeRef.get().definition
-        } yield symbolIndex.copy(definition = Some(definition)))
-          .getOrElse(symbolIndex)
-      case _ => symbolIndex
+  ): SymbolIndex = {
+    if (symbolIndex.symbol.isTerm) {
+      val (owner, desc) = ScalametaInternals.ownerAndDesc(symbolIndex.symbol)
+      val maybeTypeInfo = for {
+        typeRef <- symbolsMap.get(
+          Symbols.Global(owner, Descriptor.Type(desc.name.value))
+        )
+        definition <- typeRef.get().definition
+      } yield symbolIndex.copy(definition = Some(definition))
+      maybeTypeInfo.getOrElse(symbolIndex)
+    } else {
+      symbolIndex
     }
   }
 

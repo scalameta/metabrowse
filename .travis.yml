@@ -38,6 +38,7 @@ before_install:
   - nvm install "$TRAVIS_NODE_VERSION"
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version "$TRAVIS_YARN_VERSION"
   - export PATH=$HOME/.yarn/bin:$PATH
+  - yarn config set ignore-engines true
 
 before_cache:
   - du -h -d 1 $HOME/.ivy2/cache
