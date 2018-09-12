@@ -47,7 +47,7 @@ inThisBuild(
 
 lazy val Version = new {
   def scala = "2.12.6"
-  def scala210 = "2.10.6"
+  def scala210 = "2.10.7"
   def scalameta = "4.0.0-M11"
   def sbt = "1.1.1"
   def sbt013 = "0.13.17"
@@ -65,8 +65,8 @@ lazy val allSettings = Seq(
     "-unchecked"
   ),
   libraryDependencies ++= Seq(
-    "org.scalatest" %%% "scalatest" % "3.0.3" % Test,
-    "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
+    "org.scalatest" %%% "scalatest" % "3.0.5" % Test,
+    "org.scalacheck" %%% "scalacheck" % "1.14.0" % Test
   )
 )
 
@@ -92,9 +92,9 @@ lazy val cli = project
     mainClass.in(assembly) := Some("metadoc.cli.MetadocCli"),
     assemblyJarName.in(assembly) := "metadoc.jar",
     libraryDependencies ++= List(
-      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.7.0",
-      "com.github.alexarchambault" %% "case-app" % "1.2.0-M3",
-      "com.github.pathikrit" %% "better-files" % "3.0.0"
+      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.7.1",
+      "com.github.alexarchambault" %% "case-app" % "1.2.0",
+      "com.github.pathikrit" %% "better-files" % "3.6.0"
     ),
     resourceGenerators in Compile += Def.task {
       val zip = (resourceManaged in Compile).value / "metadoc-assets.zip"
@@ -131,7 +131,7 @@ lazy val js = project
     emitSourceMaps := false, // Disabled to reduce warnings
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.2"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.6"
     ),
     npmDevDependencies in Compile ++= Seq(
       "copy-webpack-plugin" -> "4.3.1",

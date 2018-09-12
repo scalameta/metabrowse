@@ -5,9 +5,9 @@ addSbtPlugin("com.thesamet" % "sbt-protoc" % "0.99.18")
 addSbtPlugin(
   "io.get-coursier" % "sbt-coursier" % coursier.util.Properties.version
 )
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.24")
-addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.4.0")
-addSbtPlugin("org.portable-scala" % "sbt-crossproject" % "0.4.0")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.25")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0")
+addSbtPlugin("org.portable-scala" % "sbt-crossproject" % "0.6.0")
 addSbtPlugin("com.geirsson" % "sbt-ci-release" % "1.2.2")
 libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin-shaded" % "0.8.0-RC1"
 libraryDependencies += "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
