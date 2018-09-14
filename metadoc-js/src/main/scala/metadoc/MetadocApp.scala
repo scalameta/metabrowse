@@ -71,7 +71,7 @@ object MetadocApp {
           .orElse(defaultState)
 
       dom.window.onpopstate = { e: dom.PopStateEvent =>
-        for (state <- Navigation.currentState())
+        for (state <- Navigation.currentState(e.state))
           openEditor(editorService)(state)
       }
 
@@ -86,11 +86,12 @@ object MetadocApp {
   def updateHistory(state: Navigation.State): Unit = {
     val uri = "#/" + state.toString.dropWhile(_ == '/')
 
-    Navigation.currentState() match {
+    Navigation.currentState(dom.window.history.state) match {
       case Some(cur) if cur.path == state.path =>
-        dom.window.history.replaceState(state, state.path, uri)
+        dom.window.history.replaceState(state.toString, state.path, uri)
       case _ =>
-        dom.window.history.pushState(state, state.path, uri)
+        updateTitle(state)
+        dom.window.history.pushState(state.toString, state.path, uri)
     }
   }
 

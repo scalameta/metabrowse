@@ -48,13 +48,17 @@ object Navigation {
       )
   }
 
-  def currentState(
-      state: Option[State] = Option(
-        dom.window.history.state.asInstanceOf[Navigation.State]
-      ),
-      locationHash: => String = dom.window.location.hash.dropWhile(_ == '#')
-  ): Option[Navigation.State] =
-    state.orElse(parseState(locationHash))
+  def currentState(maybeState: js.Any): Option[Navigation.State] = {
+    val state = Option(maybeState) match {
+      case Some(serialized) =>
+        Navigation.parseState(maybeState.asInstanceOf[String])
+      case None => None
+    }
+    state.orElse {
+      val locationHash = dom.window.location.hash.dropWhile(_ == '#')
+      parseState(locationHash)
+    }
+  }
 
   def parseState(state: String): Option[Navigation.State] = {
     for (uri <- parseUri(state)) yield {
@@ -70,12 +74,14 @@ object Navigation {
   def parseSelection(selection: String): Option[Selection] = {
     selection match {
       case Selection.Regex(fromLine, _, fromCol, _, toLine, _, toCol) =>
+        val defaultLine = fromLine.toInt
+        val defaultColumn = Option(fromCol).map(_.toInt).getOrElse(1)
         Some(
           new Selection(
-            fromLine.toInt,
+            defaultLine,
             Option(fromCol).map(_.toInt).getOrElse(1),
-            Option(toLine).map(_.toInt).getOrElse(fromLine.toInt + 1),
-            Option(toCol).map(_.toInt).getOrElse(1)
+            Option(toLine).map(_.toInt).getOrElse(defaultLine),
+            Option(toCol).map(_.toInt).getOrElse(defaultColumn)
           )
         )
       case _ =>
