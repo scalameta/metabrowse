@@ -60,37 +60,38 @@ object MetadocApp {
         state
       }
 
+      def locationState() =
+        Navigation.parseState(Uri.parse(dom.window.location.hash).fragment)
+
       /*
        * Discovering the initial input state may update the history so resolve the
        * input before registering the history popstate handler to avoid any event
        * being triggered.
        */
-      val state =
-        Navigation
-          .parseState(Uri.parse(dom.window.location.hash).fragment)
-          .orElse(defaultState)
+      val initialState = locationState().orElse(defaultState)
 
-      dom.window.onpopstate = { e: dom.PopStateEvent =>
-        for (state <- Navigation.currentState(e.state))
-          openEditor(editorService)(state)
+      dom.window.onpopstate = { event: dom.PopStateEvent =>
+        Navigation
+          .fromHistoryState(event.state)
+          .orElse(locationState())
+          .foreach(openEditor(editorService))
       }
 
       dom.window.onresize = { _: dom.Event =>
         editorService.resize()
       }
 
-      state.foreach(openEditor(editorService))
+      initialState.foreach(openEditor(editorService))
     }
   }
 
   def updateHistory(state: Navigation.State): Unit = {
     val uri = "#/" + state.toString.dropWhile(_ == '/')
 
-    Navigation.currentState(dom.window.history.state) match {
+    Navigation.fromHistoryState(dom.window.history.state) match {
       case Some(cur) if cur.path == state.path =>
         dom.window.history.replaceState(state.toString, state.path, uri)
       case _ =>
-        updateTitle(state)
         dom.window.history.pushState(state.toString, state.path, uri)
     }
   }
@@ -139,6 +140,7 @@ object MetadocApp {
         val selection = Navigation.Selection.fromRange(cursor.selection)
         val state =
           new Navigation.State(editor.getModel().uri.path, Some(selection))
+        updateTitle(state)
         updateHistory(state)
       }
     }
