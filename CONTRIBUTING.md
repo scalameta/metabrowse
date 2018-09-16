@@ -30,7 +30,6 @@ git submodule init
 git submodule update
 
 npm install -g yarn
-yarn config set ignore-engines true # To avoid error: engine node is incompatible with this version
 
 sbt
   > metadoc-site                        # generate static site under target/metadoc.
