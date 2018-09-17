@@ -1,7 +1,7 @@
 package monaco
 
 import scala.scalajs.js
-import monaco.editor.{IEditor, IEditorOptions, IModel}
+import monaco.editor.{IEditor, IEditorOptions, ITextModel}
 import monaco.editor.Editor.IEditorViewState
 
 /**
@@ -89,12 +89,12 @@ package services {
   }
 
   trait ITextEditorModel extends js.Object {
-    def textEditorModel: IModel
+    def textEditorModel: ITextModel
   }
 
   object ITextEditorModel {
-    def apply(model: IModel): ITextEditorModel = new ITextEditorModel {
-      override def textEditorModel: IModel = model
+    def apply(model: ITextModel): ITextEditorModel = new ITextEditorModel {
+      override def textEditorModel: ITextModel = model
     }
   }
 }

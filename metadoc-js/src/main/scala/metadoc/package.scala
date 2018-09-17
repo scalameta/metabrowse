@@ -5,9 +5,9 @@ import scala.scalajs.js.JSConverters._
 import metadoc.{schema => d}
 import monaco.Promise
 import monaco.Range
-import monaco.Thenable
+import monaco.Monaco.Thenable
 import monaco.Uri
-import monaco.editor.IReadOnlyModel
+import monaco.editor.ITextModel
 import monaco.languages.Location
 import monaco.services.IResourceInput
 import monaco.services.ITextEditorOptions
@@ -48,8 +48,7 @@ package object metadoc {
       future.toJSPromise.asInstanceOf[Thenable[T]]
   }
 
-  implicit class XtensionIReadOnlyModel(val self: IReadOnlyModel)
-      extends AnyVal {
+  implicit class XtensionITextModel(val self: ITextModel) extends AnyVal {
     def resolveLocation(pos: d.Position): Location = {
       val location = jsObject[Location]
       location.uri = createUri(pos.filename)

@@ -26,7 +26,7 @@ fi
 sed \
    -e 's/): [^ ]* is [^; ]*;/): boolean;/' \
    -e 's/: void | /: /' \
-   -e '/^declare module monaco.languages.\(typescript\|html\|css\|json\) {$/,/^}$/d' \
+   -e '/^declare namespace monaco.languages.\(typescript\|html\|css\|json\) {$/,/^}$/d' \
    -e 's/ const enum / enum /' \
    < "$NPM_MONACO_D_TS" \
    > "$MONACO_D_TS"
