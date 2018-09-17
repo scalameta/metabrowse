@@ -5,6 +5,7 @@ import scala.concurrent.Future
 import scala.scalajs.js
 import monaco.editor.IReadOnlyModel
 import monaco.languages.DefinitionProvider
+import monaco.languages.Languages.Definition
 import monaco.languages.Location
 import monaco.CancellationToken
 import monaco.Position
@@ -35,6 +36,6 @@ class ScalaDefinitionProvider(index: MetadocSemanticdbIndex)
             case None => empty
           }
       }
-    } yield locations
+    } yield locations: Definition
   }.toMonacoThenable
 }

@@ -22,15 +22,16 @@ trait Thenable[T] extends js.Object {
       onrejected: js.Function1[js.Any, TResult | Thenable[TResult]] = ???
   ): Thenable[TResult] = js.native
   /*
-  def then[TResult](
+  def `then`[TResult](
       onfulfilled: js.Function1[T, TResult | Thenable[TResult]] = ???,
       onrejected: js.Function1[js.Any, Unit] = ???
   ): Thenable[TResult] = js.native
  */
 }
 
+// @js.native
 trait IDisposable extends js.Object {
-  def dispose(): Unit
+  def dispose(): Unit // = js.native
 }
 
 @js.native
@@ -65,7 +66,7 @@ object Severity extends js.Object {
 
 @js.native
 trait TValueCallback[T] extends js.Object {
-  def apply(value: Thenable[T]): Unit = js.native
+  def apply(value: T | Thenable[T]): Unit = js.native
 }
 
 @js.native
@@ -75,6 +76,7 @@ trait ProgressCallback extends js.Object {
 
 @js.native
 @JSGlobal("monaco.Promise")
+// NOTE: Covariant to make things easier.
 class Promise[+V] protected () extends js.Object {
   def this(
       init: js.Function3[TValueCallback[V], js.Function1[js.Any, Unit], ProgressCallback, Unit],
@@ -86,57 +88,57 @@ class Promise[+V] protected () extends js.Object {
       progress: ProgressCallback = ???
   ): Promise[U] = js.native
   /*
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, Promise[U]] = ???,
       error: js.Function1[js.Any, Promise[U] | U] = ???,
       progress: ProgressCallback = ???
   ): Promise[U] = js.native
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, Promise[U]] = ???,
       error: js.Function1[js.Any, U] = ???,
       progress: ProgressCallback = ???
   ): Promise[U] = js.native
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, Promise[U]] = ???,
       error: js.Function1[js.Any, Unit] = ???,
       progress: ProgressCallback = ???
   ): Promise[U] = js.native
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, Promise[U] | U] = ???,
       error: js.Function1[js.Any, Promise[U]] = ???,
       progress: ProgressCallback = ???
   ): Promise[U] = js.native
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, Promise[U] | U] = ???,
       error: js.Function1[js.Any, Promise[U] | U] = ???,
       progress: ProgressCallback = ???
   ): Promise[U] = js.native
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, Promise[U] | U] = ???,
       error: js.Function1[js.Any, U] = ???,
       progress: ProgressCallback = ???
   ): Promise[U] = js.native
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, Promise[U] | U] = ???,
       error: js.Function1[js.Any, Unit] = ???,
       progress: ProgressCallback = ???
   ): Promise[U] = js.native
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, U] = ???,
       error: js.Function1[js.Any, Promise[U]] = ???,
       progress: ProgressCallback = ???
   ): Promise[U] = js.native
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, U] = ???,
       error: js.Function1[js.Any, Promise[U] | U] = ???,
       progress: ProgressCallback = ???
   ): Promise[U] = js.native
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, U] = ???,
       error: js.Function1[js.Any, U] = ???,
       progress: ProgressCallback = ???
   ): Promise[U] = js.native
-  def then[U](
+  def `then`[U](
       success: js.Function1[V, U] = ???,
       error: js.Function1[js.Any, Unit] = ???,
       progress: ProgressCallback = ???
@@ -658,7 +660,9 @@ package editor {
     def get(): T = js.native
   }
 
+  @js.native
   trait IEditorOverrideServices extends js.Object {
+    // NOTE: Services to enable loading of semantic DBs
     var editorService: services.IEditorService
     var textModelService: services.ITextModelService
     /*
@@ -939,6 +943,7 @@ package editor {
         captureMatches: Boolean,
         limitResultCount: Double = ???
     ): js.Array[FindMatch] = js.native
+    /*
     def findMatches(
         searchString: String,
         searchScope: IRange,
@@ -946,8 +951,9 @@ package editor {
         matchCase: Boolean,
         wordSeparators: String,
         captureMatches: Boolean,
-        limitResultCount: Double
+        limitResultCount: Double = ???
     ): js.Array[FindMatch] = js.native
+    */
     def findNextMatch(
         searchString: String,
         searchStart: IPosition,
@@ -1173,7 +1179,18 @@ package editor {
   trait ICodeEditorViewState extends js.Object {
     var cursorState: js.Array[ICursorState] = js.native
     var viewState: IViewState = js.native
-    var contributionsState: js.Dictionary[js.Any] = js.native
+    var contributionsState: ICodeEditorViewState.ContributionsState = js.native
+  }
+
+  object ICodeEditorViewState {
+
+    @js.native
+    trait ContributionsState extends js.Object {
+      @JSBracketAccess
+      def apply(id: String): js.Any = js.native
+      @JSBracketAccess
+      def update(id: String, v: js.Any): Unit = js.native
+    }
   }
 
   @js.native
@@ -1951,8 +1968,8 @@ package editor {
     def letterSpacing: Double = js.native
   }
 
-  @JSGlobal("monaco.editor")
   @js.native
+  @JSGlobal("monaco.editor")
   object Editor extends js.Object {
     def create(
         domElement: HTMLElement,
@@ -2011,8 +2028,9 @@ package editor {
     def setTheme(themeName: String): Unit = js.native
     type BuiltinTheme = String
     type IColors = js.Dictionary[String]
+    // NOTE: Diff model is not used so disable the alias to keep types simpler
     type IEditorModel = IModel // | IDiffEditorModel
-    type IEditorViewState = ICodeEditorViewState //| IDiffEditorViewState
+    type IEditorViewState = ICodeEditorViewState // | IDiffEditorViewState
   }
 
 }
@@ -2282,23 +2300,29 @@ package languages {
     var includeDeclaration: Boolean = js.native
   }
 
+  //@js.native
   trait ReferenceProvider extends js.Object {
     def provideReferences(
         model: editor.IReadOnlyModel,
         position: Position,
         context: ReferenceContext,
         token: CancellationToken
-    ): Thenable[js.Array[Location]]
+    ): js.Array[Location] | Thenable[js.Array[Location]] //= js.native
   }
 
-  class Location(val uri: Uri, val range: IRange) extends js.Object
+  @js.native
+  trait Location extends js.Object {
+    var uri: Uri = js.native
+    var range: IRange = js.native
+  }
 
+  //@js.native
   trait DefinitionProvider extends js.Object {
     def provideDefinition(
         model: editor.IReadOnlyModel,
         position: Position,
         token: CancellationToken
-    ): Thenable[Definition]
+    ): Definition | Thenable[Definition] // = js.native
   }
 
   @js.native
@@ -2307,7 +2331,7 @@ package languages {
         model: editor.IReadOnlyModel,
         position: Position,
         token: CancellationToken
-    ): Thenable[Definition] = js.native
+    ): Definition | Thenable[Definition] = js.native
   }
 
   @js.native
@@ -2316,7 +2340,7 @@ package languages {
         model: editor.IReadOnlyModel,
         position: Position,
         token: CancellationToken
-    ): Thenable[Definition] = js.native
+    ): Definition | Thenable[Definition] = js.native
   }
 
   @js.native
@@ -2355,18 +2379,20 @@ package languages {
     def apply(value: SymbolKind): String = js.native
   }
 
-  class SymbolInformation(
-      val name: String,
-      val containerName: String,
-      val kind: SymbolKind,
-      val location: Location
-  ) extends js.Object
+  @js.native
+  trait SymbolInformation extends js.Object {
+    var name: String = js.native
+    var containerName: String = js.native
+    var kind: SymbolKind = js.native
+    var location: Location = js.native
+  }
 
+  //@js.native
   trait DocumentSymbolProvider extends js.Object {
     def provideDocumentSymbols(
         model: editor.IReadOnlyModel,
         token: CancellationToken
-    ): Thenable[js.Array[SymbolInformation]]
+    ): js.Array[SymbolInformation] | Thenable[js.Array[SymbolInformation]] // = js.native
   }
 
   @js.native
@@ -2470,7 +2496,7 @@ package languages {
 
   @js.native
   trait CodeLensProvider extends js.Object {
-    var onDidChange: IEvent[CodeLensProvider] = js.native
+    var onDidChange: IEvent[this.type] = js.native
     def provideCodeLenses(
         model: editor.IReadOnlyModel,
         token: CancellationToken
@@ -2482,25 +2508,37 @@ package languages {
     ): ICodeLensSymbol | Thenable[ICodeLensSymbol] = js.native
   }
 
-  class ILanguageExtensionPoint(
-      val id: String,
-      val extensions: js.UndefOr[js.Array[String]] = js.undefined,
-      val filenames: js.UndefOr[js.Array[String]] = js.undefined,
-      val filenamePatterns: js.UndefOr[js.Array[String]] = js.undefined,
-      val firstLine: js.UndefOr[String] = js.undefined,
-      val aliases: js.UndefOr[js.Array[String]] = js.undefined,
-      val mimetypes: js.UndefOr[js.Array[String]] = js.undefined,
-      val configuration: js.UndefOr[String] = js.undefined
-  ) extends js.Object
+  @js.native
+  trait ILanguageExtensionPoint extends js.Object {
+    var id: String = js.native
+    var extensions: js.Array[String] = js.native
+    var filenames: js.Array[String] = js.native
+    var filenamePatterns: js.Array[String] = js.native
+    var firstLine: String = js.native
+    var aliases: js.Array[String] = js.native
+    var mimetypes: js.Array[String] = js.native
+    var configuration: String = js.native
+  }
 
   @js.native
   trait IMonarchLanguage extends js.Object {
-    var tokenizer: js.Dictionary[js.Array[IMonarchLanguageRule]] = js.native
+    var tokenizer: IMonarchLanguage.Tokenizer = js.native
     var ignoreCase: Boolean = js.native
     var defaultToken: String = js.native
     var brackets: js.Array[IMonarchLanguageBracket] = js.native
     var start: String = js.native
     var tokenPostfix: String = js.native
+  }
+
+  object IMonarchLanguage {
+
+    @js.native
+    trait Tokenizer extends js.Object {
+      @JSBracketAccess
+      def apply(name: String): js.Array[IMonarchLanguageRule] = js.native
+      @JSBracketAccess
+      def update(name: String, v: js.Array[IMonarchLanguageRule]): Unit = js.native
+    }
   }
 
   @js.native
@@ -2530,8 +2568,8 @@ package languages {
     var token: String = js.native
   }
 
-  @JSGlobal("monaco.languages")
   @js.native
+  @JSGlobal("monaco.languages")
   object Languages extends js.Object {
     def register(language: ILanguageExtensionPoint): Unit = js.native
     def getLanguages(): js.Array[ILanguageExtensionPoint] = js.native
@@ -2616,7 +2654,7 @@ package languages {
         provider: CompletionItemProvider
     ): IDisposable = js.native
     type CharacterPair = js.Tuple2[String, String]
-    type Definition = js.Array[Location]
+    type Definition = Location | js.Array[Location]
   }
 
 }
@@ -2637,8 +2675,8 @@ package worker {
 
 }
 
-@JSGlobal("monaco")
 @js.native
+@JSGlobal("monaco")
 object Monaco extends js.Object {
   type MarkedString = String | js.Any
 }

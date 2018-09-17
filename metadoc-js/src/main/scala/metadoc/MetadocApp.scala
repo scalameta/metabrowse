@@ -175,5 +175,9 @@ object MetadocApp {
     promise.future
   }
 
-  val ScalaLanguageExtensionPoint = new ILanguageExtensionPoint("scala")
+  val ScalaLanguageExtensionPoint = {
+    val language = jsObject[ILanguageExtensionPoint]
+    language.id = "scala"
+    language
+  }
 }
