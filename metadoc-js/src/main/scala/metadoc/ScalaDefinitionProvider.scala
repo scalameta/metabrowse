@@ -4,8 +4,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 import monaco.editor.ITextModel
+import monaco.languages.DefinitionLink
 import monaco.languages.DefinitionProvider
-import monaco.languages.Languages.Definition
 import monaco.languages.Location
 import monaco.CancellationToken
 import monaco.Position
@@ -18,7 +18,7 @@ class ScalaDefinitionProvider(index: MetadocSemanticdbIndex)
       token: CancellationToken
   ) = {
     val offset = model.getOffsetAt(position).toInt
-    def empty = Future.successful(js.Array[Location]())
+    def empty = Future.successful(js.Array[DefinitionLink]())
     for {
       symbol <- index.fetchSymbol(offset)
       locations <- {
@@ -31,11 +31,16 @@ class ScalaDefinitionProvider(index: MetadocSemanticdbIndex)
               } yield {
                 val location =
                   model.`object`.textEditorModel.resolveLocation(defn)
-                js.Array[Location](location)
+                val definitionLink = jsObject[DefinitionLink]
+                //definitionLink.origin = location.range
+                definitionLink.uri = location.uri
+                definitionLink.range = location.range
+                definitionLink.selectionRange = location.range
+                js.Array[DefinitionLink](definitionLink)
               }
             case None => empty
           }
       }
-    } yield locations: Definition
+    } yield locations
   }.toMonacoThenable
 }

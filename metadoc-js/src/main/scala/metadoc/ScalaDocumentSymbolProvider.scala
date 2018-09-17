@@ -4,8 +4,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import monaco.CancellationToken
 import monaco.editor.ITextModel
+import monaco.languages.{DocumentSymbol => MonacoDocumentSymbol}
 import monaco.languages.DocumentSymbolProvider
-import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
 import scala.meta.internal.{semanticdb => s}
 import scala.{meta => m}
@@ -13,6 +13,8 @@ import scala.meta.internal.semanticdb.Scala._
 
 class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     extends DocumentSymbolProvider {
+
+  override var displayName = "Metadoc Scala Symbol Provider"
 
   private def getDocumentSymbols(doc: s.TextDocument): Seq[DocumentSymbol] = {
     val denotations = doc.symbols.map { info =>
@@ -38,15 +40,16 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     } yield {
       val symbols = getDocumentSymbols(doc).map {
         case DocumentSymbol(denotation, kind, definition) =>
-          val symbol = jsObject[SymbolInformation]
+          val symbol = jsObject[MonacoDocumentSymbol]
           symbol.name = denotation.displayName
           // TODO: pretty print `.tpe`: https://github.com/scalameta/scalameta/issues/1479
-          symbol.containerName = denotation.symbol
+          symbol.detail = denotation.symbol
           symbol.kind = kind
-          symbol.location = model.resolveLocation(definition)
+          symbol.range = model.resolveLocation(definition).range
+          symbol.selectionRange = symbol.range
           symbol
       }
-      js.Array[SymbolInformation](symbols: _*)
+      js.Array[MonacoDocumentSymbol](symbols: _*)
     }
   }.toMonacoThenable
 
