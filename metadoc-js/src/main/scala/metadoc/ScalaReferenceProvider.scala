@@ -3,7 +3,7 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
-import monaco.editor.IReadOnlyModel
+import monaco.editor.ITextModel
 import monaco.languages.Location
 import monaco.languages.ReferenceContext
 import monaco.languages.ReferenceProvider
@@ -14,7 +14,7 @@ import MetadocEnrichments._
 class ScalaReferenceProvider(index: MetadocSemanticdbIndex)
     extends ReferenceProvider {
   override def provideReferences(
-      model: IReadOnlyModel,
+      model: ITextModel,
       position: Position,
       context: ReferenceContext,
       token: CancellationToken

@@ -3,7 +3,7 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
-import monaco.editor.IReadOnlyModel
+import monaco.editor.ITextModel
 import monaco.languages.DefinitionProvider
 import monaco.languages.Languages.Definition
 import monaco.languages.Location
@@ -13,7 +13,7 @@ import monaco.Position
 class ScalaDefinitionProvider(index: MetadocSemanticdbIndex)
     extends DefinitionProvider {
   override def provideDefinition(
-      model: IReadOnlyModel,
+      model: ITextModel,
       position: Position,
       token: CancellationToken
   ) = {

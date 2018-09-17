@@ -5,9 +5,8 @@ import scala.scalajs.js.JSConverters._
 import metadoc.{schema => d}
 import monaco.Promise
 import monaco.Range
-import monaco.Thenable
+import monaco.Monaco.Thenable
 import monaco.Uri
-import monaco.editor.IReadOnlyModel
 import monaco.languages.Location
 import monaco.services.IResourceInput
 import monaco.services.ITextEditorOptions

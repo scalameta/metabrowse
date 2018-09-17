@@ -3,7 +3,7 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import monaco.CancellationToken
-import monaco.editor.IReadOnlyModel
+import monaco.editor.ITextModel
 import monaco.languages.DocumentSymbolProvider
 import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
@@ -30,7 +30,7 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
   }
 
   override def provideDocumentSymbols(
-      model: IReadOnlyModel,
+      model: ITextModel,
       token: CancellationToken
   ) = {
     for {
