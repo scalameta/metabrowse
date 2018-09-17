@@ -41,7 +41,7 @@ inThisBuild(
         "jonas@users.noreply.github.com",
         url("https://github.com/jonas")
       )
-    ),
+    )
   )
 )
 
