@@ -51,6 +51,20 @@ object Severity extends js.Object {
 }
 
 @js.native
+sealed trait MarkerSeverity extends js.Object {}
+
+@js.native
+@JSGlobal("monaco.MarkerSeverity")
+object MarkerSeverity extends js.Object {
+  var Hint: MarkerSeverity = js.native
+  var Info: MarkerSeverity = js.native
+  var Warning: MarkerSeverity = js.native
+  var Error: MarkerSeverity = js.native
+  @JSBracketAccess
+  def apply(value: MarkerSeverity): String = js.native
+}
+
+@js.native
 @JSGlobal("monaco.Promise")
 // NOTE: Covariant to make things easier.
 class Promise[+T] protected () extends js.Object {
@@ -623,7 +637,7 @@ package editor {
   trait IMarker extends js.Object {
     var owner: String = js.native
     var resource: Uri = js.native
-    var severity: Severity = js.native
+    var severity: MarkerSeverity = js.native
     var code: String = js.native
     var message: String = js.native
     var source: String = js.native
@@ -631,14 +645,26 @@ package editor {
     var startColumn: Double = js.native
     var endLineNumber: Double = js.native
     var endColumn: Double = js.native
+    var relatedInformation: js.Array[IRelatedInformation] = js.native
   }
 
   @js.native
   trait IMarkerData extends js.Object {
     var code: String = js.native
-    var severity: Severity = js.native
+    var severity: MarkerSeverity = js.native
     var message: String = js.native
     var source: String = js.native
+    var startLineNumber: Double = js.native
+    var startColumn: Double = js.native
+    var endLineNumber: Double = js.native
+    var endColumn: Double = js.native
+    var relatedInformation: js.Array[IRelatedInformation] = js.native
+  }
+
+  @js.native
+  trait IRelatedInformation extends js.Object {
+    var resource: Uri = js.native
+    var message: String = js.native
     var startLineNumber: Double = js.native
     var startColumn: Double = js.native
     var endLineNumber: Double = js.native
@@ -703,11 +729,13 @@ package editor {
     var glyphMarginHoverMessage: IMarkdownString | js.Array[IMarkdownString] = js.native
     var hoverMessage: IMarkdownString | js.Array[IMarkdownString] = js.native
     var isWholeLine: Boolean = js.native
+    var zIndex: Double = js.native
     var overviewRuler: IModelDecorationOverviewRulerOptions = js.native
     var glyphMarginClassName: String = js.native
     var linesDecorationsClassName: String = js.native
     var marginClassName: String = js.native
     var inlineClassName: String = js.native
+    var inlineClassNameAffectsLetterSpacing: Boolean = js.native
     var beforeContentClassName: String = js.native
     var afterContentClassName: String = js.native
   }
@@ -856,6 +884,7 @@ package editor {
     def getValueLengthInRange(range: IRange): Double = js.native
     def getLineCount(): Double = js.native
     def getLineContent(lineNumber: Double): String = js.native
+    def getLineLength(lineNumber: Double): Double = js.native
     def getLinesContent(): js.Array[String] = js.native
     def getEOL(): String = js.native
     def setEOL(eol: EndOfLineSequence): Unit = js.native
@@ -1067,6 +1096,8 @@ package editor {
     var scrollTop: Double = js.native
     var scrollTopWithoutViewZones: Double = js.native
     var scrollLeft: Double = js.native
+    var firstPosition: IPosition = js.native
+    var firstPositionDeltaTop: Double = js.native
   }
 
   @js.native
@@ -1203,6 +1234,7 @@ package editor {
   @js.native
   trait IModelContentChange extends js.Object {
     def range: IRange = js.native
+    def rangeOffset: Double = js.native
     def rangeLength: Double = js.native
     def text: String = js.native
   }
@@ -1301,6 +1333,14 @@ package editor {
   }
 
   @js.native
+  trait ICodeActionsOnSaveOptions extends js.Object {
+    @JSBracketAccess
+    def apply(kind: String): Boolean = js.native
+    @JSBracketAccess
+    def update(kind: String, v: Boolean): Unit = js.native
+  }
+
+  @js.native
   trait IEditorOptions extends js.Object {
     var ariaLabel: String = js.native
     var rulers: js.Array[Double] = js.native
@@ -1346,6 +1386,7 @@ package editor {
     var contextmenu: Boolean = js.native
     var mouseWheelScrollSensitivity: Double = js.native
     var multiCursorModifier: String = js.native
+    var multiCursorMergeOverlapping: Boolean = js.native
     var accessibilitySupport: String = js.native
     var quickSuggestions: Boolean | js.Any = js.native
     var quickSuggestionsDelay: Double = js.native
@@ -1369,7 +1410,10 @@ package editor {
     var occurrencesHighlight: Boolean = js.native
     var codeLens: Boolean = js.native
     var lightbulb: IEditorLightbulbOptions = js.native
+    var codeActionsOnSave: ICodeActionsOnSaveOptions = js.native
+    var codeActionsOnSaveTimeout: Double = js.native
     var folding: Boolean = js.native
+    var foldingStrategy: String = js.native
     var showFoldingControls: String = js.native
     var matchBrackets: Boolean = js.native
     var renderWhitespace: String = js.native
@@ -1568,11 +1612,14 @@ package editor {
     def occurrencesHighlight: Boolean = js.native
     def codeLens: Boolean = js.native
     def folding: Boolean = js.native
+    def foldingStrategy: String = js.native
     def showFoldingControls: String = js.native
     def matchBrackets: Boolean = js.native
     def find: InternalEditorFindOptions = js.native
     def colorDecorators: Boolean = js.native
     def lightbulbEnabled: Boolean = js.native
+    def codeActionsOnSave: ICodeActionsOnSaveOptions = js.native
+    def codeActionsOnSaveTimeout: Double = js.native
   }
 
   @js.native
@@ -1585,6 +1632,7 @@ package editor {
     def lineHeight: Double = js.native
     def readOnly: Boolean = js.native
     def multiCursorModifier: String = js.native
+    def multiCursorMergeOverlapping: Boolean = js.native
     def wordSeparators: String = js.native
     def autoClosingBrackets: Boolean = js.native
     def autoIndent: Boolean = js.native
@@ -1641,6 +1689,7 @@ package editor {
     def readOnly: Boolean = js.native
     def accessibilitySupport: Boolean = js.native
     def multiCursorModifier: Boolean = js.native
+    def multiCursorMergeOverlapping: Boolean = js.native
     def wordSeparators: Boolean = js.native
     def autoClosingBrackets: Boolean = js.native
     def autoIndent: Boolean = js.native
@@ -1854,7 +1903,6 @@ package editor {
         newDecorations: js.Array[IModelDeltaDecoration]
     ): js.Array[String] = js.native
     def getLayoutInfo(): EditorLayoutInfo = js.native
-    def getCenteredRangeInViewport(): Range = js.native
     def getVisibleRanges(): js.Array[Range] = js.native
     def getTopForLineNumber(lineNumber: Double): Double = js.native
     def getTopForPosition(lineNumber: Double, column: Double): Double = js.native
@@ -2501,6 +2549,40 @@ package languages {
   }
 
   @js.native
+  trait FoldingContext extends js.Object {}
+
+  @js.native
+  trait FoldingRangeProvider extends js.Object {
+    def provideFoldingRanges(
+        model: editor.ITextModel,
+        context: FoldingContext,
+        token: CancellationToken
+    ): js.Array[FoldingRange] | Thenable[js.Array[FoldingRange]] = js.native
+  }
+
+  @js.native
+  trait FoldingRange extends js.Object {
+    var start: Double = js.native
+    var end: Double = js.native
+    var kind: FoldingRangeKind = js.native
+  }
+
+  @js.native
+  @JSGlobal("monaco.languages.FoldingRangeKind")
+  class FoldingRangeKind protected () extends js.Object {
+    def this(value: String) = this()
+    var value: String = js.native
+  }
+
+  @js.native
+  @JSGlobal("monaco.languages.FoldingRangeKind")
+  object FoldingRangeKind extends js.Object {
+    def Comment: FoldingRangeKind = js.native
+    def Imports: FoldingRangeKind = js.native
+    def Region: FoldingRangeKind = js.native
+  }
+
+  @js.native
   trait ResourceFileEdit extends js.Object {
     var oldUri: Uri = js.native
     var newUri: Uri = js.native
@@ -2520,7 +2602,7 @@ package languages {
   }
 
   @js.native
-  trait RenameInitialValue extends js.Object {
+  trait RenameLocation extends js.Object {
     var range: IRange = js.native
     var text: String = js.native
   }
@@ -2533,11 +2615,11 @@ package languages {
         newName: String,
         token: CancellationToken
     ): WorkspaceEdit | Thenable[WorkspaceEdit] = js.native
-    def resolveInitialRenameValue(
+    def resolveRenameLocation(
         model: editor.ITextModel,
         position: Position,
         token: CancellationToken
-    ): RenameInitialValue | Thenable[RenameInitialValue] = js.native
+    ): RenameLocation | Thenable[RenameLocation] = js.native
   }
 
   @js.native
@@ -2717,6 +2799,10 @@ package languages {
     def registerColorProvider(
         languageId: String,
         provider: DocumentColorProvider
+    ): IDisposable = js.native
+    def registerFoldingRangeProvider(
+        languageId: String,
+        provider: FoldingRangeProvider
     ): IDisposable = js.native
     type CharacterPair = js.Tuple2[String, String]
     type Definition = Location | js.Array[Location]
