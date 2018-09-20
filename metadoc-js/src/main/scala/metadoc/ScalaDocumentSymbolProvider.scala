@@ -38,13 +38,13 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     } yield {
       val symbols = getDocumentSymbols(doc).map {
         case DocumentSymbol(denotation, kind, definition) =>
-          new SymbolInformation(
-            name = denotation.displayName,
-            // TODO: pretty print `.tpe`: https://github.com/scalameta/scalameta/issues/1479
-            containerName = denotation.symbol,
-            kind = kind,
-            location = model.resolveLocation(definition)
-          )
+          val symbol = jsObject[SymbolInformation]
+          symbol.name = denotation.displayName
+          // TODO: pretty print `.tpe`: https://github.com/scalameta/scalameta/issues/1479
+          symbol.containerName = denotation.symbol
+          symbol.kind = kind
+          symbol.location = resolveLocation(definition)
+          symbol
       }
       js.Array[SymbolInformation](symbols: _*)
     }

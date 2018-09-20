@@ -2352,12 +2352,13 @@ package languages {
     def apply(value: SymbolKind): String = js.native
   }
 
-  class SymbolInformation(
-      val name: String,
-      val containerName: String,
-      val kind: SymbolKind,
-      val location: Location
-  ) extends js.Object
+  @js.native
+  trait SymbolInformation extends js.Object {
+    var name: String = js.native
+    var containerName: String = js.native
+    var kind: SymbolKind = js.native
+    var location: Location = js.native
+  }
 
   trait DocumentSymbolProvider extends js.Object {
     def provideDocumentSymbols(
