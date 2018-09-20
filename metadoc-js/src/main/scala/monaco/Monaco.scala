@@ -658,15 +658,12 @@ package editor {
     def get(): T = js.native
   }
 
+  @js.native
   trait IEditorOverrideServices extends js.Object {
-    var editorService: services.IEditorService
-    var textModelService: services.ITextModelService
-    /*
     @JSBracketAccess
     def apply(index: String): js.Any = js.native
     @JSBracketAccess
     def update(index: String, v: js.Any): Unit = js.native
-   */
   }
 
   @js.native

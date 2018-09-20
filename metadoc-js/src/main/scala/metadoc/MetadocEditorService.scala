@@ -24,8 +24,8 @@ class MetadocEditorService(index: MetadocSemanticdbIndex)
     options.scrollBeyondLastLine = false
 
     val overrides = jsObject[IEditorOverrideServices]
-    overrides.textModelService = MetadocTextModelService
-    overrides.editorService = this
+    overrides("textModelService") = MetadocTextModelService
+    overrides("editorService") = this
 
     val editor = monaco.editor.Editor.create(app, options, overrides)
     editor.asInstanceOf[js.Dynamic].getControl = { () =>
