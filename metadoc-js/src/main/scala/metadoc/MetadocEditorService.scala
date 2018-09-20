@@ -39,9 +39,6 @@ class MetadocEditorService(index: MetadocSemanticdbIndex)
   def resize(): Unit =
     editor.layout()
 
-  def getModelUri(): Uri =
-    editor.getModel().uri
-
   def open(input: IResourceInput): Future[IStandaloneCodeEditor] = {
     val selection = input.options.selection
     for {
