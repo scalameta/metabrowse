@@ -48,7 +48,7 @@ inThisBuild(
 lazy val Version = new {
   def scala = "2.12.6"
   def scala210 = "2.10.7"
-  def scalameta = "4.0.0-M11"
+  def scalameta = "4.0.0"
   def sbt = "1.1.1"
   def sbt013 = "0.13.17"
 }
