@@ -48,18 +48,15 @@ package object metadoc {
       future.toJSPromise.asInstanceOf[Thenable[T]]
   }
 
-  implicit class XtensionIReadOnlyModel(val self: IReadOnlyModel)
-      extends AnyVal {
-    def resolveLocation(pos: d.Position): Location = {
-      val range = new Range(
-        pos.startLine + 1,
-        pos.startCharacter + 1,
-        pos.endLine + 1,
-        pos.endCharacter + 1
-      )
-      val uri = createUri(pos.filename)
-      val location = new Location(uri, range)
-      location
-    }
+  def resolveLocation(pos: d.Position): Location = {
+    val location = jsObject[Location]
+    location.uri = createUri(pos.filename)
+    location.range = new Range(
+      pos.startLine + 1,
+      pos.startCharacter + 1,
+      pos.endLine + 1,
+      pos.endCharacter + 1
+    )
+    location
   }
 }

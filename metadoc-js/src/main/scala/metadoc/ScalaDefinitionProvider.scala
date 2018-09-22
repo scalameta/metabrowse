@@ -17,24 +17,9 @@ class ScalaDefinitionProvider(index: MetadocSemanticdbIndex)
       token: CancellationToken
   ) = {
     val offset = model.getOffsetAt(position).toInt
-    def empty = Future.successful(js.Array[Location]())
-    for {
-      symbol <- index.fetchSymbol(offset)
-      locations <- {
-        symbol
-          .map(_.definition)
-          .fold(empty) {
-            case Some(defn) =>
-              for {
-                model <- MetadocTextModelService.modelReference(defn.filename)
-              } yield {
-                val location =
-                  model.`object`.textEditorModel.resolveLocation(defn)
-                js.Array[Location](location)
-              }
-            case None => empty
-          }
-      }
-    } yield locations
+    for (symbol <- index.fetchSymbol(offset)) yield {
+      val locationOpt = symbol.flatMap(_.definition).map(resolveLocation)
+      js.Array[Location](locationOpt.toSeq: _*)
+    }
   }.toMonacoThenable
 }

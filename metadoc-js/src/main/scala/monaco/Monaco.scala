@@ -2288,7 +2288,11 @@ package languages {
     ): Thenable[js.Array[Location]]
   }
 
-  class Location(val uri: Uri, val range: IRange) extends js.Object
+  @js.native
+  trait Location extends js.Object {
+    var uri: Uri = js.native
+    var range: IRange = js.native
+  }
 
   trait DefinitionProvider extends js.Object {
     def provideDefinition(
