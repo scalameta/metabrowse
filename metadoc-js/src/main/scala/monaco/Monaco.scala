@@ -563,16 +563,16 @@ package editor {
     var label: String = js.native
   }
 
-  @js.native
+  // @js.native - Non-native to allow extending it in Scala
   trait IActionDescriptor extends js.Object {
-    var id: String = js.native
-    var label: String = js.native
-    var precondition: String = js.native
-    var keybindings: js.Array[Double] = js.native
-    var keybindingContext: String = js.native
-    var contextMenuGroupId: String = js.native
-    var contextMenuOrder: Double = js.native
-    def run(editor: ICodeEditor): Promise[Unit] = js.native
+    var id: String
+    var label: String
+    var precondition: String
+    var keybindings: js.Array[Double]
+    var keybindingContext: String
+    var contextMenuGroupId: String
+    var contextMenuOrder: Double
+    def run(editor: ICodeEditor): Promise[Unit]
   }
 
   @js.native

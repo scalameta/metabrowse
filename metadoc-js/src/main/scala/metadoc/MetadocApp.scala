@@ -1,5 +1,6 @@
 package metadoc
 
+import metadoc.schema.Workspace
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Promise
@@ -9,11 +10,14 @@ import scala.scalajs.js.JSConverters._
 import monaco.{IRange, Range, Uri}
 import monaco.Uri
 import monaco.editor.Editor
+import monaco.editor.IActionDescriptor
+import monaco.editor.ICommonCodeEditor
 import monaco.editor.IEditor
 import monaco.editor.IEditorConstructionOptions
 import monaco.editor.IEditorOptions
 import monaco.editor.IEditorOverrideServices
 import monaco.editor.IModelChangedEvent
+import monaco.editor.IStandaloneCodeEditor
 import monaco.languages.ILanguageExtensionPoint
 import monaco.services.{IResourceInput, ITextEditorOptions}
 import org.scalajs.dom
@@ -74,14 +78,14 @@ object MetadocApp {
         Navigation
           .fromHistoryState(event.state)
           .orElse(locationState())
-          .foreach(openEditor(editorService))
+          .foreach(openEditor(editorService, workspace))
       }
 
       dom.window.onresize = { _: dom.Event =>
         editorService.resize()
       }
 
-      initialState.foreach(openEditor(editorService))
+      initialState.foreach(openEditor(editorService, workspace))
     }
   }
 
@@ -125,7 +129,30 @@ object MetadocApp {
     )
   }
 
-  def openEditor(editorService: MetadocEditorService)(
+  def registerWorkspaceFiles(
+      editor: IStandaloneCodeEditor,
+      workspace: Workspace
+  ): Unit = {
+    workspace.filenames.foreach { file =>
+      editor.addAction(new IActionDescriptor {
+        override var id = file
+        override var label = file
+        override def run(
+            editor: ICommonCodeEditor
+        ): monaco.Promise[Unit] = {
+          dom.window.location.hash = "#/" + file
+          Future.successful(()).toMonacoPromise
+        }
+        override var precondition: String = ""
+        override var keybindings: js.Array[Double] = js.Array()
+        override var keybindingContext: String = ""
+        override var contextMenuGroupId: String = ""
+        override var contextMenuOrder: Double = 0
+      })
+    }
+  }
+
+  def openEditor(editorService: MetadocEditorService, workspace: Workspace)(
       state: Navigation.State
   ): Unit = {
     val input = jsObject[IResourceInput]
@@ -135,6 +162,7 @@ object MetadocApp {
 
     for (editor <- editorService.open(input)) {
       updateTitle(state)
+      registerWorkspaceFiles(editor, workspace)
 
       editor.onDidChangeCursorSelection { cursor =>
         val selection = Navigation.Selection.fromRange(cursor.selection)
