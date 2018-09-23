@@ -2,7 +2,6 @@ package metadoc
 
 import scala.util.Try
 import scala.scalajs.js
-import org.scalajs.dom
 import java.net.URI
 import monaco.Range
 
@@ -48,13 +47,13 @@ object Navigation {
       )
   }
 
-  def currentState(
-      state: Option[State] = Option(
-        dom.window.history.state.asInstanceOf[Navigation.State]
-      ),
-      locationHash: => String = dom.window.location.hash.dropWhile(_ == '#')
-  ): Option[Navigation.State] =
-    state.orElse(parseState(locationHash))
+  def fromHistoryState(browserState: js.Any): Option[Navigation.State] = {
+    Option(browserState) match {
+      case Some(state) =>
+        Navigation.parseState(state.asInstanceOf[String])
+      case None => None
+    }
+  }
 
   def parseState(state: String): Option[Navigation.State] = {
     for (uri <- parseUri(state)) yield {
@@ -70,14 +69,17 @@ object Navigation {
   def parseSelection(selection: String): Option[Selection] = {
     selection match {
       case Selection.Regex(fromLine, _, fromCol, _, toLine, _, toCol) =>
-        Some(
-          new Selection(
-            fromLine.toInt,
-            Option(fromCol).map(_.toInt).getOrElse(1),
-            Option(toLine).map(_.toInt).getOrElse(fromLine.toInt + 1),
-            Option(toCol).map(_.toInt).getOrElse(1)
-          )
-        )
+        val startLine = fromLine.toInt
+        val startColumn = Option(fromCol).map(_.toInt).getOrElse(1)
+        val endLine = Option(toLine).map(_.toInt).getOrElse(startLine)
+        val endColumn = Option(toCol).map(_.toInt).getOrElse {
+          if (endLine == startLine)
+            startColumn
+          else
+            1
+        }
+
+        Some(new Selection(startLine, startColumn, endLine, endColumn))
       case _ =>
         None
     }
