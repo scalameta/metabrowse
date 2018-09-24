@@ -6,6 +6,7 @@ import scala.scalajs.js
 import monaco.Range
 import monaco.Promise
 import monaco.Uri
+import monaco.editor.IActionDescriptor
 import monaco.editor.IEditor
 import monaco.editor.IEditorConstructionOptions
 import monaco.editor.IEditorOverrideServices
@@ -35,6 +36,9 @@ class MetadocEditorService(index: MetadocSemanticdbIndex)
 
     editor
   }
+
+  def addAction(action: IActionDescriptor): Unit =
+    editor.addAction(action)
 
   def resize(): Unit =
     editor.layout()

@@ -1,23 +1,21 @@
 package metadoc
 
+import metadoc.schema.Workspace
+import monaco.Uri
+import monaco.editor.Editor
+import monaco.editor.IActionDescriptor
+import monaco.editor.ICodeEditor
+import monaco.languages.ILanguageExtensionPoint
+import monaco.services.IResourceInput
+import monaco.services.ITextEditorOptions
+import org.scalajs.dom
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Promise
-import scala.scalajs.js
-import scala.scalajs.js.typedarray.TypedArrayBuffer
-import scala.scalajs.js.JSConverters._
-import monaco.{IRange, Range, Uri}
-import monaco.Uri
-import monaco.editor.Editor
-import monaco.editor.IEditor
-import monaco.editor.IEditorConstructionOptions
-import monaco.editor.IEditorOptions
-import monaco.editor.IEditorOverrideServices
-import monaco.editor.IModelChangedEvent
-import monaco.languages.ILanguageExtensionPoint
-import monaco.services.{IResourceInput, ITextEditorOptions}
-import org.scalajs.dom
 import scala.meta.internal.{semanticdb => s}
+import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.typedarray.TypedArrayBuffer
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {
@@ -47,18 +45,16 @@ object MetadocApp {
     } {
       val index = new MutableBrowserIndex(MetadocState(s.TextDocument()))
       registerLanguageExtensions(index)
+
       val editorService = new MetadocEditorService(index)
+      registerWorkspaceFiles(editorService, workspace)
 
       dom.ext.LocalStorage("editor-theme").foreach { theme =>
         Editor.setTheme(theme)
       }
 
-      def defaultState: Option[Navigation.State] = {
-        val state = Navigation.parseState(workspace.filenames.head)
-        // Starting with any path, so add the file to the history
-        state.foreach(updateHistory)
-        state
-      }
+      def defaultState: Navigation.State =
+        new Navigation.State(workspace.filenames.head, None)
 
       def locationState() =
         Navigation.parseState(Uri.parse(dom.window.location.hash).fragment)
@@ -68,7 +64,7 @@ object MetadocApp {
        * input before registering the history popstate handler to avoid any event
        * being triggered.
        */
-      val initialState = locationState().orElse(defaultState)
+      val initialState = locationState().getOrElse(defaultState)
 
       dom.window.onpopstate = { event: dom.PopStateEvent =>
         Navigation
@@ -81,7 +77,7 @@ object MetadocApp {
         editorService.resize()
       }
 
-      initialState.foreach(openEditor(editorService))
+      openEditor(editorService)(initialState)
     }
   }
 
@@ -125,15 +121,38 @@ object MetadocApp {
     )
   }
 
+  def registerWorkspaceFiles(
+      editorService: MetadocEditorService,
+      workspace: Workspace
+  ): Unit = {
+    workspace.filenames.foreach { file =>
+      editorService.addAction(new IActionDescriptor {
+        override var id = file
+        override var label = file
+        override def run(editor: ICodeEditor): monaco.Promise[Unit] = {
+          val state = new Navigation.State(file, None)
+          openEditor(editorService)(state).toMonacoPromise
+        }
+        override var precondition: String = ""
+        override var keybindings: js.Array[Double] = js.Array()
+        override var keybindingContext: String = ""
+        override var contextMenuGroupId: String = ""
+        override var contextMenuOrder: Double = 0
+      })
+    }
+  }
+
   def openEditor(editorService: MetadocEditorService)(
       state: Navigation.State
-  ): Unit = {
+  ): Future[Unit] = {
     val input = jsObject[IResourceInput]
     input.resource = createUri(state.path)
     input.options = jsObject[ITextEditorOptions]
     input.options.selection = state.selection.map(_.toRange).orUndefined
 
-    for (editor <- editorService.open(input)) {
+    updateHistory(state)
+
+    for (editor <- editorService.open(input)) yield {
       updateTitle(state)
 
       editor.onDidChangeCursorSelection { cursor =>
