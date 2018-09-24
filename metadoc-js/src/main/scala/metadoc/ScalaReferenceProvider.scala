@@ -3,7 +3,7 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
-import monaco.editor.IReadOnlyModel
+import monaco.editor.ITextModel
 import monaco.languages.Location
 import monaco.languages.ReferenceContext
 import monaco.languages.ReferenceProvider
@@ -14,7 +14,7 @@ import MetadocEnrichments._
 class ScalaReferenceProvider(index: MetadocSemanticdbIndex)
     extends ReferenceProvider {
   override def provideReferences(
-      model: IReadOnlyModel,
+      model: ITextModel,
       position: Position,
       context: ReferenceContext,
       token: CancellationToken
@@ -22,27 +22,13 @@ class ScalaReferenceProvider(index: MetadocSemanticdbIndex)
     val offset = model.getOffsetAt(position).toInt
     for {
       sym <- index.fetchSymbol(offset)
-      locations <- Future.sequence {
-        val references = sym.map(_.references).getOrElse(Map.empty)
-        references.map {
-          case (filename, ranges) =>
-            // Create the model for each reference. A reference can come from
-            // another file, and we need that file's model in order to get
-            // correct range selection.
-            MetadocTextModelService
-              .modelDocument(createUri(filename))
-              .map {
-                case MetadocMonacoDocument(_, model) =>
-                  ranges.ranges.map { r =>
-                    model.`object`.textEditorModel.resolveLocation(
-                      r.toPosition(filename)
-                    )
-                  }
-              }
-        }
-      }
     } yield {
-      js.Array[Location](locations.flatten.toSeq: _*)
+      val references = sym.map(_.references).getOrElse(Map.empty)
+      val locations = references.flatMap {
+        case (filename, ranges) =>
+          ranges.ranges.map(_.toPosition(filename)).map(resolveLocation)
+      }
+      js.Array[Location](locations.toSeq: _*)
     }
   }.toMonacoThenable
 }

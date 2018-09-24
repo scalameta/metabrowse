@@ -6,7 +6,7 @@ import scala.concurrent.Future
 import monaco.Promise
 import monaco.Uri
 import monaco.editor.Editor
-import monaco.editor.IModel
+import monaco.editor.ITextModel
 import monaco.services.IReference
 import monaco.services.ITextEditorModel
 import monaco.services.ITextModelService
@@ -20,9 +20,9 @@ object MetadocTextModelService extends ITextModelService {
     modelDocument(createUri(filename)).map(_.model)
 
   // TODO(olafur): Move this state out for easier testing.
-  private val modelDocumentCache = mutable.Map.empty[IModel, s.TextDocument]
+  private val modelDocumentCache = mutable.Map.empty[ITextModel, s.TextDocument]
 
-  private def document(model: IModel) =
+  private def document(model: ITextModel) =
     MetadocMonacoDocument(
       modelDocumentCache(model),
       new ImmortalReference(ITextEditorModel(model))

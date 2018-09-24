@@ -7,7 +7,7 @@ import js.RegExp
 
 import org.scalajs.dom.{Element => HTMLElement, MouseEvent, KeyboardEvent}
 
-import monaco.Monaco.MarkedString
+import monaco.Monaco.Thenable
 import monaco.languages.Languages.CharacterPair
 import monaco.languages.Languages.Definition
 import monaco.editor.Editor.BuiltinTheme
@@ -15,22 +15,9 @@ import monaco.editor.Editor.IColors
 import monaco.editor.Editor.IEditorModel
 import monaco.editor.Editor.IEditorViewState
 
-@js.native
-trait Thenable[T] extends js.Object {
-  def `then`[TResult](
-      onfulfilled: js.Function1[T, TResult | Thenable[TResult]] = ???,
-      onrejected: js.Function1[js.Any, TResult | Thenable[TResult]] = ???
-  ): Thenable[TResult] = js.native
-  /*
-  def then[TResult](
-      onfulfilled: js.Function1[T, TResult | Thenable[TResult]] = ???,
-      onrejected: js.Function1[js.Any, Unit] = ???
-  ): Thenable[TResult] = js.native
- */
-}
-
+// @js.native - NOTE: extended in MonacoServices
 trait IDisposable extends js.Object {
-  def dispose(): Unit
+  def dispose(): Unit // = js.native
 }
 
 @js.native
@@ -64,88 +51,46 @@ object Severity extends js.Object {
 }
 
 @js.native
-trait TValueCallback[T] extends js.Object {
-  def apply(value: Thenable[T]): Unit = js.native
-}
+sealed trait MarkerSeverity extends js.Object {}
 
 @js.native
-trait ProgressCallback extends js.Object {
-  def apply(progress: js.Any): js.Dynamic = js.native
+@JSGlobal("monaco.MarkerSeverity")
+object MarkerSeverity extends js.Object {
+  var Hint: MarkerSeverity = js.native
+  var Info: MarkerSeverity = js.native
+  var Warning: MarkerSeverity = js.native
+  var Error: MarkerSeverity = js.native
+  @JSBracketAccess
+  def apply(value: MarkerSeverity): String = js.native
 }
 
 @js.native
 @JSGlobal("monaco.Promise")
-class Promise[+V] protected () extends js.Object {
-  def this(
-      init: js.Function3[TValueCallback[V], js.Function1[js.Any, Unit], ProgressCallback, Unit],
-      oncancel: js.Any = ???
-  ) = this()
-  def `then`[U](
-      success: js.Function1[V, Promise[U]] = ???,
-      error: js.Function1[js.Any, Promise[U]] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
+// NOTE: Covariant to make things easier.
+class Promise[+T] protected () extends js.Object {
+  type TProgress = Unit
   /*
-  def then[U](
-      success: js.Function1[V, Promise[U]] = ???,
-      error: js.Function1[js.Any, Promise[U] | U] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
-  def then[U](
-      success: js.Function1[V, Promise[U]] = ???,
-      error: js.Function1[js.Any, U] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
-  def then[U](
-      success: js.Function1[V, Promise[U]] = ???,
-      error: js.Function1[js.Any, Unit] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
-  def then[U](
-      success: js.Function1[V, Promise[U] | U] = ???,
-      error: js.Function1[js.Any, Promise[U]] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
-  def then[U](
-      success: js.Function1[V, Promise[U] | U] = ???,
-      error: js.Function1[js.Any, Promise[U] | U] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
-  def then[U](
-      success: js.Function1[V, Promise[U] | U] = ???,
-      error: js.Function1[js.Any, U] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
-  def then[U](
-      success: js.Function1[V, Promise[U] | U] = ???,
-      error: js.Function1[js.Any, Unit] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
-  def then[U](
-      success: js.Function1[V, U] = ???,
-      error: js.Function1[js.Any, Promise[U]] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
-  def then[U](
-      success: js.Function1[V, U] = ???,
-      error: js.Function1[js.Any, Promise[U] | U] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
-  def then[U](
-      success: js.Function1[V, U] = ???,
-      error: js.Function1[js.Any, U] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
-  def then[U](
-      success: js.Function1[V, U] = ???,
-      error: js.Function1[js.Any, Unit] = ???,
-      progress: ProgressCallback = ???
-  ): Promise[U] = js.native
+  def this(
+      executor: js.Function3[
+        js.Function1[T | PromiseLike[T], Unit],
+        js.Function1[js.Any, Unit],
+        js.Function1[TProgress, Unit],
+        Unit
+      ],
+      oncancel: js.Function0[Unit] = ???
+  ) = this()
+  def `then`[TResult1, TResult2](
+      onfulfilled: js.Function1[T, TResult1 | PromiseLike[TResult1]] | Null =
+        ???,
+      onrejected: js.Function1[js.Any, TResult2 | PromiseLike[TResult2]] | Null =
+        ???,
+      onprogress: js.Function1[TProgress, Unit] = ???
+  ): Promise[TResult1 | TResult2] = js.native
    */
   def done(
-      success: js.Function1[V, Unit] = ???,
-      error: js.Function1[js.Any, Any] = ???,
-      progress: ProgressCallback = ???
+      onfulfilled: js.Function1[T, Unit] = ???,
+      onrejected: js.Function1[js.Any, Unit] = ???,
+      onprogress: js.Function1[TProgress, Unit] = ???
   ): Unit = js.native
   def cancel(): Unit = js.native
 }
@@ -155,24 +100,21 @@ class Promise[+V] protected () extends js.Object {
 object Promise extends js.Object {
   def as(value: Null): Promise[Null] = js.native
   def as(value: Unit): Promise[Unit] = js.native
-  def as[ValueType](value: Promise[ValueType]): Promise[ValueType] = js.native
-  def as[ValueType](value: Thenable[ValueType]): Thenable[ValueType] = js.native
-  def as[ValueType](value: ValueType): Promise[ValueType] = js.native
+  def as[T](value: PromiseLike[T]): PromiseLike[T] = js.native
+  //def as[T, SomePromise <: PromiseLike[T]](value: SomePromise): SomePromise = js.native
+  def as[T](value: T): Promise[T] = js.native
   def is(value: js.Any): Boolean = js.native
   def timeout(delay: Double): Promise[Unit] = js.native
-  def join[ValueType](
-      promises: js.Array[Promise[ValueType]]
-  ): Promise[js.Array[ValueType]] = js.native
-  def join[ValueType](
-      promises: js.Array[Thenable[ValueType]]
-  ): Thenable[js.Array[ValueType]] = js.native
-  def join[ValueType](
-      promises: js.Dictionary[Promise[ValueType]]
-  ): Promise[js.Dictionary[ValueType]] = js.native
-  def any[ValueType](promises: js.Array[Promise[ValueType]]): Promise[js.Any] = js.native
-  def wrap[ValueType](value: Thenable[ValueType]): Promise[ValueType] = js.native
-  def wrap[ValueType](value: ValueType): Promise[ValueType] = js.native
-  def wrapError[ValueType](error: Error): Promise[ValueType] = js.native
+  def join[T1, T2](
+      promises: js.Tuple2[T1 | PromiseLike[T1], T2 | PromiseLike[T2]]
+  ): Promise[js.Tuple2[T1, T2]] = js.native
+  def join[T](promises: js.Array[T | PromiseLike[T]]): Promise[js.Array[T]] = js.native
+  def join[T](
+      promises: js.Dictionary[T | PromiseLike[T]]
+  ): Promise[js.Dictionary[T]] = js.native
+  def any[T](promises: js.Array[T | PromiseLike[T]]): Promise[js.Any] = js.native
+  def wrap[T](value: PromiseLike[T]): Promise[T] = js.native
+  def wrapError[T](error: Error): Promise[T] = js.native
 }
 
 @js.native
@@ -191,16 +133,16 @@ trait CancellationToken extends js.Object {
 
 @js.native
 @JSGlobal("monaco.Uri")
-class Uri extends js.Object {
-  def scheme: String = js.native
-  def authority: String = js.native
-  def path: String = js.native
-  def query: String = js.native
-  def fragment: String = js.native
+class Uri extends UriComponents {
+  override def scheme: String = js.native
+  override def authority: String = js.native
+  override def path: String = js.native
+  override def query: String = js.native
+  override def fragment: String = js.native
   def fsPath: String = js.native
   def `with`(change: js.Any): Uri = js.native
   def toString(skipEncoding: Boolean = ???): String = js.native
-  def toJSON(): js.Dynamic = js.native
+  def toJSON(): js.Object = js.native
 }
 
 @js.native
@@ -210,7 +152,16 @@ object Uri extends js.Object {
   def parse(value: String): Uri = js.native
   def file(path: String): Uri = js.native
   def from(components: js.Any): Uri = js.native
-  def revive(data: js.Any): Uri = js.native
+  def revive(data: UriComponents | js.Any): Uri = js.native
+}
+
+@js.native
+trait UriComponents extends js.Object {
+  def scheme: String = js.native
+  def authority: String = js.native
+  def path: String = js.native
+  def query: String = js.native
+  def fragment: String = js.native
 }
 
 @js.native
@@ -351,6 +302,12 @@ object KeyMod extends js.Object {
 }
 
 @js.native
+trait IMarkdownString extends js.Object {
+  var value: String = js.native
+  var isTrusted: Boolean = js.native
+}
+
+@js.native
 trait IKeyboardEvent extends js.Object {
   def browserEvent: KeyboardEvent = js.native
   def target: HTMLElement = js.native
@@ -455,7 +412,6 @@ class Range protected () extends IRange {
   def equalsRange(other: IRange): Boolean = js.native
   def getEndPosition(): Position = js.native
   def getStartPosition(): Position = js.native
-  def cloneRange(): Range = js.native
   override def toString(): String = js.native
   def setEndPosition(endLineNumber: Double, endColumn: Double): Range = js.native
   def setStartPosition(startLineNumber: Double, startColumn: Double): Range = js.native
@@ -564,7 +520,6 @@ package editor {
 
   @js.native
   trait IDiffNavigator extends js.Object {
-    var revealFirst: Boolean = js.native
     def canNavigate(): Boolean = js.native
     def next(): Unit = js.native
     def previous(): Unit = js.native
@@ -609,8 +564,20 @@ package editor {
   }
 
   @js.native
+  trait IActionDescriptor extends js.Object {
+    var id: String = js.native
+    var label: String = js.native
+    var precondition: String = js.native
+    var keybindings: js.Array[Double] = js.native
+    var keybindingContext: String = js.native
+    var contextMenuGroupId: String = js.native
+    var contextMenuOrder: Double = js.native
+    def run(editor: ICodeEditor): Promise[Unit] = js.native
+  }
+
+  @js.native
   trait IEditorConstructionOptions extends IEditorOptions {
-    var model: IModel = js.native
+    var model: ITextModel = js.native
     var value: String = js.native
     var language: String = js.native
     var theme: String = js.native
@@ -658,22 +625,19 @@ package editor {
     def get(): T = js.native
   }
 
+  @js.native
   trait IEditorOverrideServices extends js.Object {
-    var editorService: services.IEditorService
-    var textModelService: services.ITextModelService
-    /*
     @JSBracketAccess
     def apply(index: String): js.Any = js.native
     @JSBracketAccess
     def update(index: String, v: js.Any): Unit = js.native
-   */
   }
 
   @js.native
   trait IMarker extends js.Object {
     var owner: String = js.native
     var resource: Uri = js.native
-    var severity: Severity = js.native
+    var severity: MarkerSeverity = js.native
     var code: String = js.native
     var message: String = js.native
     var source: String = js.native
@@ -681,14 +645,26 @@ package editor {
     var startColumn: Double = js.native
     var endLineNumber: Double = js.native
     var endColumn: Double = js.native
+    var relatedInformation: js.Array[IRelatedInformation] = js.native
   }
 
   @js.native
   trait IMarkerData extends js.Object {
     var code: String = js.native
-    var severity: Severity = js.native
+    var severity: MarkerSeverity = js.native
     var message: String = js.native
     var source: String = js.native
+    var startLineNumber: Double = js.native
+    var startColumn: Double = js.native
+    var endLineNumber: Double = js.native
+    var endColumn: Double = js.native
+    var relatedInformation: js.Array[IRelatedInformation] = js.native
+  }
+
+  @js.native
+  trait IRelatedInformation extends js.Object {
+    var resource: Uri = js.native
+    var message: String = js.native
     var startLineNumber: Double = js.native
     var startColumn: Double = js.native
     var endLineNumber: Double = js.native
@@ -750,14 +726,16 @@ package editor {
   trait IModelDecorationOptions extends js.Object {
     var stickiness: TrackedRangeStickiness = js.native
     var className: String = js.native
-    var glyphMarginHoverMessage: MarkedString | js.Array[MarkedString] = js.native
-    var hoverMessage: MarkedString | js.Array[MarkedString] = js.native
+    var glyphMarginHoverMessage: IMarkdownString | js.Array[IMarkdownString] = js.native
+    var hoverMessage: IMarkdownString | js.Array[IMarkdownString] = js.native
     var isWholeLine: Boolean = js.native
+    var zIndex: Double = js.native
     var overviewRuler: IModelDecorationOverviewRulerOptions = js.native
     var glyphMarginClassName: String = js.native
     var linesDecorationsClassName: String = js.native
     var marginClassName: String = js.native
     var inlineClassName: String = js.native
+    var inlineClassNameAffectsLetterSpacing: Boolean = js.native
     var beforeContentClassName: String = js.native
     var afterContentClassName: String = js.native
   }
@@ -774,7 +752,6 @@ package editor {
     def ownerId: Double = js.native
     def range: Range = js.native
     def options: IModelDecorationOptions = js.native
-    def isForValidation: Boolean = js.native
   }
 
   @js.native
@@ -828,34 +805,6 @@ package editor {
   }
 
   @js.native
-  trait IEditOperationBuilder extends js.Object {
-    def addEditOperation(range: Range, text: String): Unit = js.native
-    def addTrackedEditOperation(range: Range, text: String): Unit = js.native
-    def trackSelection(
-        selection: Selection,
-        trackPreviousOnEmpty: Boolean = ???
-    ): String = js.native
-  }
-
-  @js.native
-  trait ICursorStateComputerData extends js.Object {
-    def getInverseEditOperations(): js.Array[IIdentifiedSingleEditOperation] = js.native
-    def getTrackedSelection(id: String): Selection = js.native
-  }
-
-  @js.native
-  trait ICommand extends js.Object {
-    def getEditOperations(
-        model: ITokenizedModel,
-        builder: IEditOperationBuilder
-    ): Unit = js.native
-    def computeCursorState(
-        model: ITokenizedModel,
-        helper: ICursorStateComputerData
-    ): Selection = js.native
-  }
-
-  @js.native
   trait ISingleEditOperation extends js.Object {
     var range: IRange = js.native
     var text: String = js.native
@@ -864,11 +813,9 @@ package editor {
 
   @js.native
   trait IIdentifiedSingleEditOperation extends js.Object {
-    var identifier: ISingleEditOperationIdentifier = js.native
     var range: Range = js.native
     var text: String = js.native
     var forceMoveMarkers: Boolean = js.native
-    var isAutoWhitespaceEdit: Boolean = js.native
   }
 
   @js.native
@@ -896,7 +843,31 @@ package editor {
   }
 
   @js.native
+  @JSGlobal("monaco.editor.FindMatch")
+  class FindMatch extends js.Object {
+    var _findMatchBrand: Unit = js.native
+    def range: Range = js.native
+    def matches: js.Array[String] = js.native
+  }
+
+  @js.native
+  sealed trait TrackedRangeStickiness extends js.Object {}
+
+  @js.native
+  @JSGlobal("monaco.editor.TrackedRangeStickiness")
+  object TrackedRangeStickiness extends js.Object {
+    var AlwaysGrowsWhenTypingAtEdges: TrackedRangeStickiness = js.native
+    var NeverGrowsWhenTypingAtEdges: TrackedRangeStickiness = js.native
+    var GrowsOnlyWhenTypingBefore: TrackedRangeStickiness = js.native
+    var GrowsOnlyWhenTypingAfter: TrackedRangeStickiness = js.native
+    @JSBracketAccess
+    def apply(value: TrackedRangeStickiness): String = js.native
+  }
+
+  @js.native
   trait ITextModel extends js.Object {
+    def uri: Uri = js.native
+    def id: String = js.native
     def getOptions(): TextModelResolvedOptions = js.native
     def getVersionId(): Double = js.native
     def getAlternativeVersionId(): Double = js.native
@@ -909,13 +880,11 @@ package editor {
         eol: EndOfLinePreference = ???,
         preserveBOM: Boolean = ???
     ): Double = js.native
-    def getValueInRange(
-        range: IRange,
-        eol: EndOfLinePreference = ???
-    ): String = js.native
+    def getValueInRange(range: IRange, eol: EndOfLinePreference = ???): String = js.native
     def getValueLengthInRange(range: IRange): Double = js.native
     def getLineCount(): Double = js.native
     def getLineContent(lineNumber: Double): String = js.native
+    def getLineLength(lineNumber: Double): Double = js.native
     def getLinesContent(): js.Array[String] = js.native
     def getEOL(): String = js.native
     def setEOL(eol: EndOfLineSequence): Unit = js.native
@@ -935,7 +904,7 @@ package editor {
         searchOnlyEditableRange: Boolean,
         isRegex: Boolean,
         matchCase: Boolean,
-        wordSeparators: String,
+        wordSeparators: String | Null,
         captureMatches: Boolean,
         limitResultCount: Double = ???
     ): js.Array[FindMatch] = js.native
@@ -944,16 +913,16 @@ package editor {
         searchScope: IRange,
         isRegex: Boolean,
         matchCase: Boolean,
-        wordSeparators: String,
+        wordSeparators: String | Null,
         captureMatches: Boolean,
-        limitResultCount: Double
+        limitResultCount: Double // = ??? - compile error after erasure
     ): js.Array[FindMatch] = js.native
     def findNextMatch(
         searchString: String,
         searchStart: IPosition,
         isRegex: Boolean,
         matchCase: Boolean,
-        wordSeparators: String,
+        wordSeparators: String | Null,
         captureMatches: Boolean
     ): FindMatch = js.native
     def findPreviousMatch(
@@ -961,53 +930,12 @@ package editor {
         searchStart: IPosition,
         isRegex: Boolean,
         matchCase: Boolean,
-        wordSeparators: String,
+        wordSeparators: String | Null,
         captureMatches: Boolean
     ): FindMatch = js.native
-  }
-
-  @js.native
-  @JSGlobal("monaco.editor.FindMatch")
-  class FindMatch extends js.Object {
-    var _findMatchBrand: Unit = js.native
-    def range: Range = js.native
-    def matches: js.Array[String] = js.native
-  }
-
-  @js.native
-  trait IReadOnlyModel extends ITextModel {
-    def uri: Uri = js.native
     def getModeId(): String = js.native
     def getWordAtPosition(position: IPosition): IWordAtPosition = js.native
     def getWordUntilPosition(position: IPosition): IWordAtPosition = js.native
-  }
-
-  @js.native
-  trait ITokenizedModel extends ITextModel {
-    def getModeId(): String = js.native
-    def getWordAtPosition(position: IPosition): IWordAtPosition = js.native
-    def getWordUntilPosition(position: IPosition): IWordAtPosition = js.native
-  }
-
-  @js.native
-  trait ITextModelWithMarkers extends ITextModel {}
-
-  @js.native
-  sealed trait TrackedRangeStickiness extends js.Object {}
-
-  @js.native
-  @JSGlobal("monaco.editor.TrackedRangeStickiness")
-  object TrackedRangeStickiness extends js.Object {
-    var AlwaysGrowsWhenTypingAtEdges: TrackedRangeStickiness = js.native
-    var NeverGrowsWhenTypingAtEdges: TrackedRangeStickiness = js.native
-    var GrowsOnlyWhenTypingBefore: TrackedRangeStickiness = js.native
-    var GrowsOnlyWhenTypingAfter: TrackedRangeStickiness = js.native
-    @JSBracketAccess
-    def apply(value: TrackedRangeStickiness): String = js.native
-  }
-
-  @js.native
-  trait ITextModelWithDecorations extends js.Object {
     def deltaDecorations(
         oldDecorations: js.Array[String],
         newDecorations: js.Array[IModelDeltaDecoration],
@@ -1035,10 +963,10 @@ package editor {
         ownerId: Double = ???,
         filterOutValidation: Boolean = ???
     ): js.Array[IModelDecoration] = js.native
-  }
-
-  @js.native
-  trait IEditableTextModel extends ITextModelWithMarkers {
+    def getOverviewRulerDecorations(
+        ownerId: Double = ???,
+        filterOutValidation: Boolean = ???
+    ): js.Array[IModelDecoration] = js.native
     def normalizeIndentation(str: String): String = js.native
     def getOneIndent(): String = js.native
     def updateOptions(newOpts: ITextModelUpdateOptions): Unit = js.native
@@ -1055,18 +983,6 @@ package editor {
     def applyEdits(
         operations: js.Array[IIdentifiedSingleEditOperation]
     ): js.Array[IIdentifiedSingleEditOperation] = js.native
-  }
-
-  @js.native
-  trait IModel
-      extends IReadOnlyModel
-      with IEditableTextModel
-      with ITextModelWithMarkers
-      with ITokenizedModel
-      with ITextModelWithDecorations {
-    override def getModeId(): String = js.native
-    override def getWordAtPosition(position: IPosition): IWordAtPosition = js.native
-    override def getWordUntilPosition(position: IPosition): IWordAtPosition = js.native
     def onDidChangeContent(
         listener: js.Function1[IModelContentChangedEvent, Unit]
     ): IDisposable = js.native
@@ -1079,15 +995,45 @@ package editor {
     def onDidChangeLanguage(
         listener: js.Function1[IModelLanguageChangedEvent, Unit]
     ): IDisposable = js.native
+    def onDidChangeLanguageConfiguration(
+        listener: js.Function1[IModelLanguageConfigurationChangedEvent, Unit]
+    ): IDisposable = js.native
     def onWillDispose(listener: js.Function0[Unit]): IDisposable = js.native
-    def id: String = js.native
     def dispose(): Unit = js.native
   }
 
   @js.native
+  trait IEditOperationBuilder extends js.Object {
+    def addEditOperation(range: Range, text: String): Unit = js.native
+    def addTrackedEditOperation(range: Range, text: String): Unit = js.native
+    def trackSelection(
+        selection: Selection,
+        trackPreviousOnEmpty: Boolean = ???
+    ): String = js.native
+  }
+
+  @js.native
+  trait ICursorStateComputerData extends js.Object {
+    def getInverseEditOperations(): js.Array[IIdentifiedSingleEditOperation] = js.native
+    def getTrackedSelection(id: String): Selection = js.native
+  }
+
+  @js.native
+  trait ICommand extends js.Object {
+    def getEditOperations(
+        model: ITextModel,
+        builder: IEditOperationBuilder
+    ): Unit = js.native
+    def computeCursorState(
+        model: ITextModel,
+        helper: ICursorStateComputerData
+    ): Selection = js.native
+  }
+
+  @js.native
   trait IDiffEditorModel extends js.Object {
-    var original: IModel = js.native
-    var modified: IModel = js.native
+    var original: ITextModel = js.native
+    var modified: ITextModel = js.native
   }
 
   @js.native
@@ -1124,26 +1070,9 @@ package editor {
   }
 
   @js.native
-  trait IDiffLineInformation extends js.Object {
-    def equivalentLineNumber: Double = js.native
-  }
-
-  @js.native
   trait INewScrollPosition extends js.Object {
     var scrollLeft: Double = js.native
     var scrollTop: Double = js.native
-  }
-
-  @js.native
-  trait IActionDescriptor extends js.Object {
-    var id: String = js.native
-    var label: String = js.native
-    var precondition: String = js.native
-    var keybindings: js.Array[Double] = js.native
-    var keybindingContext: String = js.native
-    var contextMenuGroupId: String = js.native
-    var contextMenuOrder: Double = js.native
-    def run(editor: ICommonCodeEditor): Promise[Unit] = js.native
   }
 
   @js.native
@@ -1167,19 +1096,44 @@ package editor {
     var scrollTop: Double = js.native
     var scrollTopWithoutViewZones: Double = js.native
     var scrollLeft: Double = js.native
+    var firstPosition: IPosition = js.native
+    var firstPositionDeltaTop: Double = js.native
   }
 
   @js.native
   trait ICodeEditorViewState extends js.Object {
     var cursorState: js.Array[ICursorState] = js.native
     var viewState: IViewState = js.native
-    var contributionsState: js.Dictionary[js.Any] = js.native
+    var contributionsState: ICodeEditorViewState.ContributionsState = js.native
+  }
+
+  object ICodeEditorViewState {
+
+    @js.native
+    trait ContributionsState extends js.Object {
+      @JSBracketAccess
+      def apply(id: String): js.Any = js.native
+      @JSBracketAccess
+      def update(id: String, v: js.Any): Unit = js.native
+    }
   }
 
   @js.native
   trait IDiffEditorViewState extends js.Object {
     var original: ICodeEditorViewState = js.native
     var modified: ICodeEditorViewState = js.native
+  }
+
+  @js.native
+  sealed trait ScrollType extends js.Object {}
+
+  @js.native
+  @JSGlobal("monaco.editor.ScrollType")
+  object ScrollType extends js.Object {
+    var Smooth: ScrollType = js.native
+    var Immediate: ScrollType = js.native
+    @JSBracketAccess
+    def apply(value: ScrollType): String = js.native
   }
 
   @js.native
@@ -1192,23 +1146,33 @@ package editor {
     def layout(dimension: IDimension = ???): Unit = js.native
     def focus(): Unit = js.native
     def isFocused(): Boolean = js.native
-    def getActions(): js.Array[IEditorAction] = js.native
     def getSupportedActions(): js.Array[IEditorAction] = js.native
     def saveViewState(): IEditorViewState = js.native
     def restoreViewState(state: IEditorViewState): Unit = js.native
     def getVisibleColumnFromPosition(position: IPosition): Double = js.native
     def getPosition(): Position = js.native
     def setPosition(position: IPosition): Unit = js.native
-    def revealLine(lineNumber: Double): Unit = js.native
-    def revealLineInCenter(lineNumber: Double): Unit = js.native
-    def revealLineInCenterIfOutsideViewport(lineNumber: Double): Unit = js.native
+    def revealLine(lineNumber: Double, scrollType: ScrollType = ???): Unit = js.native
+    def revealLineInCenter(
+        lineNumber: Double,
+        scrollType: ScrollType = ???
+    ): Unit = js.native
+    def revealLineInCenterIfOutsideViewport(
+        lineNumber: Double,
+        scrollType: ScrollType = ???
+    ): Unit = js.native
     def revealPosition(
         position: IPosition,
-        revealVerticalInCenter: Boolean = ???,
-        revealHorizontal: Boolean = ???
+        scrollType: ScrollType = ???
     ): Unit = js.native
-    def revealPositionInCenter(position: IPosition): Unit = js.native
-    def revealPositionInCenterIfOutsideViewport(position: IPosition): Unit = js.native
+    def revealPositionInCenter(
+        position: IPosition,
+        scrollType: ScrollType = ???
+    ): Unit = js.native
+    def revealPositionInCenterIfOutsideViewport(
+        position: IPosition,
+        scrollType: ScrollType = ???
+    ): Unit = js.native
     def getSelection(): Selection = js.native
     def getSelections(): js.Array[Selection] = js.native
     def setSelection(selection: IRange): Unit = js.native
@@ -1216,16 +1180,28 @@ package editor {
     def setSelection(selection: ISelection): Unit = js.native
     def setSelection(selection: Selection): Unit = js.native
     def setSelections(selections: js.Array[ISelection]): Unit = js.native
-    def revealLines(startLineNumber: Double, endLineNumber: Double): Unit = js.native
-    def revealLinesInCenter(lineNumber: Double, endLineNumber: Double): Unit = js.native
+    def revealLines(
+        startLineNumber: Double,
+        endLineNumber: Double,
+        scrollType: ScrollType = ???
+    ): Unit = js.native
+    def revealLinesInCenter(
+        lineNumber: Double,
+        endLineNumber: Double,
+        scrollType: ScrollType = ???
+    ): Unit = js.native
     def revealLinesInCenterIfOutsideViewport(
         lineNumber: Double,
-        endLineNumber: Double
+        endLineNumber: Double,
+        scrollType: ScrollType = ???
     ): Unit = js.native
-    def revealRange(range: IRange): Unit = js.native
-    def revealRangeInCenter(range: IRange): Unit = js.native
-    def revealRangeAtTop(range: IRange): Unit = js.native
-    def revealRangeInCenterIfOutsideViewport(range: IRange): Unit = js.native
+    def revealRange(range: IRange, scrollType: ScrollType = ???): Unit = js.native
+    def revealRangeInCenter(range: IRange, scrollType: ScrollType = ???): Unit = js.native
+    def revealRangeAtTop(range: IRange, scrollType: ScrollType = ???): Unit = js.native
+    def revealRangeInCenterIfOutsideViewport(
+        range: IRange,
+        scrollType: ScrollType = ???
+    ): Unit = js.native
     def trigger(source: String, handlerId: String, payload: js.Any): Unit = js.native
     def getModel(): IEditorModel = js.native
     def setModel(model: IEditorModel): Unit = js.native
@@ -1237,88 +1213,6 @@ package editor {
     def dispose(): Unit = js.native
     def saveViewState(): js.Dynamic = js.native
     def restoreViewState(state: js.Any): Unit = js.native
-  }
-
-  @js.native
-  trait ICommonCodeEditor extends IEditor {
-    def onDidChangeModelContent(
-        listener: js.Function1[IModelContentChangedEvent, Unit]
-    ): IDisposable = js.native
-    def onDidChangeModelLanguage(
-        listener: js.Function1[IModelLanguageChangedEvent, Unit]
-    ): IDisposable = js.native
-    def onDidChangeModelOptions(
-        listener: js.Function1[IModelOptionsChangedEvent, Unit]
-    ): IDisposable = js.native
-    def onDidChangeConfiguration(
-        listener: js.Function1[IConfigurationChangedEvent, Unit]
-    ): IDisposable = js.native
-    def onDidChangeCursorPosition(
-        listener: js.Function1[ICursorPositionChangedEvent, Unit]
-    ): IDisposable = js.native
-    def onDidChangeCursorSelection(
-        listener: js.Function1[ICursorSelectionChangedEvent, Unit]
-    ): IDisposable = js.native
-    def onDidChangeModel(
-        listener: js.Function1[IModelChangedEvent, Unit]
-    ): IDisposable = js.native
-    def onDidChangeModelDecorations(
-        listener: js.Function1[IModelDecorationsChangedEvent, Unit]
-    ): IDisposable = js.native
-    def onDidFocusEditorText(listener: js.Function0[Unit]): IDisposable = js.native
-    def onDidBlurEditorText(listener: js.Function0[Unit]): IDisposable = js.native
-    def onDidFocusEditor(listener: js.Function0[Unit]): IDisposable = js.native
-    def onDidBlurEditor(listener: js.Function0[Unit]): IDisposable = js.native
-    override def saveViewState(): ICodeEditorViewState = js.native
-    override def restoreViewState(state: ICodeEditorViewState): Unit = js.native
-    def hasWidgetFocus(): Boolean = js.native
-    def getContribution[T <: IEditorContribution](id: String): T = js.native
-    override def getModel(): IModel = js.native
-    def getConfiguration(): InternalEditorOptions = js.native
-    def getValue(options: js.Any = ???): String = js.native
-    def setValue(newValue: String): Unit = js.native
-    def getScrollWidth(): Double = js.native
-    def getScrollLeft(): Double = js.native
-    def getScrollHeight(): Double = js.native
-    def getScrollTop(): Double = js.native
-    def setScrollLeft(newScrollLeft: Double): Unit = js.native
-    def setScrollTop(newScrollTop: Double): Unit = js.native
-    def setScrollPosition(position: INewScrollPosition): Unit = js.native
-    def getAction(id: String): IEditorAction = js.native
-    def executeCommand(source: String, command: ICommand): Unit = js.native
-    def pushUndoStop(): Boolean = js.native
-    def executeEdits(
-        source: String,
-        edits: js.Array[IIdentifiedSingleEditOperation],
-        endCursoState: js.Array[Selection] = ???
-    ): Boolean = js.native
-    def executeCommands(source: String, commands: js.Array[ICommand]): Unit = js.native
-    def getLineDecorations(lineNumber: Double): js.Array[IModelDecoration] = js.native
-    def deltaDecorations(
-        oldDecorations: js.Array[String],
-        newDecorations: js.Array[IModelDeltaDecoration]
-    ): js.Array[String] = js.native
-    def getLayoutInfo(): EditorLayoutInfo = js.native
-  }
-
-  @js.native
-  trait ICommonDiffEditor extends IEditor {
-    def onDidUpdateDiff(listener: js.Function0[Unit]): IDisposable = js.native
-    /*
-    def saveViewState(): IDiffEditorViewState = js.native
-    def restoreViewState(state: IDiffEditorViewState): Unit = js.native
-    def getModel(): IDiffEditorModel = js.native
-     */
-    def getOriginalEditor(): ICommonCodeEditor = js.native
-    def getModifiedEditor(): ICommonCodeEditor = js.native
-    def getLineChanges(): js.Array[ILineChange] = js.native
-    def getDiffLineInformationForOriginal(
-        lineNumber: Double
-    ): IDiffLineInformation = js.native
-    def getDiffLineInformationForModified(
-        lineNumber: Double
-    ): IDiffLineInformation = js.native
-    def getValue(options: js.Any = ???): String = js.native
   }
 
   @js.native
@@ -1335,8 +1229,12 @@ package editor {
   }
 
   @js.native
+  trait IModelLanguageConfigurationChangedEvent extends js.Object {}
+
+  @js.native
   trait IModelContentChange extends js.Object {
     def range: IRange = js.native
+    def rangeOffset: Double = js.native
     def rangeLength: Double = js.native
     def text: String = js.native
   }
@@ -1352,11 +1250,7 @@ package editor {
   }
 
   @js.native
-  trait IModelDecorationsChangedEvent extends js.Object {
-    def addedDecorations: js.Array[String] = js.native
-    def changedDecorations: js.Array[String] = js.native
-    def removedDecorations: js.Array[String] = js.native
-  }
+  trait IModelDecorationsChangedEvent extends js.Object {}
 
   @js.native
   trait IModelTokensChangedEvent extends js.Object {
@@ -1427,9 +1321,23 @@ package editor {
   @js.native
   trait IEditorMinimapOptions extends js.Object {
     var enabled: Boolean = js.native
+    var side: String = js.native
     var showSlider: String = js.native
     var renderCharacters: Boolean = js.native
     var maxColumn: Double = js.native
+  }
+
+  @js.native
+  trait IEditorLightbulbOptions extends js.Object {
+    var enabled: Boolean = js.native
+  }
+
+  @js.native
+  trait ICodeActionsOnSaveOptions extends js.Object {
+    @JSBracketAccess
+    def apply(kind: String): Boolean = js.native
+    @JSBracketAccess
+    def update(kind: String, v: Boolean): Unit = js.native
   }
 
   @js.native
@@ -1456,11 +1364,13 @@ package editor {
     var cursorBlinking: String = js.native
     var mouseWheelZoom: Boolean = js.native
     var cursorStyle: String = js.native
+    var cursorWidth: Double = js.native
     var fontLigatures: Boolean = js.native
     var disableLayerHinting: Boolean = js.native
     var disableMonospaceOptimizations: Boolean = js.native
     var hideCursorInOverviewRuler: Boolean = js.native
     var scrollBeyondLastLine: Boolean = js.native
+    var smoothScrolling: Boolean = js.native
     var automaticLayout: Boolean = js.native
     var wordWrap: String = js.native
     var wordWrapColumn: Double = js.native
@@ -1472,9 +1382,11 @@ package editor {
     var stopRenderingLineAfter: Double = js.native
     var hover: Boolean = js.native
     var links: Boolean = js.native
+    var colorDecorators: Boolean = js.native
     var contextmenu: Boolean = js.native
     var mouseWheelScrollSensitivity: Double = js.native
     var multiCursorModifier: String = js.native
+    var multiCursorMergeOverlapping: Boolean = js.native
     var accessibilitySupport: String = js.native
     var quickSuggestions: Boolean | js.Any = js.native
     var quickSuggestionsDelay: Double = js.native
@@ -1486,17 +1398,22 @@ package editor {
     var formatOnPaste: Boolean = js.native
     var dragAndDrop: Boolean = js.native
     var suggestOnTriggerCharacters: Boolean = js.native
-    var acceptSuggestionOnEnter: String = js.native
+    var acceptSuggestionOnEnter: Boolean | String = js.native
     var acceptSuggestionOnCommitCharacter: Boolean = js.native
     var snippetSuggestions: String = js.native
     var emptySelectionClipboard: Boolean = js.native
     var wordBasedSuggestions: Boolean = js.native
+    var suggestSelection: String = js.native
     var suggestFontSize: Double = js.native
     var suggestLineHeight: Double = js.native
     var selectionHighlight: Boolean = js.native
     var occurrencesHighlight: Boolean = js.native
     var codeLens: Boolean = js.native
+    var lightbulb: IEditorLightbulbOptions = js.native
+    var codeActionsOnSave: ICodeActionsOnSaveOptions = js.native
+    var codeActionsOnSaveTimeout: Double = js.native
     var folding: Boolean = js.native
+    var foldingStrategy: String = js.native
     var showFoldingControls: String = js.native
     var matchBrackets: Boolean = js.native
     var renderWhitespace: String = js.native
@@ -1599,6 +1516,7 @@ package editor {
   @js.native
   trait InternalEditorMinimapOptions extends js.Object {
     def enabled: Boolean = js.native
+    def side: String = js.native
     def showSlider: String = js.native
     def renderCharacters: Boolean = js.native
     def maxColumn: Double = js.native
@@ -1624,14 +1542,28 @@ package editor {
   }
 
   @js.native
+  sealed trait RenderLineNumbersType extends js.Object {}
+
+  @js.native
+  @JSGlobal("monaco.editor.RenderLineNumbersType")
+  object RenderLineNumbersType extends js.Object {
+    var Off: RenderLineNumbersType = js.native
+    var On: RenderLineNumbersType = js.native
+    var Relative: RenderLineNumbersType = js.native
+    var Interval: RenderLineNumbersType = js.native
+    var Custom: RenderLineNumbersType = js.native
+    @JSBracketAccess
+    def apply(value: RenderLineNumbersType): String = js.native
+  }
+
+  @js.native
   trait InternalEditorViewOptions extends js.Object {
     def extraEditorClassName: String = js.native
     def disableMonospaceOptimizations: Boolean = js.native
     def rulers: js.Array[Double] = js.native
     def ariaLabel: String = js.native
-    def renderLineNumbers: Boolean = js.native
+    def renderLineNumbers: RenderLineNumbersType = js.native
     def renderCustomLineNumbers: js.Function1[Double, String] = js.native
-    def renderRelativeLineNumbers: Boolean = js.native
     def selectOnLineNumbers: Boolean = js.native
     def glyphMargin: Boolean = js.native
     def revealHorizontalRightPadding: Double = js.native
@@ -1641,8 +1573,10 @@ package editor {
     def cursorBlinking: TextEditorCursorBlinkingStyle = js.native
     def mouseWheelZoom: Boolean = js.native
     def cursorStyle: TextEditorCursorStyle = js.native
+    def cursorWidth: Double = js.native
     def hideCursorInOverviewRuler: Boolean = js.native
     def scrollBeyondLastLine: Boolean = js.native
+    def smoothScrolling: Boolean = js.native
     def stopRenderingLineAfter: Double = js.native
     def renderWhitespace: String = js.native
     def renderControlCharacters: Boolean = js.native
@@ -1671,15 +1605,21 @@ package editor {
     def acceptSuggestionOnCommitCharacter: Boolean = js.native
     def snippetSuggestions: String = js.native
     def wordBasedSuggestions: Boolean = js.native
+    def suggestSelection: String = js.native
     def suggestFontSize: Double = js.native
     def suggestLineHeight: Double = js.native
     def selectionHighlight: Boolean = js.native
     def occurrencesHighlight: Boolean = js.native
     def codeLens: Boolean = js.native
     def folding: Boolean = js.native
+    def foldingStrategy: String = js.native
     def showFoldingControls: String = js.native
     def matchBrackets: Boolean = js.native
     def find: InternalEditorFindOptions = js.native
+    def colorDecorators: Boolean = js.native
+    def lightbulbEnabled: Boolean = js.native
+    def codeActionsOnSave: ICodeActionsOnSaveOptions = js.native
+    def codeActionsOnSaveTimeout: Double = js.native
   }
 
   @js.native
@@ -1692,6 +1632,7 @@ package editor {
     def lineHeight: Double = js.native
     def readOnly: Boolean = js.native
     def multiCursorModifier: String = js.native
+    def multiCursorMergeOverlapping: Boolean = js.native
     def wordSeparators: String = js.native
     def autoClosingBrackets: Boolean = js.native
     def autoIndent: Boolean = js.native
@@ -1730,6 +1671,7 @@ package editor {
     def contentLeft: Double = js.native
     def contentWidth: Double = js.native
     def contentHeight: Double = js.native
+    def minimapLeft: Double = js.native
     def minimapWidth: Double = js.native
     def renderMinimap: RenderMinimap = js.native
     def viewportColumn: Double = js.native
@@ -1747,6 +1689,7 @@ package editor {
     def readOnly: Boolean = js.native
     def accessibilitySupport: Boolean = js.native
     def multiCursorModifier: Boolean = js.native
+    def multiCursorMergeOverlapping: Boolean = js.native
     def wordSeparators: Boolean = js.native
     def autoClosingBrackets: Boolean = js.native
     def autoIndent: Boolean = js.native
@@ -1875,7 +1818,38 @@ package editor {
   }
 
   @js.native
-  trait ICodeEditor extends ICommonCodeEditor {
+  trait ICodeEditor extends IEditor {
+    def onDidChangeModelContent(
+        listener: js.Function1[IModelContentChangedEvent, Unit]
+    ): IDisposable = js.native
+    def onDidChangeModelLanguage(
+        listener: js.Function1[IModelLanguageChangedEvent, Unit]
+    ): IDisposable = js.native
+    def onDidChangeModelLanguageConfiguration(
+        listener: js.Function1[IModelLanguageConfigurationChangedEvent, Unit]
+    ): IDisposable = js.native
+    def onDidChangeModelOptions(
+        listener: js.Function1[IModelOptionsChangedEvent, Unit]
+    ): IDisposable = js.native
+    def onDidChangeConfiguration(
+        listener: js.Function1[IConfigurationChangedEvent, Unit]
+    ): IDisposable = js.native
+    def onDidChangeCursorPosition(
+        listener: js.Function1[ICursorPositionChangedEvent, Unit]
+    ): IDisposable = js.native
+    def onDidChangeCursorSelection(
+        listener: js.Function1[ICursorSelectionChangedEvent, Unit]
+    ): IDisposable = js.native
+    def onDidChangeModel(
+        listener: js.Function1[IModelChangedEvent, Unit]
+    ): IDisposable = js.native
+    def onDidChangeModelDecorations(
+        listener: js.Function1[IModelDecorationsChangedEvent, Unit]
+    ): IDisposable = js.native
+    def onDidFocusEditorText(listener: js.Function0[Unit]): IDisposable = js.native
+    def onDidBlurEditorText(listener: js.Function0[Unit]): IDisposable = js.native
+    def onDidFocusEditor(listener: js.Function0[Unit]): IDisposable = js.native
+    def onDidBlurEditor(listener: js.Function0[Unit]): IDisposable = js.native
     def onMouseUp(
         listener: js.Function1[IEditorMouseEvent, Unit]
     ): IDisposable = js.native
@@ -1899,6 +1873,39 @@ package editor {
     def onDidScrollChange(
         listener: js.Function1[IScrollEvent, Unit]
     ): IDisposable = js.native
+    override def saveViewState(): ICodeEditorViewState = js.native
+    override def restoreViewState(state: ICodeEditorViewState): Unit = js.native
+    def hasWidgetFocus(): Boolean = js.native
+    def getContribution[T <: IEditorContribution](id: String): T = js.native
+    override def getModel(): ITextModel = js.native
+    def getConfiguration(): InternalEditorOptions = js.native
+    def getValue(options: js.Any = ???): String = js.native
+    def setValue(newValue: String): Unit = js.native
+    def getScrollWidth(): Double = js.native
+    def getScrollLeft(): Double = js.native
+    def getScrollHeight(): Double = js.native
+    def getScrollTop(): Double = js.native
+    def setScrollLeft(newScrollLeft: Double): Unit = js.native
+    def setScrollTop(newScrollTop: Double): Unit = js.native
+    def setScrollPosition(position: INewScrollPosition): Unit = js.native
+    def getAction(id: String): IEditorAction = js.native
+    def executeCommand(source: String, command: ICommand): Unit = js.native
+    def pushUndoStop(): Boolean = js.native
+    def executeEdits(
+        source: String,
+        edits: js.Array[IIdentifiedSingleEditOperation],
+        endCursoState: js.Array[Selection] = ???
+    ): Boolean = js.native
+    def executeCommands(source: String, commands: js.Array[ICommand]): Unit = js.native
+    def getLineDecorations(lineNumber: Double): js.Array[IModelDecoration] = js.native
+    def deltaDecorations(
+        oldDecorations: js.Array[String],
+        newDecorations: js.Array[IModelDeltaDecoration]
+    ): js.Array[String] = js.native
+    def getLayoutInfo(): EditorLayoutInfo = js.native
+    def getVisibleRanges(): js.Array[Range] = js.native
+    def getTopForLineNumber(lineNumber: Double): Double = js.native
+    def getTopForPosition(lineNumber: Double, column: Double): Double = js.native
     def getDomNode(): HTMLElement = js.native
     def addContentWidget(widget: IContentWidget): Unit = js.native
     def layoutContentWidget(widget: IContentWidget): Unit = js.native
@@ -1909,22 +1916,36 @@ package editor {
     def changeViewZones(
         callback: js.Function1[IViewZoneChangeAccessor, Unit]
     ): Unit = js.native
-    def getCenteredRangeInViewport(): Range = js.native
     def getOffsetForColumn(lineNumber: Double, column: Double): Double = js.native
     def render(): Unit = js.native
-    def getTopForLineNumber(lineNumber: Double): Double = js.native
-    def getTopForPosition(lineNumber: Double, column: Double): Double = js.native
-    def getTargetAtClientPoint(
-        clientX: Double,
-        clientY: Double
-    ): IMouseTarget = js.native
+    def getTargetAtClientPoint(clientX: Double, clientY: Double): IMouseTarget = js.native
     def getScrolledVisiblePosition(position: IPosition): js.Any = js.native
     def applyFontInfo(target: HTMLElement): Unit = js.native
   }
 
   @js.native
-  trait IDiffEditor extends ICommonDiffEditor {
+  trait IDiffLineInformation extends js.Object {
+    def equivalentLineNumber: Double = js.native
+  }
+
+  @js.native
+  trait IDiffEditor extends IEditor {
     def getDomNode(): HTMLElement = js.native
+    def onDidUpdateDiff(listener: js.Function0[Unit]): IDisposable = js.native
+    /*
+    def saveViewState(): IDiffEditorViewState = js.native
+    def restoreViewState(state: IDiffEditorViewState): Unit = js.native
+    def getModel(): IDiffEditorModel = js.native
+     */
+    def getOriginalEditor(): ICodeEditor = js.native
+    def getModifiedEditor(): ICodeEditor = js.native
+    def getLineChanges(): js.Array[ILineChange] = js.native
+    def getDiffLineInformationForOriginal(
+        lineNumber: Double
+    ): IDiffLineInformation = js.native
+    def getDiffLineInformationForModified(
+        lineNumber: Double
+    ): IDiffLineInformation = js.native
   }
 
   @js.native
@@ -1951,8 +1972,8 @@ package editor {
     def letterSpacing: Double = js.native
   }
 
-  @JSGlobal("monaco.editor")
   @js.native
+  @JSGlobal("monaco.editor")
   object Editor extends js.Object {
     def create(
         domElement: HTMLElement,
@@ -1976,18 +1997,22 @@ package editor {
         value: String,
         language: String = ???,
         uri: Uri = ???
-    ): IModel = js.native
-    def setModelLanguage(model: IModel, language: String): Unit = js.native
+    ): ITextModel = js.native
+    def setModelLanguage(model: ITextModel, language: String): Unit = js.native
     def setModelMarkers(
-        model: IModel,
+        model: ITextModel,
         owner: String,
         markers: js.Array[IMarkerData]
     ): Unit = js.native
     def getModelMarkers(filter: js.Any): js.Array[IMarker] = js.native
-    def getModel(uri: Uri): IModel = js.native
-    def getModels(): js.Array[IModel] = js.native
-    def onDidCreateModel(listener: js.Function1[IModel, Unit]): IDisposable = js.native
-    def onWillDisposeModel(listener: js.Function1[IModel, Unit]): IDisposable = js.native
+    def getModel(uri: Uri): ITextModel = js.native
+    def getModels(): js.Array[ITextModel] = js.native
+    def onDidCreateModel(
+        listener: js.Function1[ITextModel, Unit]
+    ): IDisposable = js.native
+    def onWillDisposeModel(
+        listener: js.Function1[ITextModel, Unit]
+    ): IDisposable = js.native
     def onDidChangeModelLanguage(
         listener: js.Function1[js.Any, Unit]
     ): IDisposable = js.native
@@ -2002,7 +2027,7 @@ package editor {
         options: IColorizerOptions
     ): Promise[String] = js.native
     def colorizeModelLine(
-        model: IModel,
+        model: ITextModel,
         lineNumber: Double,
         tabSize: Double = ???
     ): String = js.native
@@ -2011,8 +2036,11 @@ package editor {
     def setTheme(themeName: String): Unit = js.native
     type BuiltinTheme = String
     type IColors = js.Dictionary[String]
-    type IEditorModel = IModel // | IDiffEditorModel
-    type IEditorViewState = ICodeEditorViewState //| IDiffEditorViewState
+    // NOTE: Diff model is not used so disable the alias to keep types simpler
+    type IEditorModel = ITextModel // | IDiffEditorModel
+    type IEditorViewState = ICodeEditorViewState // | IDiffEditorViewState
+    type IReadOnlyModel = ITextModel
+    type IModel = ITextModel
   }
 
 }
@@ -2040,16 +2068,19 @@ package languages {
   @js.native
   trait CodeActionContext extends js.Object {
     def markers: js.Array[editor.IMarkerData] = js.native
+    def only: String = js.native
   }
 
   @js.native
   trait CodeActionProvider extends js.Object {
     def provideCodeActions(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         range: Range,
         context: CodeActionContext,
         token: CancellationToken
-    ): js.Array[Command] | Thenable[js.Array[Command]] = js.native
+    ): js.Array[Command | CodeAction] | Thenable[
+      js.Array[Command | CodeAction]
+    ] = js.native
   }
 
   @js.native
@@ -2091,12 +2122,15 @@ package languages {
     var label: String = js.native
     var kind: CompletionItemKind = js.native
     var detail: String = js.native
-    var documentation: String = js.native
+    var documentation: String | IMarkdownString = js.native
+    var command: Command = js.native
     var sortText: String = js.native
     var filterText: String = js.native
     var insertText: String | SnippetString = js.native
     var range: Range = js.native
+    var commitCharacters: js.Array[String] = js.native
     var textEdit: editor.ISingleEditOperation = js.native
+    var additionalTextEdits: js.Array[editor.ISingleEditOperation] = js.native
   }
 
   @js.native
@@ -2106,12 +2140,19 @@ package languages {
   }
 
   @js.native
+  trait CompletionContext extends js.Object {
+    var triggerKind: SuggestTriggerKind = js.native
+    var triggerCharacter: String = js.native
+  }
+
+  @js.native
   trait CompletionItemProvider extends js.Object {
     var triggerCharacters: js.Array[String] = js.native
     def provideCompletionItems(
-        model: editor.IReadOnlyModel,
+        document: editor.ITextModel,
         position: Position,
-        token: CancellationToken
+        token: CancellationToken,
+        context: CompletionContext
     ): js.Array[CompletionItem] | Thenable[js.Array[CompletionItem]] | CompletionList | Thenable[
       CompletionList
     ] = js.native
@@ -2136,6 +2177,7 @@ package languages {
     var onEnterRules: js.Array[OnEnterRule] = js.native
     var autoClosingPairs: js.Array[IAutoClosingPairConditional] = js.native
     var surroundingPairs: js.Array[IAutoClosingPair] = js.native
+    var folding: FoldingRules = js.native
     var __electricCharacterSupport: IBracketElectricCharacterContribution = js.native
   }
 
@@ -2145,6 +2187,18 @@ package languages {
     var increaseIndentPattern: RegExp = js.native
     var indentNextLinePattern: RegExp = js.native
     var unIndentedLinePattern: RegExp = js.native
+  }
+
+  @js.native
+  trait FoldingMarkers extends js.Object {
+    var start: RegExp = js.native
+    var end: RegExp = js.native
+  }
+
+  @js.native
+  trait FoldingRules extends js.Object {
+    var offSide: Boolean = js.native
+    var markers: FoldingMarkers = js.native
   }
 
   @js.native
@@ -2206,29 +2260,51 @@ package languages {
 
   @js.native
   trait Hover extends js.Object {
-    var contents: js.Array[MarkedString] = js.native
+    var contents: js.Array[IMarkdownString] = js.native
     var range: IRange = js.native
   }
 
   @js.native
   trait HoverProvider extends js.Object {
     def provideHover(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         position: Position,
         token: CancellationToken
     ): Hover | Thenable[Hover] = js.native
   }
 
   @js.native
+  sealed trait SuggestTriggerKind extends js.Object {}
+
+  @js.native
+  @JSGlobal("monaco.languages.SuggestTriggerKind")
+  object SuggestTriggerKind extends js.Object {
+    var Invoke: SuggestTriggerKind = js.native
+    var TriggerCharacter: SuggestTriggerKind = js.native
+    var TriggerForIncompleteCompletions: SuggestTriggerKind = js.native
+    @JSBracketAccess
+    def apply(value: SuggestTriggerKind): String = js.native
+  }
+
+  @js.native
+  trait CodeAction extends js.Object {
+    var title: String = js.native
+    var command: Command = js.native
+    var edit: WorkspaceEdit = js.native
+    var diagnostics: js.Array[editor.IMarkerData] = js.native
+    var kind: String = js.native
+  }
+
+  @js.native
   trait ParameterInformation extends js.Object {
     var label: String = js.native
-    var documentation: String = js.native
+    var documentation: String | IMarkdownString = js.native
   }
 
   @js.native
   trait SignatureInformation extends js.Object {
     var label: String = js.native
-    var documentation: String = js.native
+    var documentation: String | IMarkdownString = js.native
     var parameters: js.Array[ParameterInformation] = js.native
   }
 
@@ -2243,7 +2319,7 @@ package languages {
   trait SignatureHelpProvider extends js.Object {
     var signatureHelpTriggerCharacters: js.Array[String] = js.native
     def provideSignatureHelp(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         position: Position,
         token: CancellationToken
     ): SignatureHelp | Thenable[SignatureHelp] = js.native
@@ -2271,7 +2347,7 @@ package languages {
   @js.native
   trait DocumentHighlightProvider extends js.Object {
     def provideDocumentHighlights(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         position: Position,
         token: CancellationToken
     ): js.Array[DocumentHighlight] | Thenable[js.Array[DocumentHighlight]] = js.native
@@ -2282,41 +2358,47 @@ package languages {
     var includeDeclaration: Boolean = js.native
   }
 
+  // @js.native - Non-native to allow extending it in Scala
   trait ReferenceProvider extends js.Object {
     def provideReferences(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         position: Position,
         context: ReferenceContext,
         token: CancellationToken
-    ): Thenable[js.Array[Location]]
+    ): js.Array[Location] | Thenable[js.Array[Location]] // = js.native
   }
 
-  class Location(val uri: Uri, val range: IRange) extends js.Object
+  @js.native
+  trait Location extends js.Object {
+    var uri: Uri = js.native
+    var range: IRange = js.native
+  }
 
+  // @js.native - Non-native to allow extending it in Scala
   trait DefinitionProvider extends js.Object {
     def provideDefinition(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         position: Position,
         token: CancellationToken
-    ): Thenable[Definition]
+    ): Definition | Thenable[Definition] // = js.native
   }
 
   @js.native
   trait ImplementationProvider extends js.Object {
     def provideImplementation(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         position: Position,
         token: CancellationToken
-    ): Thenable[Definition] = js.native
+    ): Definition | Thenable[Definition] = js.native
   }
 
   @js.native
   trait TypeDefinitionProvider extends js.Object {
     def provideTypeDefinition(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         position: Position,
         token: CancellationToken
-    ): Thenable[Definition] = js.native
+    ): Definition | Thenable[Definition] = js.native
   }
 
   @js.native
@@ -2355,18 +2437,20 @@ package languages {
     def apply(value: SymbolKind): String = js.native
   }
 
-  class SymbolInformation(
-      val name: String,
-      val containerName: String,
-      val kind: SymbolKind,
-      val location: Location
-  ) extends js.Object
+  @js.native
+  trait SymbolInformation extends js.Object {
+    var name: String = js.native
+    var containerName: String = js.native
+    var kind: SymbolKind = js.native
+    var location: Location = js.native
+  }
 
+  // @js.native - Non-native to allow extending it in Scala
   trait DocumentSymbolProvider extends js.Object {
     def provideDocumentSymbols(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         token: CancellationToken
-    ): Thenable[js.Array[SymbolInformation]]
+    ): js.Array[SymbolInformation] | Thenable[js.Array[SymbolInformation]] // = js.native
   }
 
   @js.native
@@ -2385,7 +2469,7 @@ package languages {
   @js.native
   trait DocumentFormattingEditProvider extends js.Object {
     def provideDocumentFormattingEdits(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         options: FormattingOptions,
         token: CancellationToken
     ): js.Array[TextEdit] | Thenable[js.Array[TextEdit]] = js.native
@@ -2394,7 +2478,7 @@ package languages {
   @js.native
   trait DocumentRangeFormattingEditProvider extends js.Object {
     def provideDocumentRangeFormattingEdits(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         range: Range,
         options: FormattingOptions,
         token: CancellationToken
@@ -2405,7 +2489,7 @@ package languages {
   trait OnTypeFormattingEditProvider extends js.Object {
     var autoFormatTriggerCharacters: js.Array[String] = js.native
     def provideOnTypeFormattingEdits(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         position: Position,
         ch: String,
         options: FormattingOptions,
@@ -2422,7 +2506,7 @@ package languages {
   @js.native
   trait LinkProvider extends js.Object {
     def provideLinks(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         token: CancellationToken
     ): js.Array[ILink] | Thenable[js.Array[ILink]] = js.native
     var resolveLink: js.Function2[ILink, CancellationToken, ILink | Thenable[
@@ -2431,26 +2515,111 @@ package languages {
   }
 
   @js.native
-  trait IResourceEdit extends js.Object {
-    var resource: Uri = js.native
+  trait IColor extends js.Object {
+    def red: Double = js.native
+    def green: Double = js.native
+    def blue: Double = js.native
+    def alpha: Double = js.native
+  }
+
+  @js.native
+  trait IColorPresentation extends js.Object {
+    var label: String = js.native
+    var textEdit: TextEdit = js.native
+    var additionalTextEdits: js.Array[TextEdit] = js.native
+  }
+
+  @js.native
+  trait IColorInformation extends js.Object {
     var range: IRange = js.native
-    var newText: String = js.native
+    var color: IColor = js.native
+  }
+
+  @js.native
+  trait DocumentColorProvider extends js.Object {
+    def provideDocumentColors(
+        model: editor.ITextModel,
+        token: CancellationToken
+    ): js.Array[IColorInformation] | Thenable[js.Array[IColorInformation]] = js.native
+    def provideColorPresentations(
+        model: editor.ITextModel,
+        colorInfo: IColorInformation,
+        token: CancellationToken
+    ): js.Array[IColorPresentation] | Thenable[js.Array[IColorPresentation]] = js.native
+  }
+
+  @js.native
+  trait FoldingContext extends js.Object {}
+
+  @js.native
+  trait FoldingRangeProvider extends js.Object {
+    def provideFoldingRanges(
+        model: editor.ITextModel,
+        context: FoldingContext,
+        token: CancellationToken
+    ): js.Array[FoldingRange] | Thenable[js.Array[FoldingRange]] = js.native
+  }
+
+  @js.native
+  trait FoldingRange extends js.Object {
+    var start: Double = js.native
+    var end: Double = js.native
+    var kind: FoldingRangeKind = js.native
+  }
+
+  @js.native
+  @JSGlobal("monaco.languages.FoldingRangeKind")
+  class FoldingRangeKind protected () extends js.Object {
+    def this(value: String) = this()
+    var value: String = js.native
+  }
+
+  @js.native
+  @JSGlobal("monaco.languages.FoldingRangeKind")
+  object FoldingRangeKind extends js.Object {
+    def Comment: FoldingRangeKind = js.native
+    def Imports: FoldingRangeKind = js.native
+    def Region: FoldingRangeKind = js.native
+  }
+
+  @js.native
+  trait ResourceFileEdit extends js.Object {
+    var oldUri: Uri = js.native
+    var newUri: Uri = js.native
+  }
+
+  @js.native
+  trait ResourceTextEdit extends js.Object {
+    var resource: Uri = js.native
+    var modelVersionId: Double = js.native
+    var edits: js.Array[TextEdit] = js.native
   }
 
   @js.native
   trait WorkspaceEdit extends js.Object {
-    var edits: js.Array[IResourceEdit] = js.native
+    var edits: js.Array[ResourceTextEdit | ResourceFileEdit] = js.native
     var rejectReason: String = js.native
+  }
+
+  @js.native
+  trait RenameLocation extends js.Object {
+    var range: IRange = js.native
+    var text: String = js.native
   }
 
   @js.native
   trait RenameProvider extends js.Object {
     def provideRenameEdits(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         position: Position,
         newName: String,
         token: CancellationToken
     ): WorkspaceEdit | Thenable[WorkspaceEdit] = js.native
+    def resolveRenameLocation(
+        model: editor.ITextModel,
+        position: Position,
+        token: CancellationToken
+    ): RenameLocation | Thenable[RenameLocation] = js.native
   }
 
   @js.native
@@ -2470,37 +2639,49 @@ package languages {
 
   @js.native
   trait CodeLensProvider extends js.Object {
-    var onDidChange: IEvent[CodeLensProvider] = js.native
+    var onDidChange: IEvent[this.type] = js.native
     def provideCodeLenses(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         token: CancellationToken
     ): js.Array[ICodeLensSymbol] | Thenable[js.Array[ICodeLensSymbol]] = js.native
     def resolveCodeLens(
-        model: editor.IReadOnlyModel,
+        model: editor.ITextModel,
         codeLens: ICodeLensSymbol,
         token: CancellationToken
     ): ICodeLensSymbol | Thenable[ICodeLensSymbol] = js.native
   }
 
-  class ILanguageExtensionPoint(
-      val id: String,
-      val extensions: js.UndefOr[js.Array[String]] = js.undefined,
-      val filenames: js.UndefOr[js.Array[String]] = js.undefined,
-      val filenamePatterns: js.UndefOr[js.Array[String]] = js.undefined,
-      val firstLine: js.UndefOr[String] = js.undefined,
-      val aliases: js.UndefOr[js.Array[String]] = js.undefined,
-      val mimetypes: js.UndefOr[js.Array[String]] = js.undefined,
-      val configuration: js.UndefOr[String] = js.undefined
-  ) extends js.Object
+  @js.native
+  trait ILanguageExtensionPoint extends js.Object {
+    var id: String = js.native
+    var extensions: js.Array[String] = js.native
+    var filenames: js.Array[String] = js.native
+    var filenamePatterns: js.Array[String] = js.native
+    var firstLine: String = js.native
+    var aliases: js.Array[String] = js.native
+    var mimetypes: js.Array[String] = js.native
+    var configuration: String = js.native
+  }
 
   @js.native
   trait IMonarchLanguage extends js.Object {
-    var tokenizer: js.Dictionary[js.Array[IMonarchLanguageRule]] = js.native
+    var tokenizer: IMonarchLanguage.Tokenizer = js.native
     var ignoreCase: Boolean = js.native
     var defaultToken: String = js.native
     var brackets: js.Array[IMonarchLanguageBracket] = js.native
     var start: String = js.native
     var tokenPostfix: String = js.native
+  }
+
+  object IMonarchLanguage {
+
+    @js.native
+    trait Tokenizer extends js.Object {
+      @JSBracketAccess
+      def apply(name: String): js.Array[IMonarchLanguageRule] = js.native
+      @JSBracketAccess
+      def update(name: String, v: js.Array[IMonarchLanguageRule]): Unit = js.native
+    }
   }
 
   @js.native
@@ -2530,8 +2711,8 @@ package languages {
     var token: String = js.native
   }
 
-  @JSGlobal("monaco.languages")
   @js.native
+  @JSGlobal("monaco.languages")
   object Languages extends js.Object {
     def register(language: ILanguageExtensionPoint): Unit = js.native
     def getLanguages(): js.Array[ILanguageExtensionPoint] = js.native
@@ -2615,8 +2796,16 @@ package languages {
         languageId: String,
         provider: CompletionItemProvider
     ): IDisposable = js.native
+    def registerColorProvider(
+        languageId: String,
+        provider: DocumentColorProvider
+    ): IDisposable = js.native
+    def registerFoldingRangeProvider(
+        languageId: String,
+        provider: FoldingRangeProvider
+    ): IDisposable = js.native
     type CharacterPair = js.Tuple2[String, String]
-    type Definition = js.Array[Location]
+    type Definition = Location | js.Array[Location]
   }
 
 }
@@ -2637,8 +2826,10 @@ package worker {
 
 }
 
-@JSGlobal("monaco")
 @js.native
+@JSGlobal("monaco")
 object Monaco extends js.Object {
-  type MarkedString = String | js.Any
+  type Thenable[T] = PromiseLike[T]
+  type TValueCallback[T] = js.Function1[T | PromiseLike[T], Unit]
+  type ProgressCallback[TProgress] = js.Function1[TProgress, Unit]
 }

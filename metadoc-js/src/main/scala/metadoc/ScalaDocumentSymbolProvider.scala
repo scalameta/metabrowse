@@ -3,7 +3,7 @@ package metadoc
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import monaco.CancellationToken
-import monaco.editor.IReadOnlyModel
+import monaco.editor.ITextModel
 import monaco.languages.DocumentSymbolProvider
 import monaco.languages.SymbolInformation
 import monaco.languages.SymbolKind
@@ -30,7 +30,7 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
   }
 
   override def provideDocumentSymbols(
-      model: IReadOnlyModel,
+      model: ITextModel,
       token: CancellationToken
   ) = {
     for {
@@ -38,13 +38,13 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
     } yield {
       val symbols = getDocumentSymbols(doc).map {
         case DocumentSymbol(denotation, kind, definition) =>
-          new SymbolInformation(
-            name = denotation.displayName,
-            // TODO: pretty print `.tpe`: https://github.com/scalameta/scalameta/issues/1479
-            containerName = denotation.symbol,
-            kind = kind,
-            location = model.resolveLocation(definition)
-          )
+          val symbol = jsObject[SymbolInformation]
+          symbol.name = denotation.displayName
+          // TODO: print signature instead of `denotation.symbol`: https://github.com/scalameta/metadoc/issues/99
+          symbol.containerName = denotation.symbol
+          symbol.kind = kind
+          symbol.location = resolveLocation(definition)
+          symbol
       }
       js.Array[SymbolInformation](symbols: _*)
     }
