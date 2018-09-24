@@ -1,26 +1,21 @@
 package metadoc
 
 import metadoc.schema.Workspace
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.concurrent.Promise
-import scala.scalajs.js
-import scala.scalajs.js.typedarray.TypedArrayBuffer
-import scala.scalajs.js.JSConverters._
-import monaco.{IRange, Range, Uri}
 import monaco.Uri
 import monaco.editor.Editor
 import monaco.editor.IActionDescriptor
-import monaco.editor.ICommonCodeEditor
-import monaco.editor.IEditor
-import monaco.editor.IEditorConstructionOptions
-import monaco.editor.IEditorOptions
-import monaco.editor.IEditorOverrideServices
-import monaco.editor.IModelChangedEvent
+import monaco.editor.ICodeEditor
 import monaco.languages.ILanguageExtensionPoint
-import monaco.services.{IResourceInput, ITextEditorOptions}
+import monaco.services.IResourceInput
+import monaco.services.ITextEditorOptions
 import org.scalajs.dom
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.meta.internal.{semanticdb => s}
+import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.typedarray.TypedArrayBuffer
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {
@@ -134,9 +129,7 @@ object MetadocApp {
       editorService.addAction(new IActionDescriptor {
         override var id = file
         override var label = file
-        override def run(
-            editor: ICommonCodeEditor
-        ): monaco.Promise[Unit] = {
+        override def run(editor: ICodeEditor): monaco.Promise[Unit] = {
           val state = new Navigation.State(file, None)
           openEditor(editorService)(state).toMonacoPromise
         }
