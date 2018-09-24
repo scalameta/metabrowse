@@ -40,7 +40,7 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
         case DocumentSymbol(denotation, kind, definition) =>
           val symbol = jsObject[SymbolInformation]
           symbol.name = denotation.displayName
-          // TODO: pretty print `.tpe`: https://github.com/scalameta/scalameta/issues/1479
+          // TODO: print signature instead of `denotation.symbol`: https://github.com/scalameta/metadoc/issues/99
           symbol.containerName = denotation.symbol
           symbol.kind = kind
           symbol.location = resolveLocation(definition)
