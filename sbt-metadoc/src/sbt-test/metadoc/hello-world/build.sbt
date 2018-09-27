@@ -12,8 +12,8 @@ TaskKey[Unit]("check") := {
 
   // Test that sources for both main and test configurations are handled.
   val expectedSemanticDbs = List(
-    "src/main/scala/Hello.scala.semanticdb",
-    "src/test/scala/HelloTest.scala.semanticdb"
+    "src/main/scala/Hello.scala.semanticdb.gz",
+    "src/test/scala/HelloTest.scala.semanticdb.gz"
   )
 
   assertExists(dir, s"Metadoc output directory does not exist: $dir")
