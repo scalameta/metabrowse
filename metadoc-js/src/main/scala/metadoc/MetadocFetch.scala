@@ -5,20 +5,22 @@ import scala.concurrent.Future
 import scala.meta.internal.{semanticdb => s}
 import metadoc.MetadocApp._
 import metadoc.{schema => d}
+import MetadocEnrichments._
 
 object MetadocFetch {
 
   def symbol(symbolId: String): Future[Option[d.SymbolIndex]] = {
-    val url = "symbol/" + JSSha512.sha512(symbolId)
+    val url = "symbol/" + symbolId.symbolIndexPath
     for {
       bytes <- fetchBytes(url)
     } yield {
-      Some(d.SymbolIndex.parseFrom(bytes))
+      val indexes = d.SymbolIndexes.parseFrom(bytes)
+      indexes.indexes.find(_.symbol == symbolId)
     }
   }.recover(or404)
 
   def document(filename: String): Future[Option[s.TextDocument]] = {
-    val url = "semanticdb/" + filename + ".semanticdb"
+    val url = "semanticdb/" + filename + ".semanticdb.gz"
     for {
       bytes <- fetchBytes(url)
     } yield {
@@ -28,7 +30,7 @@ object MetadocFetch {
 
   def workspace(): Future[d.Workspace] = {
     for {
-      bytes <- fetchBytes("index.workspace")
+      bytes <- fetchBytes("index.workspace.gz")
     } yield {
       d.Workspace.parseFrom(bytes)
     }

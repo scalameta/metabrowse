@@ -25,6 +25,7 @@ import scala.collection.parallel.mutable.ParArray
 import scala.util.control.NonFatal
 import caseapp._
 import caseapp.core.Messages
+import java.util.zip.GZIPOutputStream
 import scalapb.json4s.JsonFormat
 import metadoc.schema
 import metadoc.schema.SymbolIndex
@@ -36,6 +37,8 @@ import metadoc.MetadocEnrichments._
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import scala.meta.internal.metadoc.ScalametaInternals
+import scala.collection.JavaConverters._
+import scala.meta.internal.semanticdb.Scala._
 
 @AppName("metadoc")
 @AppVersion("<version>")
@@ -98,25 +101,33 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   )
   private val semanticdb = target.resolve("semanticdb")
   private val symbolRoot = target.resolve("symbol")
-  private type Symbol = String
   private val filenames = new ConcurrentSkipListSet[String]()
   private val symbols =
-    new ConcurrentHashMap[Symbol, AtomicReference[d.SymbolIndex]]()
-  private val mappingFunction: JFunction[Symbol, AtomicReference[
-    d.SymbolIndex
-  ]] =
-    t => new AtomicReference(d.SymbolIndex(symbol = t))
-
-  private def overwrite(out: Path, bytes: Array[Byte]): Unit = {
-    Files.write(
-      out,
-      bytes,
-      StandardOpenOption.TRUNCATE_EXISTING,
-      StandardOpenOption.CREATE
-    )
+    new ConcurrentHashMap[String, AtomicReference[d.SymbolIndex]]()
+  private val mappingFunction: JFunction[
+    String,
+    AtomicReference[d.SymbolIndex]
+  ] = { t =>
+    new AtomicReference(d.SymbolIndex(symbol = t))
   }
 
-  private def addDefinition(symbol: Symbol, position: d.Position): Unit = {
+  private def overwrite(out: Path, bytes: Array[Byte]): Unit = {
+    val gzout = out.resolveSibling(out.getFileName.toString + ".gz")
+    val fos = Files.newOutputStream(gzout)
+    try {
+      val gos = new GZIPOutputStream(fos, bytes.length)
+      try {
+        gos.write(bytes)
+        gos.finish()
+      } finally {
+        gos.close()
+      }
+    } finally {
+      fos.close()
+    }
+  }
+
+  private def addDefinition(symbol: String, position: d.Position): Unit = {
     val value = symbols.computeIfAbsent(symbol, mappingFunction)
     value.getAndUpdate(new UnaryOperator[d.SymbolIndex] {
       override def apply(t: schema.SymbolIndex): schema.SymbolIndex =
@@ -130,7 +141,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   private def addReference(
       filename: String,
       range: d.Range,
-      symbol: Symbol
+      symbol: String
   ): Unit = {
     val value = symbols.computeIfAbsent(symbol, mappingFunction)
     value.getAndUpdate(new UnaryOperator[d.SymbolIndex] {
@@ -263,30 +274,45 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       }
     }
 
+  def symbolIndexByTopLevelSymbol: util.Map[String, List[d.SymbolIndex]] = {
+    val byToplevel = new util.HashMap[String, List[d.SymbolIndex]]()
+    symbols.asScala.foreach {
+      case (sym, ref) =>
+        val toplevel = sym.toplevelPackage
+        val old = byToplevel.getOrDefault(toplevel, Nil)
+        byToplevel.put(toplevel, ref.get() :: old)
+    }
+    byToplevel
+  }
+
   def writeSymbolIndex(): Unit =
     phase("Writing symbol index", symbols.size()) { tick =>
-      import scala.collection.JavaConverters._
       Files.createDirectory(symbolRoot.toNIO)
       val symbolsMap = symbols.asScala
-      symbolsMap.foreach {
-        case (_, ref) =>
+      val byToplevel = symbolIndexByTopLevelSymbol.asScala
+      byToplevel.foreach {
+        case (sym, indexes) =>
           tick()
-          val symbolIndex = ref.get()
-          val actualIndex = symbolIndex.definition match {
-            case Some(_) => updateReferencesForType(symbolsMap, symbolIndex)
-            case None => updateDefinitionsForTerm(symbolsMap, symbolIndex)
+          val actualIndexes = indexes.map { symbolIndex =>
+            val actualIndex = symbolIndex.definition match {
+              case Some(_) => updateReferencesForType(symbolsMap, symbolIndex)
+              case None => updateDefinitionsForTerm(symbolsMap, symbolIndex)
+            }
+            actualIndex
           }
-
-          if (actualIndex.definition.isDefined) {
-            val url = MetadocCli.encodeSymbolName(actualIndex.symbol)
-            val out = symbolRoot.resolve(url)
-            overwrite(out.toNIO, actualIndex.toByteArray)
+          val symbolIndexes =
+            d.SymbolIndexes(actualIndexes.filter(_.definition.isDefined))
+          if (symbolIndexes.indexes.nonEmpty) {
+            val filename = sym.symbolIndexPath.stripSuffix(".gz")
+            val out = symbolRoot.resolve(filename)
+            Files.createDirectories(out.toNIO.getParent)
+            overwrite(out.toNIO, symbolIndexes.toByteArray)
           }
       }
     }
 
   private def updateReferencesForType(
-      symbolsMap: concurrent.Map[Symbol, AtomicReference[SymbolIndex]],
+      symbolsMap: concurrent.Map[String, AtomicReference[SymbolIndex]],
       symbolIndex: SymbolIndex
   ): SymbolIndex = {
     if (symbolIndex.symbol.isType) {
@@ -309,7 +335,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   }
 
   private def updateDefinitionsForTerm(
-      symbolsMap: concurrent.Map[Symbol, AtomicReference[SymbolIndex]],
+      symbolsMap: concurrent.Map[String, AtomicReference[SymbolIndex]],
       symbolIndex: SymbolIndex
   ): SymbolIndex = {
     if (symbolIndex.symbol.isTerm) {

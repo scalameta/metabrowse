@@ -15,7 +15,9 @@ import scala.concurrent.Promise
 import scala.meta.internal.{semanticdb => s}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSON
 import scala.scalajs.js.typedarray.TypedArrayBuffer
+import scala.scalajs.js.typedarray.Uint8Array
 
 object MetadocApp {
   def main(args: Array[String]): Unit = {
@@ -43,6 +45,7 @@ object MetadocApp {
       _ <- loadMonaco()
       workspace <- MetadocFetch.workspace()
     } {
+      println(workspace.toProtoString)
       val index = new MutableBrowserIndex(MetadocState(s.TextDocument()))
       registerLanguageExtensions(index)
 
@@ -166,13 +169,20 @@ object MetadocApp {
   }
 
   def fetchBytes(url: String): Future[Array[Byte]] = {
+    println(s"Fetching $url")
     for {
       response <- dom.experimental.Fetch.fetch(url).toFuture
+      _ = println(JSON.stringify(response))
       _ = require(response.status == 200, s"${response.status} != 200")
       buffer <- response.arrayBuffer().toFuture
+      _ = println(buffer.byteLength)
     } yield {
-      val bytes = Array.ofDim[Byte](buffer.byteLength)
-      TypedArrayBuffer.wrap(buffer).get(bytes)
+      val isGzip = url.endsWith(".gz")
+      val output =
+        if (isGzip) Pako.inflate(buffer)
+        else buffer
+      val bytes = Array.ofDim[Byte](output.byteLength)
+      TypedArrayBuffer.wrap(output).get(bytes)
       bytes
     }
   }
