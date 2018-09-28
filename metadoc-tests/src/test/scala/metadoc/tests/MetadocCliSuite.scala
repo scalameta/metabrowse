@@ -17,7 +17,7 @@ class MetadocCliSuite extends BaseMetadocCliSuite {
       |paiges/core/src/test/scala/org/typelevel/paiges/JsonTest.scala.semanticdb.gz
       |paiges/core/src/test/scala/org/typelevel/paiges/PaigesTest.scala.semanticdb.gz
     """.stripMargin
-  test("target/semanticdb") {
+  test("semanticdb.gz") {
     val obtained = FileIO
       .listAllFilesRecursively(out.resolve("semanticdb"))
       .files
@@ -25,7 +25,19 @@ class MetadocCliSuite extends BaseMetadocCliSuite {
     assertNoDiffOrPrintExpected(obtained.mkString("\n"), expectedFiles)
   }
 
-  test("target/symbol") {
+  test("package.symbolindexes.gz") {
+    val expectedSymbols =
+      """
+        |org/typelevel/paiges/package.symbolindexes.gz
+      """.stripMargin
+    val obtained = FileIO
+      .listAllFilesRecursively(out.resolve("symbol"))
+      .files
+      .sortBy(_.toString())
+    assertNoDiffOrPrintExpected(obtained.mkString("\n"), expectedSymbols)
+  }
+
+  test("indexed symbols") {
     val obtained = FileIO
       .listAllFilesRecursively(out.resolve("symbol"))
       .flatMap { path =>
@@ -237,7 +249,7 @@ class MetadocCliSuite extends BaseMetadocCliSuite {
     assertNoDiffOrPrintExpected(obtained, expected)
   }
 
-  test("target/index.workspace") {
+  test("index.workspace.gz") {
     val workspacePath = out.resolve("index.workspace.gz")
     assert(Files.exists(workspacePath.toNIO))
     val workspace = d.Workspace.parseFromCompressedPath(workspacePath)
@@ -246,6 +258,7 @@ class MetadocCliSuite extends BaseMetadocCliSuite {
       assert(workspace.filenames.contains(file.stripSuffix(".semanticdb.gz")))
     }
   }
+
   checkSymbolIndex(
     "org/typelevel/paiges/Json.JArray.",
     """

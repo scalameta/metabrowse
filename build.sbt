@@ -149,8 +149,7 @@ lazy val js = project
       "pako" -> "1.0.6",
       "monaco-editor" -> "0.13.1",
       "roboto-fontface" -> "0.7.0",
-      "material-components-web" -> "0.21.1",
-      "js-sha512" -> "0.4.0"
+      "material-components-web" -> "0.21.1"
     )
   )
   .dependsOn(coreJS)

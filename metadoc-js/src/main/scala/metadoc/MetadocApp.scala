@@ -45,7 +45,6 @@ object MetadocApp {
       _ <- loadMonaco()
       workspace <- MetadocFetch.workspace()
     } {
-      println(workspace.toProtoString)
       val index = new MutableBrowserIndex(MetadocState(s.TextDocument()))
       registerLanguageExtensions(index)
 
@@ -169,15 +168,22 @@ object MetadocApp {
   }
 
   def fetchBytes(url: String): Future[Array[Byte]] = {
-    println(s"Fetching $url")
     for {
       response <- dom.experimental.Fetch.fetch(url).toFuture
-      _ = println(JSON.stringify(response))
       _ = require(response.status == 200, s"${response.status} != 200")
       buffer <- response.arrayBuffer().toFuture
-      _ = println(buffer.byteLength)
     } yield {
       val isGzip = url.endsWith(".gz")
+      // NOTE(olafur) Ideally, the browser should be able to inflate the response
+      // for us instead of us doing it with a JavaScript library. However, the
+      // browser does not inflate the response body even if the server response
+      // headers contains `Content-Type: application/gzip`. I tried
+      // updating the request headers to include `Accept-Encoding: gzip` but it
+      // did not help. If someone can figure out how to let the browser inflate
+      // for us then that would be great. However, pako claims to be "Almost as
+      // fast in modern JS engines as C implementation" so maybe it's not a problem.
+      // If we go the route of letting the browser inflate for us, then we would
+      // first need to guarantee that it works with any static file server.
       val output =
         if (isGzip) Pako.inflate(buffer)
         else buffer

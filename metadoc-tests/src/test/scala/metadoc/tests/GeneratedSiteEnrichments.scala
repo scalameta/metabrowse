@@ -7,7 +7,7 @@ import scalapb.GeneratedMessageCompanion
 import scalapb.Message
 
 object GeneratedSiteEnrichments {
-  implicit class XTensionGeneratedMessageCompanion[
+  implicit class XtensionGeneratedMessageCompanion[
       A <: GeneratedMessage with Message[A]
   ](companion: GeneratedMessageCompanion[A]) {
     def parseFromCompressedPath(path: AbsolutePath): A = {

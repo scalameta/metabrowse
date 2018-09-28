@@ -411,13 +411,6 @@ object MetadocCli extends CaseApp[MetadocOptions] {
   override val messages: Messages[MetadocOptions] =
     Messages[MetadocOptions].copy(optionsDesc = "[options] classpath")
 
-  def encodeSymbolName(name: String): String = {
-    val md = java.security.MessageDigest.getInstance("SHA-512")
-    val sha = md.digest(name.getBytes("UTF-8"))
-    // 512 bits ~> 64 bytes and doubled for the hex encoding
-    String.format("%0128x", new java.math.BigInteger(1, sha))
-  }
-
   def run(options: MetadocOptions, remainingArgs: RemainingArgs): Unit = {
 
     if (options.target.isEmpty) {
