@@ -16,12 +16,6 @@ inThisBuild(
     homepage := Some(url("https://github.com/scalameta/metadoc")),
     autoAPIMappings := true,
     apiURL := Some(url("https://scalameta.github.io/metadoc")),
-    scmInfo := Some(
-      ScmInfo(
-        url("https://github.com/scalameta/metadoc"),
-        "scm:git:git@github.com:scalameta/metadoc.git"
-      )
-    ),
     publishTo := Some {
       if (isSnapshot.value)
         Opts.resolver.sonatypeSnapshots
