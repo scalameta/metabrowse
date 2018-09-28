@@ -24,6 +24,7 @@ header .mdc-toolbar__row {
   min-height: 56px;
   background-color: #002b36;
   color: white;
+  fill: white;
 }
 
 header #title {

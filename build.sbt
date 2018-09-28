@@ -140,7 +140,6 @@ lazy val js = project
       "file-loader" -> "1.1.6",
       "html-webpack-plugin" -> "2.30.1",
       "image-webpack-loader" -> "4.1.0",
-      "material-design-icons" -> "3.0.1",
       "material-components-web" -> "0.21.1",
       "style-loader" -> "0.20.1",
       "ts-loader" -> "3.4.0",
