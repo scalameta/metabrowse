@@ -17,12 +17,10 @@ env:
 
 jobs:
   include:
-    - env: TEST="sbt test"
+    - env: TEST="sbt ci-test"
       script: sbt ci-test
-    - env: SCRIPTED_SBT_VERSION="0.13.17"
-      script: sbt ";^^$SCRIPTED_SBT_VERSION; scripted"
-    - env: SCRIPTED_SBT_VERSION="1.2.1"
-      script: sbt ";^^$SCRIPTED_SBT_VERSION; scripted"
+    - env: TEST="sbt scripted"
+      script: sbt scripted
     - env: TEST=scalafmt
       script: ./bin/scalafmt --test
     - stage: release
