@@ -4,11 +4,6 @@ import sbtcrossproject.{crossProject, CrossType}
 
 inThisBuild(
   List(
-    version ~= { old =>
-      val suffix =
-        if (sys.props.contains("metadoc.snapshot")) "-SNAPSHOT" else ""
-      old.replace('+', '-') + suffix
-    },
     organization := "org.scalameta",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -16,12 +11,6 @@ inThisBuild(
     homepage := Some(url("https://github.com/scalameta/metadoc")),
     autoAPIMappings := true,
     apiURL := Some(url("https://scalameta.github.io/metadoc")),
-    publishTo := Some {
-      if (isSnapshot.value)
-        Opts.resolver.sonatypeSnapshots
-      else
-        Opts.resolver.sonatypeStaging
-    },
     developers := List(
       Developer(
         "olafurpg",
@@ -35,9 +24,25 @@ inThisBuild(
         "jonas@users.noreply.github.com",
         url("https://github.com/jonas")
       )
+    ),
+    scalaVersion := Version.scala,
+    crossScalaVersions := Seq(Version.scala),
+    crossSbtVersions := Nil,
+    scalacOptions := Seq(
+      "-deprecation",
+      "-encoding",
+      "UTF-8",
+      "-feature",
+      "-unchecked"
+    ),
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % "3.0.5" % Test,
+      "org.scalacheck" %%% "scalacheck" % "1.14.0" % Test
     )
   )
 )
+
+skip in publish := true
 
 lazy val Version = new {
   def scala = "2.12.6"
@@ -47,27 +52,10 @@ lazy val Version = new {
   def sbt013 = "0.13.17"
 }
 
-lazy val allSettings = Seq(
-  scalaVersion := Version.scala,
-  crossScalaVersions := Seq(Version.scala),
-  crossSbtVersions := Nil,
-  scalacOptions := Seq(
-    "-deprecation",
-    "-encoding",
-    "UTF-8",
-    "-feature",
-    "-unchecked"
-  ),
-  libraryDependencies ++= Seq(
-    "org.scalatest" %%% "scalatest" % "3.0.5" % Test,
-    "org.scalacheck" %%% "scalacheck" % "1.14.0" % Test
-  )
-)
-
 lazy val example = project
   .in(file("paiges") / "core")
   .settings(
-    noPublish,
+    skip in publish := true,
     addCompilerPlugin(
       "org.scalameta" % "semanticdb-scalac" % Version.scalameta cross CrossVersion.full
     ),
@@ -81,7 +69,6 @@ lazy val example = project
 lazy val cli = project
   .in(file("metadoc-cli"))
   .settings(
-    allSettings,
     moduleName := "metadoc-cli",
     mainClass.in(assembly) := Some("metadoc.cli.MetadocCli"),
     assemblyJarName.in(assembly) := "metadoc.jar",
@@ -113,7 +100,7 @@ lazy val cli = project
 lazy val js = project
   .in(file("metadoc-js"))
   .settings(
-    noPublish,
+    skip in publish := true,
     moduleName := "metadoc-js",
     additionalNpmConfig in Compile := Map("private" -> bool(true)),
     additionalNpmConfig in Test := additionalNpmConfig.in(Test).value,
@@ -152,9 +139,8 @@ lazy val js = project
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("metadoc-core"))
-  .jsSettings(noPublish)
+  .jsSettings(skip in publish := true)
   .settings(
-    allSettings,
     moduleName := "metadoc-core",
     PB.targets.in(Compile) := Seq(
       scalapb.gen(
@@ -194,7 +180,6 @@ val sbtPlugin = project
   .enablePlugins(BuildInfoPlugin)
   .settings(
     name := "sbt-metadoc",
-    allSettings,
     crossSbtVersions := List(Version.sbt, Version.sbt013),
     scalaVersion := {
       (sbtBinaryVersion in pluginCrossBuild).value match {
@@ -221,9 +206,8 @@ val sbtPlugin = project
 
 lazy val tests = project
   .in(file("metadoc-tests"))
-  .disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
   .settings(
-    noPublish,
+    skip in publish := true,
     buildInfoPackage := "metadoc.tests",
     compileInputs.in(Test, compile) :=
       compileInputs
@@ -247,22 +231,10 @@ lazy val tests = project
   .dependsOn(cli)
   .enablePlugins(BuildInfoPlugin)
 
-lazy val noPublish = allSettings ++ Seq(
-  publish := {},
-  publishLocal := {},
-  publishArtifact := false
-)
 
 addCommandAlias("ci-test", ";compile ; metadoc-site ; test")
 addCommandAlias(
   "ci-release",
   s";+publishSigned ;^^${Version.sbt013} ;sbtPlugin/publishSigned"
 )
-noPublish
-disablePlugins(ScriptedPlugin) // sbt/sbt#3514 fixed in sbt 1.2
 
-inScope(Global)(
-  Seq(
-    PgpKeys.pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray())
-  )
-)

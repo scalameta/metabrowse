@@ -9,5 +9,5 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.25")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0")
 addSbtPlugin("org.portable-scala" % "sbt-crossproject" % "0.6.0")
 addSbtPlugin("com.geirsson" % "sbt-ci-release" % "1.2.2")
-libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin-shaded" % "0.8.0-RC1"
+libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin-shaded" % "0.8.0"
 libraryDependencies += "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
