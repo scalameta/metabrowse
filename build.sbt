@@ -27,7 +27,6 @@ inThisBuild(
     ),
     scalaVersion := Version.scala,
     crossScalaVersions := Seq(Version.scala),
-    crossSbtVersions := Nil,
     scalacOptions := Seq(
       "-deprecation",
       "-encoding",
@@ -180,13 +179,6 @@ val sbtPlugin = project
   .enablePlugins(BuildInfoPlugin)
   .settings(
     name := "sbt-metadoc",
-    crossSbtVersions := List(Version.sbt, Version.sbt013),
-    scalaVersion := {
-      (sbtBinaryVersion in pluginCrossBuild).value match {
-        case "0.13" => Version.scala210
-        case _ => Version.scala
-      }
-    },
     publishLocal := publishLocal
       .dependsOn(publishLocal in coreJVM)
       .dependsOn(publishLocal in cli)
@@ -231,10 +223,4 @@ lazy val tests = project
   .dependsOn(cli)
   .enablePlugins(BuildInfoPlugin)
 
-
 addCommandAlias("ci-test", ";compile ; metadoc-site ; test")
-addCommandAlias(
-  "ci-release",
-  s";+publishSigned ;^^${Version.sbt013} ;sbtPlugin/publishSigned"
-)
-
