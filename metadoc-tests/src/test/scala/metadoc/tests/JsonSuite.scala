@@ -11,10 +11,12 @@ import scalapb.json4s.JsonFormat
 import metadoc.cli.MetadocCli
 import metadoc.cli.MetadocOptions
 import metadoc.schema.SymbolIndex
+import metadoc.schema.SymbolIndexes
 import scala.meta.internal.io.FileIO
 import scala.meta.io.AbsolutePath
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
+import metadoc.tests.GeneratedSiteEnrichments._
 
 class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
   val compiler: Global = InteractiveSemanticdb.newCompiler()
@@ -42,9 +44,9 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
     val symbols = FileIO
       .listAllFilesRecursively(AbsolutePath(out).resolve("symbol"))
       .toList
-    assert(symbols.length == 2)
+    assert(symbols.length == 1)
     val index = symbols
-      .map(path => SymbolIndex.parseFrom(path.readAllBytes))
+      .flatMap(path => SymbolIndexes.parseFromCompressedPath(path).indexes)
       .sortBy(_.symbol)
       .map(_.toProtoString)
       .mkString("\n\n")

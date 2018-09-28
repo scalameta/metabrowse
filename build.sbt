@@ -146,10 +146,10 @@ lazy val js = project
       "webpack-merge" -> "4.1.1"
     ),
     npmDependencies in Compile ++= Seq(
+      "pako" -> "1.0.6",
       "monaco-editor" -> "0.13.1",
       "roboto-fontface" -> "0.7.0",
-      "material-components-web" -> "0.21.1",
-      "js-sha512" -> "0.4.0"
+      "material-components-web" -> "0.21.1"
     )
   )
   .dependsOn(coreJS)
@@ -259,7 +259,7 @@ lazy val noPublish = allSettings ++ Seq(
   publishArtifact := false
 )
 
-addCommandAlias("ci-test", ";compile ;test")
+addCommandAlias("ci-test", ";compile ; metadoc-site ; test")
 addCommandAlias(
   "ci-release",
   s";+publishSigned ;^^${Version.sbt013} ;sbtPlugin/publishSigned"
