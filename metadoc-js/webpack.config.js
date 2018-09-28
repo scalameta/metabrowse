@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-const ExtractSass = new ExtractTextPlugin({
+const ExtractCss = new ExtractTextPlugin({
   filename: 'metadoc.[contenthash].css',
   disable: process.env.NODE_ENV === "development"
 });
@@ -39,10 +39,9 @@ module.exports = merge(config, {
       },
       {
         test: /\.s?css$/,
-        use: ExtractSass.extract({
+        use: ExtractCss.extract({
           use: [
-            { loader: "css-loader" }, // translates CSS into CommonJS
-            { loader: "sass-loader" } // compiles Sass to CSS
+            { loader: "css-loader" } // translates CSS into CommonJS
           ],
           // use style-loader in development
           fallback: "style-loader"
@@ -61,12 +60,12 @@ module.exports = merge(config, {
     ]
   },
   plugins: [
-    ExtractSass,
+    ExtractCss,
     new CopyWebpackPlugin([
       {
         from: path.resolve(MonacoEditorBaseDir, 'vs'),
         to: 'vs',
-        ignore: [ 'basic-languages/**/*' ]
+        ignore: [ 'basic-languages/**/*', 'language/**/*' ]
       }
     ]),
     new HtmlWebpackPlugin({

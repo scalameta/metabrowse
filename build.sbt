@@ -140,10 +140,6 @@ lazy val js = project
       "file-loader" -> "1.1.6",
       "html-webpack-plugin" -> "2.30.1",
       "image-webpack-loader" -> "4.1.0",
-      "material-design-icons" -> "3.0.1",
-      "material-components-web" -> "0.21.1",
-      "node-sass" -> "4.7.2",
-      "sass-loader" -> "6.0.6",
       "style-loader" -> "0.20.1",
       "ts-loader" -> "3.4.0",
       "typescript" -> "2.6.2",
@@ -152,6 +148,7 @@ lazy val js = project
     npmDependencies in Compile ++= Seq(
       "monaco-editor" -> "0.13.1",
       "roboto-fontface" -> "0.7.0",
+      "material-components-web" -> "0.21.1",
       "js-sha512" -> "0.4.0"
     )
   )
