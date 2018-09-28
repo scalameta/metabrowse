@@ -2,6 +2,11 @@ import scalapb.compiler.Version.scalapbVersion
 import scalajsbundler.util.JSON._
 import sbtcrossproject.{crossProject, CrossType}
 
+lazy val Version = new {
+  def scala = "2.12.7"
+  def scalameta = "4.0.0"
+}
+
 inThisBuild(
   List(
     organization := "org.scalameta",
@@ -42,14 +47,6 @@ inThisBuild(
 )
 
 skip in publish := true
-
-lazy val Version = new {
-  def scala = "2.12.6"
-  def scala210 = "2.10.7"
-  def scalameta = "4.0.0"
-  def sbt = "1.1.1"
-  def sbt013 = "0.13.17"
-}
 
 lazy val example = project
   .in(file("paiges") / "core")
