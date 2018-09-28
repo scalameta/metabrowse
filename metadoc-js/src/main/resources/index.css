@@ -1,0 +1,59 @@
+@font-face {
+  font-family: 'Roboto';
+  src: url('~node_modules/roboto-fontface/fonts/Roboto/Roboto-Regular.eot');
+  src: local('Roboto Regular'),
+       local('Roboto-Regular'),
+       url('~node_modules/roboto-fontface/fonts/Roboto/Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+       url('~node_modules/roboto-fontface/fonts/Roboto/Roboto-Regular.woff2') format('woff2'),
+       url('~node_modules/roboto-fontface/fonts/Roboto/Roboto-Regular.woff') format('woff'),
+       url('~node_modules/roboto-fontface/fonts/Roboto/Roboto-Regular.ttf') format('truetype'),
+       url('~node_modules/roboto-fontface/fonts/Roboto/Roboto-Regular.svg#Roboto') format('svg');
+  font-weight: 400;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Roboto';
+  overflow: hidden;
+}
+
+header .mdc-toolbar__row {
+  min-height: 56px;
+  background-color: #002b36;
+  color: white;
+}
+
+header #title {
+  font-size: 16px;
+  padding-left: 56px;
+  margin-left: 0;
+  background-image: url('images/favicon.png');
+  background-repeat: no-repeat;
+  background-size: 40px;
+  background-position: 8px center;
+  display: block;
+  font-weight: bold;
+
+  /* Show partial path as: ".../org/example/Module.scala" */
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+header .actions {
+  max-width: 56px;
+}
+
+main.mdc-toolbar-fixed-adjust {
+  margin-top: 56px;
+}
+
+main #editor {
+  height: calc(100vh - 56px);
+  margin: 0;
+}

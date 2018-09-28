@@ -11,4 +11,4 @@ window.ScalaLanguage = require('./scala.ts')
 
 require('node_modules/material-design-icons/iconfont/material-icons.css')
 require('node_modules/material-components-web/dist/material-components-web.css')
-require('./index.scss')
+require('./index.css')
