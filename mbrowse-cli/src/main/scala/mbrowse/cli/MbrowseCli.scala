@@ -1,4 +1,4 @@
-package metadoc.cli
+package mbrowse.cli
 
 import java.io.File
 import java.io.OutputStreamWriter
@@ -27,25 +27,25 @@ import caseapp._
 import caseapp.core.Messages
 import java.util.zip.GZIPOutputStream
 import scalapb.json4s.JsonFormat
-import metadoc.schema
-import metadoc.schema.SymbolIndex
-import metadoc.{schema => d}
+import mbrowse.schema
+import mbrowse.schema.SymbolIndex
+import mbrowse.{schema => d}
 import scala.meta._
 import scala.meta.internal.{semanticdb => s}
 import scala.meta.internal.semanticdb.Scala._
-import metadoc.MetadocEnrichments._
+import mbrowse.MbrowseEnrichments._
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
-import scala.meta.internal.metadoc.ScalametaInternals
+import scala.meta.internal.mbrowse.ScalametaInternals
 import scala.collection.JavaConverters._
 import scala.meta.internal.semanticdb.Scala._
 
-@AppName("metadoc")
+@AppName("mbrowse")
 @AppVersion("<version>")
-@ProgName("metadoc")
-case class MetadocOptions(
+@ProgName("mbrowse")
+case class MbrowseOptions(
     @HelpMessage(
-      "The output directory to generate the metadoc site. (required)"
+      "The output directory to generate the mbrowse site. (required)"
     )
     target: Option[String] = None,
     @HelpMessage(
@@ -59,7 +59,7 @@ case class MetadocOptions(
     )
     cleanTargetFirst: Boolean = false,
     @HelpMessage(
-      "Experimental. Emit metadoc.zip file instead of static files."
+      "Experimental. Emit mbrowse.zip file instead of static files."
     )
     zip: Boolean = false,
     @HelpMessage("Disable fancy progress bar")
@@ -74,7 +74,7 @@ case class MetadocOptions(
 
 case class Target(target: AbsolutePath, onClose: () => Unit)
 
-class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
+class CliRunner(classpath: Seq[AbsolutePath], options: MbrowseOptions) {
   private implicit val cwd: AbsolutePath =
     options.cwd.fold(PathIO.workingDirectory)(AbsolutePath(_))
   private val sourceroot: AbsolutePath =
@@ -82,7 +82,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   val Target(target, onClose) = if (options.zip) {
     // For large corpora (>1M LOC) writing the symbol/ directory is the
     // bottle-neck unless --zip is enabled.
-    val out = options.targetPath.resolve("metadoc.zip")
+    val out = options.targetPath.resolve("mbrowse.zip")
     Files.createDirectories(out.toNIO.getParent)
     val zipfs = FileSystems.newFileSystem(
       URI.create(s"jar:file:${out.toURI.getPath}"), {
@@ -354,10 +354,10 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
 
   def writeAssets(): Unit = {
     val root = target.toNIO
-    val inputStream = MetadocCli.getClass.getClassLoader
-      .getResourceAsStream("metadoc-assets.zip")
+    val inputStream = MbrowseCli.getClass.getClassLoader
+      .getResourceAsStream("mbrowse-assets.zip")
     if (inputStream == null)
-      sys.error("Failed to locate metadoc-assets.zip on the classpath")
+      sys.error("Failed to locate mbrowse-assets.zip on the classpath")
     val zipStream = new ZipInputStream(inputStream)
     val bytes = new Array[Byte](8012)
     Stream
@@ -406,12 +406,12 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   }
 }
 
-object MetadocCli extends CaseApp[MetadocOptions] {
+object MbrowseCli extends CaseApp[MbrowseOptions] {
 
-  override val messages: Messages[MetadocOptions] =
-    Messages[MetadocOptions].copy(optionsDesc = "[options] classpath")
+  override val messages: Messages[MbrowseOptions] =
+    Messages[MbrowseOptions].copy(optionsDesc = "[options] classpath")
 
-  def run(options: MetadocOptions, remainingArgs: RemainingArgs): Unit = {
+  def run(options: MbrowseOptions, remainingArgs: RemainingArgs): Unit = {
 
     if (options.target.isEmpty) {
       error("--target is required")

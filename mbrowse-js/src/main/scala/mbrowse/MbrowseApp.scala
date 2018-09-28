@@ -1,6 +1,6 @@
-package metadoc
+package mbrowse
 
-import metadoc.schema.Workspace
+import mbrowse.schema.Workspace
 import monaco.Uri
 import monaco.editor.Editor
 import monaco.editor.IActionDescriptor
@@ -19,7 +19,7 @@ import scala.scalajs.js.JSON
 import scala.scalajs.js.typedarray.TypedArrayBuffer
 import scala.scalajs.js.typedarray.Uint8Array
 
-object MetadocApp {
+object MbrowseApp {
   def main(args: Array[String]): Unit = {
     val editorThemeMenuElement =
       dom.document.querySelector("#editor-theme-menu");
@@ -43,12 +43,12 @@ object MetadocApp {
 
     for {
       _ <- loadMonaco()
-      workspace <- MetadocFetch.workspace()
+      workspace <- MbrowseFetch.workspace()
     } {
-      val index = new MutableBrowserIndex(MetadocState(s.TextDocument()))
+      val index = new MutableBrowserIndex(MbrowseState(s.TextDocument()))
       registerLanguageExtensions(index)
 
-      val editorService = new MetadocEditorService(index)
+      val editorService = new MbrowseEditorService(index)
       registerWorkspaceFiles(editorService, workspace)
 
       dom.ext.LocalStorage("editor-theme").foreach { theme =>
@@ -99,7 +99,7 @@ object MetadocApp {
     dom.document.getElementById("title").textContent = title
   }
 
-  def registerLanguageExtensions(index: MetadocSemanticdbIndex): Unit = {
+  def registerLanguageExtensions(index: MbrowseSemanticdbIndex): Unit = {
     monaco.languages.Languages.register(ScalaLanguageExtensionPoint)
     monaco.languages.Languages.setMonarchTokensProvider(
       ScalaLanguageExtensionPoint.id,
@@ -124,7 +124,7 @@ object MetadocApp {
   }
 
   def registerWorkspaceFiles(
-      editorService: MetadocEditorService,
+      editorService: MbrowseEditorService,
       workspace: Workspace
   ): Unit = {
     workspace.filenames.foreach { file =>
@@ -144,7 +144,7 @@ object MetadocApp {
     }
   }
 
-  def openEditor(editorService: MetadocEditorService)(
+  def openEditor(editorService: MbrowseEditorService)(
       state: Navigation.State
   ): Future[Unit] = {
     val input = jsObject[IResourceInput]

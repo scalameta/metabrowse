@@ -8,7 +8,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const ExtractCss = new ExtractTextPlugin({
-  filename: 'metadoc.[contenthash].css',
+  filename: 'mbrowse.[contenthash].css',
   disable: process.env.NODE_ENV === "development"
 });
 
@@ -80,7 +80,7 @@ module.exports = merge(config, {
   devServer: {
     contentBase: [
       __dirname,
-      path.resolve(RootDir, '../target/metadoc')
+      path.resolve(RootDir, '../target/mbrowse')
     ]
   }
 });

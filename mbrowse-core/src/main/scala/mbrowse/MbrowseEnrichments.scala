@@ -1,11 +1,11 @@
-package metadoc
+package mbrowse
 
-import metadoc.{schema => d}
+import mbrowse.{schema => d}
 import scala.meta.internal.{semanticdb => s}
 import scala.meta.internal.semanticdb.Scala._
 
-object MetadocEnrichments {
-  implicit class XtensionMetadocRange(val r: d.Range) extends AnyVal {
+object MbrowseEnrichments {
+  implicit class XtensionMbrowseRange(val r: d.Range) extends AnyVal {
     def toPosition(uri: String): d.Position = {
       d.Position(
         uri,

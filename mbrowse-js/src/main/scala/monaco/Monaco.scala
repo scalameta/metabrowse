@@ -1992,7 +1992,7 @@ package editor {
         diffEditor: IStandaloneDiffEditor,
         opts: IDiffNavigatorOptions = ???
     ): IDiffNavigator = js.native
-    // NOTE: Do not call this method, use MetadocTextModelService.createModel instead.
+    // NOTE: Do not call this method, use MbrowseTextModelService.createModel instead.
     def createModel(
         value: String,
         language: String = ???,

@@ -1,4 +1,4 @@
-package metadoc
+package mbrowse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -15,7 +15,7 @@ import monaco.services.IResourceInput
 import monaco.services.IEditorService
 import org.scalajs.dom
 
-class MetadocEditorService(index: MetadocSemanticdbIndex)
+class MbrowseEditorService(index: MbrowseSemanticdbIndex)
     extends IEditorService {
   private lazy val editor: IStandaloneCodeEditor = {
     val app = dom.document.getElementById("editor")
@@ -25,7 +25,7 @@ class MetadocEditorService(index: MetadocSemanticdbIndex)
     options.scrollBeyondLastLine = false
 
     val overrides = jsObject[IEditorOverrideServices]
-    overrides("textModelService") = MetadocTextModelService
+    overrides("textModelService") = MbrowseTextModelService
     overrides("editorService") = this
 
     val editor = monaco.editor.Editor.create(app, options, overrides)
@@ -46,13 +46,13 @@ class MetadocEditorService(index: MetadocSemanticdbIndex)
   def open(input: IResourceInput): Future[IStandaloneCodeEditor] = {
     val selection = input.options.selection
     for {
-      MetadocMonacoDocument(document, model) <- MetadocTextModelService
+      MbrowseMonacoDocument(document, model) <- MbrowseTextModelService
         .modelDocument(
           input.resource
         )
     } yield {
       editor.setModel(model.`object`.textEditorModel)
-      index.dispatch(MetadocEvent.SetDocument(document))
+      index.dispatch(MbrowseEvent.SetDocument(document))
       selection.foreach { irange =>
         val range = Range.lift(irange)
         editor.setSelection(range)

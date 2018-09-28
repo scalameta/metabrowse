@@ -1,13 +1,13 @@
-package metadoc
+package mbrowse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.meta.internal.{semanticdb => s}
-import metadoc.MetadocApp._
-import metadoc.{schema => d}
-import MetadocEnrichments._
+import mbrowse.MbrowseApp._
+import mbrowse.{schema => d}
+import MbrowseEnrichments._
 
-object MetadocFetch {
+object MbrowseFetch {
 
   def symbol(symbolId: String): Future[Option[d.SymbolIndex]] = {
     val url = "symbol/" + symbolId.symbolIndexPath

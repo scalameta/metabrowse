@@ -1,14 +1,14 @@
 name := "test"
-enablePlugins(MetadocPlugin)
-scalaVersion := _root_.metadoc.sbt.BuildInfo.scalaVersion
-metadocSettings // enable semanticdb-scalac
+enablePlugins(MbrowsePlugin)
+scalaVersion := _root_.mbrowse.sbt.BuildInfo.scalaVersion
+mbrowseSettings // enable semanticdb-scalac
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.3" % Test
 
 def assertExists(file: File, message: String) =
   assert(file.exists, message)
 
 TaskKey[Unit]("check") := {
-  val dir = metadoc.value
+  val dir = mbrowse.value
 
   // Test that sources for both main and test configurations are handled.
   val expectedSemanticDbs = List(
@@ -16,7 +16,7 @@ TaskKey[Unit]("check") := {
     "src/test/scala/HelloTest.scala.semanticdb.gz"
   )
 
-  assertExists(dir, s"Metadoc output directory does not exist: $dir")
+  assertExists(dir, s"Mbrowse output directory does not exist: $dir")
 
   for (semanticDb <- expectedSemanticDbs)
     assertExists(

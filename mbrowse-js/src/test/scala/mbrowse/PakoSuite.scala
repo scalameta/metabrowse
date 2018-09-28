@@ -1,6 +1,6 @@
-package metadoc
+package mbrowse
 
-import metadoc.schema.Workspace
+import mbrowse.schema.Workspace
 import org.scalatest.FunSuite
 import scala.meta.internal.io.JSModules
 import scala.meta.internal.io.PathIO
@@ -15,7 +15,7 @@ class PakoSuite extends FunSuite {
   test("deflate") {
     val path = PathIO.workingDirectory
       .resolve("target")
-      .resolve("metadoc")
+      .resolve("mbrowse")
       .resolve("index.workspace.gz")
     val in = path.readAllBytes
     val input = new ArrayBuffer(in.length)

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package metadoc.schema;
+package mbrowse.schema;
 
 message Position {
     string filename = 1;

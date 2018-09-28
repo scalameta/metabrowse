@@ -1,4 +1,4 @@
-package metadoc
+package mbrowse
 
 import org.scalatest.FunSuite
 import monaco.Range

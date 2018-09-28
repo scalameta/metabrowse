@@ -2,13 +2,13 @@
 
 Tickets and patches are very welcome!
 
-Metadoc follows [scalameta's contribution guidelines]. Please read them for
+Mbrowse follows [scalameta's contribution guidelines]. Please read them for
 information about how to create good bug reports and submit pull requests.
 
 For ideas of how to contribute, take a look at the list of tickets with the
 [<kbd>help wanted</kbd> label][help-wanted].
 
- [help-wanted]: https://github.com/scalameta/metadoc/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22
+ [help-wanted]: https://github.com/scalameta/mbrowse/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22
  [scalameta's contribution guidelines]: https://github.com/scalameta/scalameta/blob/master/CONTRIBUTING.md
 
 Remember to run
@@ -21,18 +21,18 @@ Before raising a PR to ensure the code is formatted correctly (otherwise it will
 
 ## Running locally
 
-To run metadoc on corpus locally,
+To run mbrowse on corpus locally,
 
 ```
-git clone https://github.com/scalameta/metadoc.git
-cd metadoc
+git clone https://github.com/scalameta/mbrowse.git
+cd mbrowse
 git submodule init
 git submodule update
 
 npm install -g yarn
 
 sbt
-  > metadoc-site                        # generate static site under target/metadoc.
+  > mbrowse-site                        # generate static site under target/mbrowse.
   > js/fastOptJS::startWebpackDevServer # spin up local file server that listens for changes.
   > ~js/fastOptJS                       # compiles Scala.js application, browser refreshes on edit.
 open http://localhost:8080
@@ -42,12 +42,12 @@ open http://localhost:8080
 
 ```
 sbt cli/assembly
-java -jar ./metadoc-cli/target/scala-2.12/metadoc.jar ...
+java -jar ./mbrowse-cli/target/scala-2.12/mbrowse.jar ...
 ```
 
 ## Upgrading the Monaco Editor
 
-Metadoc interfaces with the Monaco Editor using a Scala.js facade based on the
+Mbrowse interfaces with the Monaco Editor using a Scala.js facade based on the
 `monaco.d.ts` TypeScript type definition file provided as part of the
 `monaco-editor` NPM package. The facade can be generated with
 [scala-js-ts-importer], however, manual merging is necessary, since the facade
@@ -77,7 +77,7 @@ facades:
    manually editing `Monaco.scala`
  - Reformat `Monaco.scala`
    ```
-   $ bin/scalafmt metadoc-js/src/main/scala/monaco/Monaco.scala
+   $ bin/scalafmt mbrowse-js/src/main/scala/monaco/Monaco.scala
    ```
 
 At this point merge the changes to `Monaco.scala` using `git add -i` or some

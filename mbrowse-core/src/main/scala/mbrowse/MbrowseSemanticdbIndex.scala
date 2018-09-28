@@ -1,18 +1,18 @@
-package metadoc
+package mbrowse
 
 import scala.concurrent.Future
-import metadoc.{schema => d}
+import mbrowse.{schema => d}
 import scala.meta.{inputs => m}
 import scala.meta.internal.{semanticdb => s}
-import MetadocEnrichments._
+import MbrowseEnrichments._
 import scala.meta.internal.semanticdb.Scala._
 
 /** Index to lookup symbol definitions and references. */
-trait MetadocSemanticdbIndex {
+trait MbrowseSemanticdbIndex {
   def document: s.TextDocument
   def symbol(sym: String): Future[Option[d.SymbolIndex]]
   def semanticdb(sym: String): Future[Option[s.TextDocument]]
-  def dispatch(event: MetadocEvent): Unit
+  def dispatch(event: MbrowseEvent): Unit
 
   def definition(symbol: String): Option[d.Position] =
     document.occurrences.collectFirst {

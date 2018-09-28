@@ -10,7 +10,7 @@ if [[ "$TRAVIS_SECURE_ENV_VARS" == true && "$CI_PUBLISH" == true ]]; then
     sbt ci-release sonatypeReleaseAll
   elif [[ "$TRAVIS_BRANCH" == "master" ]]; then
     echo "Merge, publishing snapshot to Sonatype."
-    sbt -Dmetadoc.snapshot=true ci-release
+    sbt -Dmbrowse.snapshot=true ci-release
   fi
 else
   echo "Skipping publish, branch=$TRAVIS_BRANCH"

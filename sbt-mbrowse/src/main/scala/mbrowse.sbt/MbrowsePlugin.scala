@@ -1,18 +1,18 @@
-package metadoc.sbt
+package mbrowse.sbt
 
 import sbt._
 import sbt.Keys._
 
 /**
-  * Generate a staic Metadoc site.
+  * Generate a staic Mbrowse site.
   *
   * == Usage ==
   *
   * This plugin must be explicitly enabled in the project that generates the
-  * static metadoc site. To enable it add the following line
+  * static mbrowse site. To enable it add the following line
   * to your `.sbt` file:
   * {{{
-  * enablePlugins(MetadocPlugin)
+  * enablePlugins(MbrowsePlugin)
   * }}}
   *
   * The static site includes sources for projects that enable the semanticdb-scalac
@@ -20,38 +20,38 @@ import sbt.Keys._
   * To enable the compiler plugin, add the following to your projects settings
   *
   * {{{
-  *   lazy val projectToIncludeSourcesForMetadocSite = project.settings(
-  *     metadocSettings // important, must *appear* after scalacOptions.
+  *   lazy val projectToIncludeSourcesForMbrowseSite = project.settings(
+  *     mbrowseSettings // important, must *appear* after scalacOptions.
   *   )
   * }}}
   *
-  * By default, semantic data is read from `metadocClasspath` which is
+  * By default, semantic data is read from `mbrowseClasspath` which is
   * automatically populated based on the various filter settings.
   */
-object MetadocPlugin extends AutoPlugin {
+object MbrowsePlugin extends AutoPlugin {
 
   object autoImport {
-    val Metadoc = config("metadoc")
-    val metadocSettings = MetadocPlugin.metadocSettings
-    val metadocScopeFilter =
-      settingKey[ScopeFilter]("Control sources to be included in metadoc.")
-    val metadocProjectFilter = settingKey[ScopeFilter.ProjectFilter](
-      "Control projects to be included in metadoc."
+    val Mbrowse = config("mbrowse")
+    val mbrowseSettings = MbrowsePlugin.mbrowseSettings
+    val mbrowseScopeFilter =
+      settingKey[ScopeFilter]("Control sources to be included in mbrowse.")
+    val mbrowseProjectFilter = settingKey[ScopeFilter.ProjectFilter](
+      "Control projects to be included in mbrowse."
     )
-    val metadocConfigurationFilter =
+    val mbrowseConfigurationFilter =
       settingKey[ScopeFilter.ConfigurationFilter](
-        "Control configurations to be included in metadoc."
+        "Control configurations to be included in mbrowse."
       )
-    val metadocClasspath =
-      taskKey[Seq[Classpath]]("Class directories to be included in metadoc")
-    val metadoc = taskKey[File]("Generate a static Metadoc site")
+    val mbrowseClasspath =
+      taskKey[Seq[Classpath]]("Class directories to be included in mbrowse")
+    val mbrowse = taskKey[File]("Generate a static Mbrowse site")
   }
   import autoImport._
 
   override def requires = plugins.JvmPlugin
   override def trigger: PluginTrigger = allRequirements
 
-  lazy val metadocSettings: List[Def.Setting[_]] = List(
+  lazy val mbrowseSettings: List[Def.Setting[_]] = List(
     addCompilerPlugin(
       "org.scalameta" % "semanticdb-scalac" % BuildInfo.scalametaVersion cross CrossVersion.full
     ),
@@ -62,34 +62,34 @@ object MetadocPlugin extends AutoPlugin {
   )
 
   lazy val classpathTask = Def.taskDyn {
-    fullClasspath.all(metadocScopeFilter.value)
+    fullClasspath.all(mbrowseScopeFilter.value)
   }
 
   override def projectSettings: Seq[Setting[_]] = Seq(
-    ivyConfigurations += Metadoc,
+    ivyConfigurations += Mbrowse,
     libraryDependencies ++= List(
       // Explicitly set the Scala version dependency so the resolution doesn't pick
       // up the Scala version of the project the plugin is enabled in.
-      "org.scala-lang" % "scala-reflect" % BuildInfo.scalaVersion % Metadoc,
-      "org.scalameta" % s"metadoc-cli_${BuildInfo.scalaBinaryVersion}" % BuildInfo.version % Metadoc
+      "org.scala-lang" % "scala-reflect" % BuildInfo.scalaVersion % Mbrowse,
+      "org.scalameta" % s"mbrowse-cli_${BuildInfo.scalaBinaryVersion}" % BuildInfo.version % Mbrowse
     ),
-    metadocClasspath := classpathTask.value,
-    metadocScopeFilter := ScopeFilter(
-      metadocProjectFilter.value,
-      metadocConfigurationFilter.value
+    mbrowseClasspath := classpathTask.value,
+    mbrowseScopeFilter := ScopeFilter(
+      mbrowseProjectFilter.value,
+      mbrowseConfigurationFilter.value
     ),
-    metadocProjectFilter := inAnyProject,
-    metadocConfigurationFilter := inConfigurations(Compile, Test),
-    target in metadoc := target.value / "metadoc",
-    mainClass in Metadoc := Some("metadoc.cli.MetadocCli"),
-    fullClasspath in Metadoc := Classpaths
-      .managedJars(Metadoc, classpathTypes.value, update.value),
-    runner in (Metadoc, run) := {
+    mbrowseProjectFilter := inAnyProject,
+    mbrowseConfigurationFilter := inConfigurations(Compile, Test),
+    target in mbrowse := target.value / "mbrowse",
+    mainClass in Mbrowse := Some("mbrowse.cli.MbrowseCli"),
+    fullClasspath in Mbrowse := Classpaths
+      .managedJars(Mbrowse, classpathTypes.value, update.value),
+    runner in (Mbrowse, run) := {
       new ForkRun(Compat.forkOptions.value)
     },
-    metadoc := {
-      val output = (target in metadoc).value
-      val classpath = metadocClasspath.value.flatten
+    mbrowse := {
+      val output = (target in mbrowse).value
+      val classpath = mbrowseClasspath.value.flatten
       val classDirectories = Attributed
         .data(classpath)
         .collect {
@@ -102,9 +102,9 @@ object MetadocPlugin extends AutoPlugin {
         output.getAbsolutePath
       ) ++ classDirectories
 
-      (runner in (Metadoc, run)).value.run(
-        (mainClass in Metadoc).value.get,
-        Attributed.data((fullClasspath in Metadoc).value),
+      (runner in (Mbrowse, run)).value.run(
+        (mainClass in Mbrowse).value.get,
+        Attributed.data((fullClasspath in Mbrowse).value),
         options,
         streams.value.log
       )

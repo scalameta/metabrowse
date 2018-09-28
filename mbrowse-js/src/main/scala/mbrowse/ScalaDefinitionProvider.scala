@@ -1,4 +1,4 @@
-package metadoc
+package mbrowse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -10,7 +10,7 @@ import monaco.languages.Location
 import monaco.CancellationToken
 import monaco.Position
 
-class ScalaDefinitionProvider(index: MetadocSemanticdbIndex)
+class ScalaDefinitionProvider(index: MbrowseSemanticdbIndex)
     extends DefinitionProvider {
   override def provideDefinition(
       model: ITextModel,

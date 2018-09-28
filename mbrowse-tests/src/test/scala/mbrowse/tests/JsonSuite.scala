@@ -1,4 +1,4 @@
-package metadoc.tests
+package mbrowse.tests
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -8,15 +8,15 @@ import scala.meta.testkit.DiffAssertions
 import scala.tools.nsc.interactive.Global
 import caseapp.RemainingArgs
 import scalapb.json4s.JsonFormat
-import metadoc.cli.MetadocCli
-import metadoc.cli.MetadocOptions
-import metadoc.schema.SymbolIndex
-import metadoc.schema.SymbolIndexes
+import mbrowse.cli.MbrowseCli
+import mbrowse.cli.MbrowseOptions
+import mbrowse.schema.SymbolIndex
+import mbrowse.schema.SymbolIndexes
 import scala.meta.internal.io.FileIO
 import scala.meta.io.AbsolutePath
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
-import metadoc.tests.GeneratedSiteEnrichments._
+import mbrowse.tests.GeneratedSiteEnrichments._
 
 class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
   val compiler: Global = InteractiveSemanticdb.newCompiler()
@@ -34,11 +34,11 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
     )
     val db = TextDocuments(doc :: Nil)
     val dbJson = JsonFormat.toJsonString(db)
-    val jsonFile = Files.createTempFile("metadoc", ".semanticdb.json")
-    val out = Files.createTempDirectory("metadoc")
+    val jsonFile = Files.createTempFile("mbrowse", ".semanticdb.json")
+    val out = Files.createTempDirectory("mbrowse")
     Files.write(jsonFile, dbJson.getBytes(StandardCharsets.UTF_8))
-    MetadocCli.run(
-      MetadocOptions(target = Some(out.toString)),
+    MbrowseCli.run(
+      MbrowseOptions(target = Some(out.toString)),
       RemainingArgs(jsonFile.toString :: Nil, Nil)
     )
     val symbols = FileIO

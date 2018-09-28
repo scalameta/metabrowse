@@ -1,4 +1,4 @@
-package metadoc
+package mbrowse
 
 import scala.util.Try
 import scala.scalajs.js

@@ -1,4 +1,4 @@
-package metadoc.cli
+package mbrowse.cli
 
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets

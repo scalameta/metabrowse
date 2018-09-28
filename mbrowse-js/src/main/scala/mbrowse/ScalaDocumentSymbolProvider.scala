@@ -1,4 +1,4 @@
-package metadoc
+package mbrowse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
@@ -11,7 +11,7 @@ import scala.meta.internal.{semanticdb => s}
 import scala.{meta => m}
 import scala.meta.internal.semanticdb.Scala._
 
-class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
+class ScalaDocumentSymbolProvider(index: MbrowseSemanticdbIndex)
     extends DocumentSymbolProvider {
 
   private def getDocumentSymbols(doc: s.TextDocument): Seq[DocumentSymbol] = {
@@ -40,7 +40,7 @@ class ScalaDocumentSymbolProvider(index: MetadocSemanticdbIndex)
         case DocumentSymbol(denotation, kind, definition) =>
           val symbol = jsObject[SymbolInformation]
           symbol.name = denotation.displayName
-          // TODO: print signature instead of `denotation.symbol`: https://github.com/scalameta/metadoc/issues/99
+          // TODO: print signature instead of `denotation.symbol`: https://github.com/scalameta/mbrowse/issues/99
           symbol.containerName = denotation.symbol
           symbol.kind = kind
           symbol.location = resolveLocation(definition)

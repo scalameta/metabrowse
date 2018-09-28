@@ -2,7 +2,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import metadoc.{schema => d}
+import mbrowse.{schema => d}
 import monaco.Promise
 import monaco.Range
 import monaco.Monaco.Thenable
@@ -11,7 +11,7 @@ import monaco.languages.Location
 import monaco.services.IResourceInput
 import monaco.services.ITextEditorOptions
 
-package object metadoc {
+package object mbrowse {
 
   /**
     * Instantiate a JavaScript object conforming to a
@@ -39,7 +39,7 @@ package object metadoc {
 
   implicit class XtensionFutureToThenable[T](future: Future[T]) {
     import scala.scalajs.js.JSConverters._
-    // This method allows us to work with Future[T] in metadoc and convert
+    // This method allows us to work with Future[T] in mbrowse and convert
     // to monaco.Promise as late as possible.
     def toMonacoPromise: Promise[T] =
       Promise.wrap(toMonacoThenable)

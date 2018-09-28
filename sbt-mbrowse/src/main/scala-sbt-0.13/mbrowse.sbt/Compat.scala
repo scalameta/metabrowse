@@ -1,4 +1,4 @@
-package metadoc.sbt
+package mbrowse.sbt
 
 import sbt._
 import sbt.Keys._

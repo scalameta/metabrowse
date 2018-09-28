@@ -1,1 +1,1 @@
-addSbtPlugin("org.scalameta" % "sbt-metadoc" % sys.props("project.version"))
+addSbtPlugin("org.scalameta" % "sbt-mbrowse" % sys.props("project.version"))

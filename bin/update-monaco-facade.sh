@@ -9,10 +9,10 @@ set -x
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 TS_IMPORTER_DIR="$ROOT_DIR/project/ts-importer"
-NODE_MODULES_DIR="$ROOT_DIR/metadoc-js/target/scala-2.12/scalajs-bundler/main/node_modules"
-NPM_MONACO_D_TS="$ROOT_DIR/metadoc-js/target/scala-2.12/scalajs-bundler/main/node_modules/monaco-editor/monaco.d.ts"
+NODE_MODULES_DIR="$ROOT_DIR/mbrowse-js/target/scala-2.12/scalajs-bundler/main/node_modules"
+NPM_MONACO_D_TS="$ROOT_DIR/mbrowse-js/target/scala-2.12/scalajs-bundler/main/node_modules/monaco-editor/monaco.d.ts"
 MONACO_D_TS="$TS_IMPORTER_DIR/monaco.d.ts"
-MONACO_SCALA="$ROOT_DIR/metadoc-js/src/main/scala/monaco/Monaco.scala"
+MONACO_SCALA="$ROOT_DIR/mbrowse-js/src/main/scala/monaco/Monaco.scala"
 
 if [[ ! -e "$NPM_MONACO_D_TS" ]]; then
   (cd "$ROOT_DIR" && sbt -batch clean js/compile:npmUpdate)

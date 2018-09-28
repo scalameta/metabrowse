@@ -1,4 +1,4 @@
-package metadoc
+package mbrowse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -9,9 +9,9 @@ import monaco.languages.ReferenceContext
 import monaco.languages.ReferenceProvider
 import monaco.CancellationToken
 import monaco.Position
-import MetadocEnrichments._
+import MbrowseEnrichments._
 
-class ScalaReferenceProvider(index: MetadocSemanticdbIndex)
+class ScalaReferenceProvider(index: MbrowseSemanticdbIndex)
     extends ReferenceProvider {
   override def provideReferences(
       model: ITextModel,

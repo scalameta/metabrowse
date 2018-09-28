@@ -1,11 +1,11 @@
-package metadoc.tests
+package mbrowse.tests
 
 import java.nio.file._
-import metadoc.{schema => d}
+import mbrowse.{schema => d}
 import scala.meta.internal.io.FileIO
 import GeneratedSiteEnrichments._
 
-class MetadocCliSuite extends BaseMetadocCliSuite {
+class MbrowseCliSuite extends BaseMbrowseCliSuite {
 
   val expectedFiles =
     """paiges/core/src/main/scala/org/typelevel/paiges/Chunk.scala.semanticdb.gz

@@ -1,7 +1,7 @@
-package metadoc
+package mbrowse
 
 import monaco.languages.SymbolKind
-import metadoc.{schema => d}
+import mbrowse.{schema => d}
 import scala.meta.internal.semanticdb.SymbolInformation
 
 /** "Go to symbol" eligible definition */

@@ -1,4 +1,4 @@
-package metadoc
+package mbrowse
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,7 +13,7 @@ import monaco.services.ITextModelService
 import monaco.services.ImmortalReference
 import scala.meta.internal.{semanticdb => s}
 
-object MetadocTextModelService extends ITextModelService {
+object MbrowseTextModelService extends ITextModelService {
   def modelReference(
       filename: String
   ): Future[IReference[ITextEditorModel]] =
@@ -23,20 +23,20 @@ object MetadocTextModelService extends ITextModelService {
   private val modelDocumentCache = mutable.Map.empty[ITextModel, s.TextDocument]
 
   private def document(model: ITextModel) =
-    MetadocMonacoDocument(
+    MbrowseMonacoDocument(
       modelDocumentCache(model),
       new ImmortalReference(ITextEditorModel(model))
     )
 
   def modelDocument(
       resource: Uri
-  ): Future[MetadocMonacoDocument] = {
+  ): Future[MbrowseMonacoDocument] = {
     val model = Editor.getModel(resource)
     if (model != null) {
       Future.successful(document(model))
     } else {
       for {
-        Some(doc) <- MetadocFetch.document(resource.path)
+        Some(doc) <- MbrowseFetch.document(resource.path)
       } yield {
         val model = Editor.createModel(doc.text, "scala", resource)
         modelDocumentCache(model) = doc

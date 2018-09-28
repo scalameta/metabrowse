@@ -1,4 +1,4 @@
-package metadoc.tests
+package mbrowse.tests
 import java.nio.file.Files
 import java.util.zip.GZIPInputStream
 import scala.meta.io.AbsolutePath

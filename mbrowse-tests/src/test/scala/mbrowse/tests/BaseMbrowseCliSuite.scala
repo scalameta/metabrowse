@@ -1,23 +1,23 @@
-package metadoc.tests
+package mbrowse.tests
 
 import caseapp.RemainingArgs
 import java.nio.file.Files
-import metadoc.cli.MetadocCli
-import metadoc.cli.MetadocOptions
+import mbrowse.cli.MbrowseCli
+import mbrowse.cli.MbrowseOptions
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 import scala.meta.io.AbsolutePath
 import scala.meta.testkit.DiffAssertions
-import metadoc.{schema => d}
-import metadoc.MetadocEnrichments._
+import mbrowse.{schema => d}
+import mbrowse.MbrowseEnrichments._
 import GeneratedSiteEnrichments._
 
-class BaseMetadocCliSuite
+class BaseMbrowseCliSuite
     extends FunSuite
     with BeforeAndAfterAll
     with DiffAssertions {
   var out: AbsolutePath = _
-  def options = MetadocOptions(
+  def options = MbrowseOptions(
     Some(out.toString()),
     cleanTargetFirst = true,
     nonInteractive = true
@@ -25,10 +25,10 @@ class BaseMetadocCliSuite
   def files: Seq[String] =
     BuildInfo.exampleClassDirectory.map(_.getAbsolutePath)
 
-  def runCli(): Unit = MetadocCli.run(options, RemainingArgs(files, Nil))
+  def runCli(): Unit = MbrowseCli.run(options, RemainingArgs(files, Nil))
 
   override def beforeAll(): Unit = {
-    out = AbsolutePath(Files.createTempDirectory("metadoc"))
+    out = AbsolutePath(Files.createTempDirectory("mbrowse"))
     out.toFile.deleteOnExit()
     runCli()
   }

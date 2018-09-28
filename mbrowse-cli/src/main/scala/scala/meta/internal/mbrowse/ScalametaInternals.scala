@@ -1,4 +1,4 @@
-package scala.meta.internal.metadoc
+package scala.meta.internal.mbrowse
 
 import scala.meta.internal.semanticdb.Scala._
 
