@@ -1,0 +1,265 @@
+out/symbol
+├── C
+│   └── package.symbolindexes.gz
+├── _empty_
+│   └── package.symbolindexes.gz
+├── advanced
+│   └── package.symbolindexes.gz
+├── annot
+│   └── package.symbolindexes.gz
+├── banana
+│   └── rule
+│       └── package.symbolindexes.gz
+├── classes
+│   └── package.symbolindexes.gz
+├── com
+│   └── geirsson
+│       ├── mutable
+│       │   ├── package.symbolindexes.gz
+│       │   └── unsafe
+│       │       └── package.symbolindexes.gz
+│       └── package.symbolindexes.gz
+├── docs
+│   └── package.symbolindexes.gz
+├── example
+│   └── package.symbolindexes.gz
+├── fix
+│   └── package.symbolindexes.gz
+├── flags
+│   └── p
+│       └── package.symbolindexes.gz
+├── locals
+│   └── package.symbolindexes.gz
+├── objects
+│   └── package.symbolindexes.gz
+├── org
+│   └── scalameta
+│       ├── adt
+│       │   └── package.symbolindexes.gz
+│       ├── collections
+│       │   └── package.symbolindexes.gz
+│       ├── data
+│       │   └── package.symbolindexes.gz
+│       ├── explore
+│       │   └── package.symbolindexes.gz
+│       ├── internal
+│       │   └── package.symbolindexes.gz
+│       ├── invariants
+│       │   └── package.symbolindexes.gz
+│       ├── overload
+│       │   └── package.symbolindexes.gz
+│       ├── package.symbolindexes.gz
+│       └── tests
+│           └── package.symbolindexes.gz
+├── prefixes
+│   └── package.symbolindexes.gz
+├── scala
+│   ├── meta
+│   │   ├── classifiers
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── cli
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── common
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── contrib
+│   │   │   ├── equality
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── implicits
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── instances
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── dialects
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── inputs
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── interactive
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── internal
+│   │   │   ├── classifiers
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── classpath
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── cli
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── dialects
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── inputs
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── io
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── javacp
+│   │   │   │   ├── asm
+│   │   │   │   │   └── package.symbolindexes.gz
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── metacp
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── metai
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── metap
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── package.symbolindexes.gz
+│   │   │   ├── parsers
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── platform
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── prettyprinters
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── quasiquotes
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── scalacp
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── scalafix
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── semanticdb
+│   │   │   │   ├── javac
+│   │   │   │   │   ├── package.symbolindexes.gz
+│   │   │   │   │   └── semantics
+│   │   │   │   │       └── package.symbolindexes.gz
+│   │   │   │   ├── package.symbolindexes.gz
+│   │   │   │   └── scalac
+│   │   │   │       └── package.symbolindexes.gz
+│   │   │   ├── semanticidx
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── symtab
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── tokenizers
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── tokens
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   ├── transversers
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   └── trees
+│   │   │       └── package.symbolindexes.gz
+│   │   ├── io
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── metacp
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── metai
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── metap
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── package.symbolindexes.gz
+│   │   ├── parsers
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── prettyprinters
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── quasiquotes
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── testkit
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── tests
+│   │   │   ├── contrib
+│   │   │   │   └── package.symbolindexes.gz
+│   │   │   └── prettyprinters
+│   │   │       └── package.symbolindexes.gz
+│   │   ├── tokenizers
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── tokens
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── transversers
+│   │   │   └── package.symbolindexes.gz
+│   │   └── trees
+│   │       └── package.symbolindexes.gz
+│   └── tools
+│       └── nsc
+│           └── typechecker
+│               └── package.symbolindexes.gz
+├── scalafix
+│   ├── cli
+│   │   └── package.symbolindexes.gz
+│   ├── config
+│   │   └── package.symbolindexes.gz
+│   ├── docs
+│   │   └── package.symbolindexes.gz
+│   ├── internal
+│   │   ├── config
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── diff
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── interfaces
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── jgit
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── patch
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── reflect
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── rule
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── testkit
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── tests
+│   │   │   └── utils
+│   │   │       └── package.symbolindexes.gz
+│   │   ├── util
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── v0
+│   │   │   └── package.symbolindexes.gz
+│   │   └── v1
+│   │       └── package.symbolindexes.gz
+│   ├── lint
+│   │   └── package.symbolindexes.gz
+│   ├── package.symbolindexes.gz
+│   ├── patch
+│   │   └── package.symbolindexes.gz
+│   ├── reflect
+│   │   └── package.symbolindexes.gz
+│   ├── rule
+│   │   └── package.symbolindexes.gz
+│   ├── syntax
+│   │   └── package.symbolindexes.gz
+│   ├── test
+│   │   └── package.symbolindexes.gz
+│   ├── testkit
+│   │   └── package.symbolindexes.gz
+│   ├── tests
+│   │   ├── cli
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── config
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── core
+│   │   │   ├── package.symbolindexes.gz
+│   │   │   └── util
+│   │   │       └── package.symbolindexes.gz
+│   │   ├── package.symbolindexes.gz
+│   │   ├── reflect
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── rule
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── testkit
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── util
+│   │   │   └── package.symbolindexes.gz
+│   │   ├── v0
+│   │   │   └── package.symbolindexes.gz
+│   │   └── v1
+│   │       └── package.symbolindexes.gz
+│   ├── util
+│   │   └── package.symbolindexes.gz
+│   ├── v0
+│   │   └── package.symbolindexes.gz
+│   ├── v1
+│   │   └── package.symbolindexes.gz
+│   └── website
+│       └── package.symbolindexes.gz
+├── selfs
+│   └── package.symbolindexes.gz
+├── test
+│   ├── disableSyntax
+│   │   └── package.symbolindexes.gz
+│   ├── escapeHatch
+│   │   └── package.symbolindexes.gz
+│   ├── explicitResultTypes
+│   │   └── package.symbolindexes.gz
+│   ├── package.symbolindexes.gz
+│   └── pkg
+│       └── package.symbolindexes.gz
+├── test2
+│   └── package.symbolindexes.gz
+├── traits
+│   └── package.symbolindexes.gz
+└── types
+    └── package.symbolindexes.gz
+
+136 directories, 126 files
