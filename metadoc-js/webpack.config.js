@@ -4,7 +4,7 @@ const merge = require("webpack-merge")
 const config = require('./scalajs.webpack.config')
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const RootDir = path.resolve(__dirname, '../../../..')
@@ -55,13 +55,7 @@ module.exports = merge(config, {
     ]
   },
   plugins: [
-    new CopyWebpackPlugin([
-      {
-        from: path.resolve(MonacoEditorBaseDir, 'vs'),
-        to: 'vs',
-        ignore: [ 'basic-languages/**/*', 'language/**/*' ]
-      }
-    ]),
+    new MonacoWebpackPlugin({ languages: [] }),
     new MiniCssExtractPlugin({
       filename: DevMode ? '[name].css' : '[name].[hash].css',
       chunkFilename: DevMode ? '[id].css' : '[id].[hash].css',
