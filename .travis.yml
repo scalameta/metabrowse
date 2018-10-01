@@ -13,7 +13,7 @@ stages:
 env:
   global:
     - TRAVIS_NODE_VERSION="10"
-    - TRAVIS_YARN_VERSION="1.10.0"
+    - TRAVIS_YARN_VERSION="1.10.1"
 
 jobs:
   include:
