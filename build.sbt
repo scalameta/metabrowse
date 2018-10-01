@@ -106,6 +106,11 @@ lazy val js = project
     version in startWebpackDevServer := "3.1.8",
     useYarn := true,
     emitSourceMaps := false, // Disabled to reduce warnings
+    webpackExtraArgs in (Compile, fullOptJS) ++= Seq(
+      "-p",
+      "--mode",
+      "production"
+    ),
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.6"
