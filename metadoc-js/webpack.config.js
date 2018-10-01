@@ -5,18 +5,16 @@ const config = require('./scalajs.webpack.config')
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-
-const ExtractCss = new ExtractTextPlugin({
-  filename: 'metadoc.[contenthash].css',
-  disable: process.env.NODE_ENV === "development"
-});
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const RootDir = path.resolve(__dirname, '../../../..')
 const ResourcesDir = path.resolve(RootDir, 'src/main/resources')
 const MonacoEditorBaseDir = path.resolve(__dirname, 'node_modules/monaco-editor/min')
 
+const DevMode = process.env.NODE_ENV !== 'production'
+
 module.exports = merge(config, {
+  mode: DevMode ? 'development' : 'production',
   entry: {
     'index': path.resolve(ResourcesDir, 'index.js')
   },
@@ -38,14 +36,11 @@ module.exports = merge(config, {
         })
       },
       {
-        test: /\.s?css$/,
-        use: ExtractCss.extract({
-          use: [
-            { loader: "css-loader" } // translates CSS into CommonJS
-          ],
-          // use style-loader in development
-          fallback: "style-loader"
-        })
+        test: /\.(sa|sc|c)ss$/,
+        use: [
+          DevMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+          'css-loader'
+        ],
       },
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
@@ -60,7 +55,6 @@ module.exports = merge(config, {
     ]
   },
   plugins: [
-    ExtractCss,
     new CopyWebpackPlugin([
       {
         from: path.resolve(MonacoEditorBaseDir, 'vs'),
@@ -68,6 +62,10 @@ module.exports = merge(config, {
         ignore: [ 'basic-languages/**/*', 'language/**/*' ]
       }
     ]),
+    new MiniCssExtractPlugin({
+      filename: DevMode ? '[name].css' : '[name].[hash].css',
+      chunkFilename: DevMode ? '[id].css' : '[id].[hash].css',
+    }),
     new HtmlWebpackPlugin({
       inject: true,
       favicon: ResourcesDir + '/images/favicon.png',
