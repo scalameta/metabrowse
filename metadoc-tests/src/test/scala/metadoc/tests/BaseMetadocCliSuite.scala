@@ -39,7 +39,13 @@ class BaseMetadocCliSuite
         out.resolve("symbol").resolve(id.symbolIndexPath)
       )
       val index = indexes.indexes.find(_.symbol == id).get
-      val obtained = index.toProtoString
+      // Sort ranges to ensure we assert against deterministic input.
+      val indexNormalized = index.copy(
+        references = index.references.mapValues { ranges =>
+          ranges.copy(ranges = ranges.ranges.sortBy(_.startLine))
+        }
+      )
+      val obtained = indexNormalized.toProtoString
       assertNoDiffOrPrintExpected(obtained, expected)
     }
   }
