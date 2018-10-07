@@ -102,25 +102,30 @@ lazy val js = project
     additionalNpmConfig in Test := additionalNpmConfig.in(Test).value,
     scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     scalaJSUseMainModuleInitializer := true,
-    version in webpack := "3.10.0",
-    version in startWebpackDevServer := "2.11.1",
+    version in webpack := "4.20.2",
+    version in startWebpackDevServer := "3.1.8",
     useYarn := true,
     emitSourceMaps := false, // Disabled to reduce warnings
+    webpackExtraArgs in (Compile, fullOptJS) ++= Seq(
+      "-p",
+      "--mode",
+      "production"
+    ),
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.6"
     ),
     npmDevDependencies in Compile ++= Seq(
-      "copy-webpack-plugin" -> "4.3.1",
-      "css-loader" -> "0.28.9",
-      "extract-text-webpack-plugin" -> "3.0.2",
-      "file-loader" -> "1.1.6",
-      "html-webpack-plugin" -> "2.30.1",
-      "image-webpack-loader" -> "4.1.0",
-      "style-loader" -> "0.20.1",
-      "ts-loader" -> "3.4.0",
+      "copy-webpack-plugin" -> "4.5.2",
+      "css-loader" -> "0.28.11",
+      "mini-css-extract-plugin" -> "0.4.3",
+      "file-loader" -> "1.1.11",
+      "html-webpack-plugin" -> "3.2.0",
+      "image-webpack-loader" -> "4.3.1",
+      "style-loader" -> "0.23.0",
+      "ts-loader" -> "5.2.1",
       "typescript" -> "2.6.2",
-      "webpack-merge" -> "4.1.1"
+      "webpack-merge" -> "4.1.4"
     ),
     npmDependencies in Compile ++= Seq(
       "pako" -> "1.0.6",
