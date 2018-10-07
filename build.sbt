@@ -38,10 +38,6 @@ inThisBuild(
       "UTF-8",
       "-feature",
       "-unchecked"
-    ),
-    libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.0.5" % Test,
-      "org.scalacheck" %%% "scalacheck" % "1.14.0" % Test
     )
   )
 )
@@ -58,6 +54,10 @@ lazy val example = project
     scalacOptions ++= Seq(
       "-Yrangepos",
       "-Xplugin-require:semanticdb"
+    ),
+    libraryDependencies ++= List(
+      "org.scalatest" %% "scalatest" % "3.0.5" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test
     ),
     test := {} // no need to run paiges tests.
   )
@@ -99,7 +99,7 @@ lazy val js = project
     skip in publish := true,
     moduleName := "metadoc-js",
     additionalNpmConfig in Compile := Map("private" -> bool(true)),
-    additionalNpmConfig in Test := additionalNpmConfig.in(Test).value,
+    additionalNpmConfig in Test := additionalNpmConfig.in(Compile).value,
     scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     scalaJSUseMainModuleInitializer := true,
     version in webpack := "4.20.2",
@@ -113,7 +113,8 @@ lazy val js = project
     ),
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.6"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.6",
+      "org.scalatest" %%% "scalatest" % "3.0.5" % Test
     ),
     npmDevDependencies in Compile ++= Seq(
       "copy-webpack-plugin" -> "4.5.2",
@@ -213,7 +214,9 @@ lazy val tests = project
         .value,
     libraryDependencies ++= List(
       "org.scalameta" %% "testkit" % Version.scalameta % Test,
-      "org.scalameta" % "interactive" % Version.scalameta % Test cross CrossVersion.full
+      "org.scalameta" % "interactive" % Version.scalameta % Test cross CrossVersion.full,
+      "org.scalatest" %% "scalatest" % "3.0.5" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test
     ),
     buildInfoKeys := Seq[BuildInfoKey](
       "exampleClassDirectory" -> List(
