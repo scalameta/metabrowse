@@ -42,7 +42,6 @@ object MetadocApp {
     }
 
     for {
-      _ <- loadMonaco()
       workspace <- MetadocFetch.workspace()
     } {
       val index = new MutableBrowserIndex(MetadocState(s.TextDocument()))
@@ -191,23 +190,6 @@ object MetadocApp {
       TypedArrayBuffer.wrap(output).get(bytes)
       bytes
     }
-  }
-
-  /**
-    * Load the Monaco Editor AMD bundle using `require`.
-    *
-    * The AMD bundle is not compatible with Webpack and must be loaded
-    * dynamically at runtime to avoid errors:
-    * https://github.com/Microsoft/monaco-editor/issues/18
-    */
-  def loadMonaco(): Future[Unit] = {
-    val promise = Promise[Unit]()
-    js.Dynamic.global.require(js.Array("vs/editor/editor.main"), {
-      ctx: js.Dynamic =>
-        println("Monaco Editor loaded")
-        promise.success(())
-    }: js.ThisFunction)
-    promise.future
   }
 
   val ScalaLanguageExtensionPoint = {
