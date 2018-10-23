@@ -43,6 +43,8 @@ inThisBuild(
   )
 )
 
+cancelable.in(Global) := true
+
 skip in publish := true
 crossScalaVersions := Nil
 
@@ -63,6 +65,21 @@ lazy val example = project
     ),
     test := {} // no need to run paiges tests.
   )
+
+lazy val server = project
+  .in(file("metabrowse-server"))
+  .settings(
+    moduleName := "metabrowse-server",
+    resolvers += Resolver.sonatypeRepo("snapshots"),
+    libraryDependencies ++= List(
+      "io.undertow" % "undertow-core" % "2.0.13.Final",
+      "org.slf4j" % "slf4j-simple" % "1.8.0-beta2",
+      "org.jboss.xnio" % "xnio-nio" % "3.6.5.Final",
+      "org.scalameta" % "interactive" % "4.0.0" cross CrossVersion.full,
+      "org.scalameta" %% "mtags" % "0.2.0-M1"
+    )
+  )
+  .dependsOn(cli)
 
 lazy val cli = project
   .in(file("metabrowse-cli"))
@@ -212,8 +229,10 @@ val sbtPlugin = project
 
 lazy val tests = project
   .in(file("metabrowse-tests"))
+  .configs(IntegrationTest)
   .settings(
     skip in publish := true,
+    Defaults.itSettings,
     buildInfoPackage := "metabrowse.tests",
     compileInputs.in(Test, compile) :=
       compileInputs
@@ -224,11 +243,16 @@ lazy val tests = project
         )
         .value,
     libraryDependencies ++= List(
-      "org.scalameta" %% "testkit" % Version.scalameta % Test,
-      "org.scalameta" % "interactive" % Version.scalameta % Test cross CrossVersion.full,
-      "org.scalatest" %% "scalatest" % "3.0.5" % Test,
-      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test
+      "org.scalameta" %% "testkit" % Version.scalameta,
+      "org.scalameta" % "interactive" % Version.scalameta cross CrossVersion.full,
+      "org.scalatest" %% "scalatest" % "3.0.5",
+      "org.scalacheck" %% "scalacheck" % "1.14.0",
+      "org.seleniumhq.selenium" % "selenium-java" % "2.35.0" % IntegrationTest
     ),
+    compile.in(IntegrationTest) := {
+      _root_.io.github.bonigarcia.wdm.WebDriverManager.chromedriver.setup()
+      compile.in(IntegrationTest).value
+    },
     buildInfoKeys := Seq[BuildInfoKey](
       "exampleClassDirectory" -> List(
         classDirectory.in(example, Compile).value,
@@ -236,7 +260,7 @@ lazy val tests = project
       )
     )
   )
-  .dependsOn(cli)
+  .dependsOn(cli, server)
   .enablePlugins(BuildInfoPlugin)
 
 addCommandAlias("ci-test", ";compile ; metabrowse-site ; test")

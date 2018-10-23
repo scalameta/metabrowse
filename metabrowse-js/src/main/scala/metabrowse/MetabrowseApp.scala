@@ -10,6 +10,8 @@ import monaco.languages.ILanguageExtensionPoint
 import monaco.services.IResourceInput
 import monaco.services.ITextEditorOptions
 import org.scalajs.dom
+import org.scalajs.dom.experimental.Headers
+import org.scalajs.dom.experimental.RequestInit
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Promise
@@ -46,6 +48,7 @@ object MetabrowseApp {
       _ <- loadMonaco()
       workspace <- MetabrowseFetch.workspace()
     } {
+      println(s"Loaded workspace with ${workspace.filenames.length} file(s)")
       val index = new MutableBrowserIndex(MetabrowseState(s.TextDocument()))
       registerLanguageExtensions(index)
 
@@ -169,13 +172,20 @@ object MetabrowseApp {
     }
   }
 
-  def fetchBytes(url: String): Future[Array[Byte]] = {
+  def fetchBytes(
+      url: String,
+      headers: Headers = new Headers()
+  ): Future[Array[Byte]] = {
     for {
-      response <- dom.experimental.Fetch.fetch(url).toFuture
+      response <- dom.experimental.Fetch
+        .fetch(url, RequestInit(headers = headers))
+        .toFuture
       _ = require(response.status == 200, s"${response.status} != 200")
       buffer <- response.arrayBuffer().toFuture
     } yield {
-      val isGzip = url.endsWith(".gz")
+      val gzip: js.UndefOr[String] = "gzip"
+      val isGzip = url.endsWith(".gz") &&
+        response.headers.get("Content-Encoding") != gzip
       // NOTE(olafur) Ideally, the browser should be able to inflate the response
       // for us instead of us doing it with a JavaScript library. However, the
       // browser does not inflate the response body even if the server response

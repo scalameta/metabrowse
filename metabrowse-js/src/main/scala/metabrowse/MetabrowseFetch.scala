@@ -6,13 +6,16 @@ import scala.meta.internal.{semanticdb => s}
 import metabrowse.MetabrowseApp._
 import metabrowse.{schema => d}
 import MetabrowseEnrichments._
+import org.scalajs.dom.experimental.Headers
 
 object MetabrowseFetch {
 
   def symbol(symbolId: String): Future[Option[d.SymbolIndex]] = {
     val url = "symbol/" + symbolId.symbolIndexPath
+    val headers = new Headers()
+    headers.set("Metabrowse-Symbol", symbolId)
     for {
-      bytes <- fetchBytes(url)
+      bytes <- fetchBytes(url, headers)
     } yield {
       val indexes = d.SymbolIndexes.parseFrom(bytes)
       indexes.indexes.find(_.symbol == symbolId)
