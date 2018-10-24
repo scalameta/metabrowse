@@ -4,7 +4,8 @@ import scala.concurrent.Future
 import scala.meta.internal.semanticdb.TextDocument
 import scala.meta.internal.{semanticdb => s}
 
-class MutableBrowserIndex(init: MetabrowseState) extends MetabrowseSemanticdbIndex {
+class MutableBrowserIndex(init: MetabrowseState)
+    extends MetabrowseSemanticdbIndex {
   private var state: MetabrowseState = init
 
   override def dispatch(event: MetabrowseEvent): Unit = event match {
