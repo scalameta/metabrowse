@@ -44,6 +44,7 @@ inThisBuild(
 )
 
 skip in publish := true
+crossScalaVersions := Nil
 
 lazy val example = project
   .in(file("paiges") / "core")
@@ -107,7 +108,7 @@ lazy val js = project
   .settings(
     skip in publish := true,
     moduleName := "metadoc-js",
-    crossScalaVersions := Seq(Version.scala212),
+    crossScalaVersions := Seq(Version.scala212, Version.scala211),
     additionalNpmConfig in Compile := Map("private" -> bool(true)),
     additionalNpmConfig in Test := additionalNpmConfig.in(Compile).value,
     scalacOptions += "-P:scalajs:sjsDefinedByDefault",
