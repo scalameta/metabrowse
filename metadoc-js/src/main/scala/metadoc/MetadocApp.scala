@@ -5,6 +5,7 @@ import monaco.Uri
 import monaco.editor.Editor
 import monaco.editor.IActionDescriptor
 import monaco.editor.ICodeEditor
+import monaco.editor.ICursorSelectionChangedEvent
 import monaco.languages.ILanguageExtensionPoint
 import monaco.services.IResourceInput
 import monaco.services.ITextEditorOptions
@@ -157,12 +158,13 @@ object MetadocApp {
     for (editor <- editorService.open(input)) yield {
       updateTitle(state)
 
-      editor.onDidChangeCursorSelection { cursor =>
-        val selection = Navigation.Selection.fromRange(cursor.selection)
-        val state =
-          new Navigation.State(editor.getModel().uri.path, Some(selection))
-        updateTitle(state)
-        updateHistory(state)
+      editor.onDidChangeCursorSelection {
+        cursor: ICursorSelectionChangedEvent =>
+          val selection = Navigation.Selection.fromRange(cursor.selection)
+          val state =
+            new Navigation.State(editor.getModel().uri.path, Some(selection))
+          updateTitle(state)
+          updateHistory(state)
       }
     }
   }

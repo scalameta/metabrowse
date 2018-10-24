@@ -67,7 +67,7 @@ case class MetadocOptions(
     @HelpMessage(
       "The working directory used to relativize file directories, default to sys.props('user.dir') if empty."
     )
-    cwd: Option[String] = None,
+    cwd: Option[String] = None
 ) {
   def targetPath: AbsolutePath = AbsolutePath(target.get)
 }
