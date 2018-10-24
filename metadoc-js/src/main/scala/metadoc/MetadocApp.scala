@@ -158,12 +158,13 @@ object MetadocApp {
     for (editor <- editorService.open(input)) yield {
       updateTitle(state)
 
-      editor.onDidChangeCursorSelection { cursor: ICursorSelectionChangedEvent =>
-        val selection = Navigation.Selection.fromRange(cursor.selection)
-        val state =
-          new Navigation.State(editor.getModel().uri.path, Some(selection))
-        updateTitle(state)
-        updateHistory(state)
+      editor.onDidChangeCursorSelection {
+        cursor: ICursorSelectionChangedEvent =>
+          val selection = Navigation.Selection.fromRange(cursor.selection)
+          val state =
+            new Navigation.State(editor.getModel().uri.path, Some(selection))
+          updateTitle(state)
+          updateHistory(state)
       }
     }
   }
