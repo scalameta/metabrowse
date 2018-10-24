@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package metabrowse.schema;
+
+message Position {
+    string filename = 1;
+    int32 startLine = 2;
+    int32 startCharacter = 3;
+    int32 endLine = 4;
+    int32 endCharacter = 5;
+}
+
+message SymbolIndexes {
+    repeated SymbolIndex indexes = 1;
+}
+
+message SymbolIndex {
+    string symbol = 1;
+    Position definition = 2;
+    reserved 3;
+    map<string, Ranges> references = 4;
+}
+
+message Range {
+    int32 startLine = 1;
+    int32 startCharacter = 2;
+    int32 endLine = 3;
+    int32 endCharacter = 4;
+}
+
+message Ranges {
+    repeated Range ranges = 1;
+}
+
+message Workspace {
+    repeated string filenames = 1;
+}
