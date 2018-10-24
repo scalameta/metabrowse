@@ -3,7 +3,8 @@ import scalajsbundler.util.JSON._
 import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
-  def scala = "2.12.7"
+  def scala212 = "2.12.7"
+  def scala211 = "2.11.12"
   def scalameta = "4.0.0"
 }
 
@@ -30,8 +31,8 @@ inThisBuild(
         url("https://github.com/jonas")
       )
     ),
-    scalaVersion := Version.scala,
-    crossScalaVersions := Seq(Version.scala),
+    scalaVersion := Version.scala212,
+    crossScalaVersions := Seq(Version.scala212, Version.scala211),
     scalacOptions := Seq(
       "-deprecation",
       "-encoding",
@@ -68,6 +69,14 @@ lazy val cli = project
     moduleName := "metadoc-cli",
     mainClass.in(assembly) := Some("metadoc.cli.MetadocCli"),
     assemblyJarName.in(assembly) := "metadoc.jar",
+    scalacOptions ++= {
+      CrossVersion.partialVersion(scalaBinaryVersion.value) match {
+        case Some((2, 11)) =>
+          Seq("-Xexperimental")
+        case _ =>
+          Nil
+      }
+    },
     libraryDependencies ++= List(
       "com.thesamet.scalapb" %% "scalapb-json4s" % "0.7.1",
       "com.github.alexarchambault" %% "case-app" % "1.2.0",
@@ -98,6 +107,7 @@ lazy val js = project
   .settings(
     skip in publish := true,
     moduleName := "metadoc-js",
+    crossScalaVersions := Seq(Version.scala212),
     additionalNpmConfig in Compile := Map("private" -> bool(true)),
     additionalNpmConfig in Test := additionalNpmConfig.in(Compile).value,
     scalacOptions += "-P:scalajs:sjsDefinedByDefault",
@@ -182,6 +192,7 @@ val sbtPlugin = project
   .enablePlugins(BuildInfoPlugin)
   .settings(
     name := "sbt-metadoc",
+    crossScalaVersions := Seq(Version.scala212),
     publishLocal := publishLocal
       .dependsOn(publishLocal in coreJVM)
       .dependsOn(publishLocal in cli)
