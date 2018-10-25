@@ -263,4 +263,10 @@ lazy val tests = project
   .dependsOn(cli, server)
   .enablePlugins(BuildInfoPlugin)
 
-addCommandAlias("ci-test", ";compile ; metabrowse-site ; test")
+commands += Command.command("ci-test") { s =>
+  s"++${sys.env("TRAVIS_SCALA_VERSION")}" ::
+    "compile" ::
+    "metabrowse-site" ::
+    "test" ::
+    s
+}
