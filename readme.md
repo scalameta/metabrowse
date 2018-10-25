@@ -1,7 +1,7 @@
 # Metabrowse
 
 [![Build Status](https://travis-ci.org/scalameta/metabrowse.svg?branch=master)](https://travis-ci.org/scalameta/metabrowse)
-[![Join the chat at https://gitter.im/scalameta/scalameta](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scalameta/metabrowse)
+[![Join the chat at https://gitter.im/scalameta/scalameta](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scalameta/metabrowse) [![Join the chat at https://gitter.im/scalameta/metabrowse](https://badges.gitter.im/scalameta/metabrowse.svg)](https://gitter.im/scalameta/metabrowse?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 An experiment with [Scalameta Semantic API](http://scalameta.org/tutorial/#SemanticAPI)
 to build online code browser with IDE-like features such as "jump to definition" and "find usages".
