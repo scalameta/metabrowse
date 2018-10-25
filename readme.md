@@ -1,11 +1,11 @@
-# Metadoc
+# Metabrowse
 
-[![Build Status](https://travis-ci.org/scalameta/metadoc.svg?branch=master)](https://travis-ci.org/scalameta/metadoc)
-[![Join the chat at https://gitter.im/scalameta/scalameta](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scalameta/metadoc)
+[![Build Status](https://travis-ci.org/scalameta/metabrowse.svg?branch=master)](https://travis-ci.org/scalameta/metabrowse)
+[![Join the chat at https://gitter.im/scalameta/scalameta](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scalameta/metabrowse)
 
 An experiment with [Scalameta Semantic API](http://scalameta.org/tutorial/#SemanticAPI)
 to build online code browser with IDE-like features such as "jump to definition" and "find usages".
-See our [demo](http://scalameta.org/metadoc/) page to try it out!
+See our [demo](http://scalameta.org/metabrowse/) page to try it out!
 
 ## Implemented features
 
@@ -14,7 +14,7 @@ See our [demo](http://scalameta.org/metadoc/) page to try it out!
 - Find usages
 - Search by symbol
 
-For other features on the roadmap, see our issue tracker: https://github.com/scalameta/metadoc/issues
+For other features on the roadmap, see our issue tracker: https://github.com/scalameta/metabrowse/issues
 
 ## Related projects
 
@@ -32,7 +32,7 @@ The current maintainers (people who can merge pull requests) are:
 * Jonas Fonseca - [`@jonas`](https://github.com/jonas)
 * Ólafur Páll Geirsson - [`@olafurpg`](https://github.com/olafurpg)
 
-An up-to-date list of contributors is available here: https://github.com/scalameta/metadoc/graphs/contributors.
+An up-to-date list of contributors is available here: https://github.com/scalameta/metabrowse/graphs/contributors.
 
 ## License
 
