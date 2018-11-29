@@ -76,7 +76,7 @@ lazy val server = project
       "org.slf4j" % "slf4j-simple" % "1.8.0-beta2",
       "org.jboss.xnio" % "xnio-nio" % "3.6.5.Final",
       "org.scalameta" % "interactive" % "4.0.0" cross CrossVersion.full,
-      "org.scalameta" %% "mtags" % "0.2.0-M1"
+      "org.scalameta" %% "mtags" % "0.2.0"
     )
   )
   .dependsOn(cli)

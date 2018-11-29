@@ -19,10 +19,9 @@ jobs:
   include:
     - env: TEST="sbt ci-test"
       script: sbt ci-test
-    # Disabled until mtags dependency of server is published for 2.11
-    # - env: TEST="sbt ci-test"
-    #   scala: 2.11.12
-    #   script: sbt ci-test
+    - env: TEST="sbt ci-test"
+      scala: 2.11.12
+      script: sbt ci-test
     - env: TEST="sbt scripted"
       script: sbt scripted
     - env: TEST=scalafmt
