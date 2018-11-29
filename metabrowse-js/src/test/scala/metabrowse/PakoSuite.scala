@@ -26,7 +26,7 @@ class PakoSuite extends FunSuite {
     TypedArrayBuffer.wrap(output).get(out)
     val workspace = Workspace.parseFrom(out)
     val obtained =
-      workspace.toProtoString.lines.toList.sorted.mkString("\n").trim
+      workspace.toProtoString.linesIterator.toList.sorted.mkString("\n").trim
     val expected =
       """
         |filenames: "paiges/core/src/main/scala/org/typelevel/paiges/Chunk.scala"
