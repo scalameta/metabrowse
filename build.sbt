@@ -70,6 +70,7 @@ lazy val server = project
   .in(file("metabrowse-server"))
   .settings(
     moduleName := "metabrowse-server",
+    resolvers += Resolver.sonatypeRepo("releases"),
     resolvers += Resolver.sonatypeRepo("snapshots"),
     libraryDependencies ++= List(
       "io.undertow" % "undertow-core" % "2.0.13.Final",

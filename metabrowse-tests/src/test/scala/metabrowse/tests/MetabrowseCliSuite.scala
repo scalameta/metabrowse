@@ -254,7 +254,7 @@ class MetabrowseCliSuite extends BaseMetabrowseCliSuite {
     assert(Files.exists(workspacePath.toNIO))
     val workspace = d.Workspace.parseFromCompressedPath(workspacePath)
     assert(workspace.filenames.nonEmpty)
-    expectedFiles.lines.filter(_.trim.nonEmpty).foreach { file =>
+    expectedFiles.linesIterator.filter(_.trim.nonEmpty).foreach { file =>
       assert(workspace.filenames.contains(file.stripSuffix(".semanticdb.gz")))
     }
   }

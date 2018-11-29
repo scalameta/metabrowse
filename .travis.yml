@@ -19,6 +19,9 @@ jobs:
   include:
     - env: TEST="sbt ci-test"
       script: sbt ci-test
+    - jdk: openjdk11
+      env: TEST="sbt ci-test"
+      script: sbt ci-test
     - env: TEST="sbt ci-test"
       scala: 2.11.12
       script: sbt ci-test
