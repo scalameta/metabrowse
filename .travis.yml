@@ -1,5 +1,5 @@
 language: scala
-scala: 2.12.6
+scala: 2.12.7
 jdk: oraclejdk8
 sudo: false
 dist: trusty
@@ -18,6 +18,9 @@ env:
 jobs:
   include:
     - env: TEST="sbt ci-test"
+      script: sbt ci-test
+    - jdk: openjdk11
+      env: TEST="sbt ci-test"
       script: sbt ci-test
     - env: TEST="sbt ci-test"
       scala: 2.11.12

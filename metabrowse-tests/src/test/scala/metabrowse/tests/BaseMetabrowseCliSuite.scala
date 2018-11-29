@@ -12,7 +12,7 @@ import metabrowse.{schema => d}
 import metabrowse.MetabrowseEnrichments._
 import GeneratedSiteEnrichments._
 
-class BaseMetabrowseCliSuite
+abstract class BaseMetabrowseCliSuite
     extends FunSuite
     with BeforeAndAfterAll
     with DiffAssertions {
