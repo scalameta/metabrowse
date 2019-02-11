@@ -248,7 +248,7 @@ lazy val tests = project
       "org.scalameta" % "interactive" % Version.scalameta cross CrossVersion.full,
       "org.scalatest" %% "scalatest" % "3.0.5",
       "org.scalacheck" %% "scalacheck" % "1.14.0",
-      "org.seleniumhq.selenium" % "selenium-java" % "2.35.0" % IntegrationTest,
+      "org.seleniumhq.selenium" % "selenium-java" % "2.53.1" % IntegrationTest,
       "org.slf4j" % "slf4j-simple" % "1.8.0-beta2"
     ),
     compile.in(IntegrationTest) := {
