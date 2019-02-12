@@ -247,7 +247,10 @@ class MetabrowseServer(
             text,
             filename,
             timeout,
-            List("-P:semanticdb:symbols:none")
+            List(
+              "-P:semanticdb:synthetics:on",
+              "-P:semanticdb:symbols:none"
+            )
           )
         }
         Some(textDocument)
