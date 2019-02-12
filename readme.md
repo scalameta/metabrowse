@@ -28,7 +28,6 @@ See the [contribution guide](CONTRIBUTING.md).
 
 The current maintainers (people who can merge pull requests) are:
 
-* Eugene Burmako - [`@xeno-by`](https://github.com/xeno-by)
 * Jonas Fonseca - [`@jonas`](https://github.com/jonas)
 * Ólafur Páll Geirsson - [`@olafurpg`](https://github.com/olafurpg)
 
