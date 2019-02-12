@@ -73,9 +73,9 @@ lazy val server = project
     resolvers += Resolver.sonatypeRepo("releases"),
     resolvers += Resolver.sonatypeRepo("snapshots"),
     libraryDependencies ++= List(
-      "io.undertow" % "undertow-core" % "2.0.13.Final",
+      "io.undertow" % "undertow-core" % "2.0.17.Final",
       "org.slf4j" % "slf4j-api" % "1.8.0-beta2",
-      "org.jboss.xnio" % "xnio-nio" % "3.6.5.Final",
+      "org.jboss.xnio" % "xnio-nio" % "3.7.0.Final",
       "org.scalameta" % "interactive" % "4.0.0" cross CrossVersion.full,
       "org.scalameta" %% "mtags" % "0.2.0"
     )
@@ -97,9 +97,9 @@ lazy val cli = project
       }
     },
     libraryDependencies ++= List(
-      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.7.1",
+      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.7.2",
       "com.github.alexarchambault" %% "case-app" % "1.2.0",
-      "com.github.pathikrit" %% "better-files" % "3.6.0"
+      "com.github.pathikrit" %% "better-files" % "3.7.0"
     ),
     resourceGenerators in Compile += Def.task {
       val zip = (resourceManaged in Compile).value / "metabrowse-assets.zip"
