@@ -99,7 +99,7 @@ lazy val cli = project
     libraryDependencies ++= List(
       "com.thesamet.scalapb" %% "scalapb-json4s" % "0.7.2",
       "com.github.alexarchambault" %% "case-app" % "1.2.0",
-      "com.github.pathikrit" %% "better-files" % "3.7.0"
+      "com.github.pathikrit" %% "better-files" % "3.7.1"
     ),
     resourceGenerators in Compile += Def.task {
       val zip = (resourceManaged in Compile).value / "metabrowse-assets.zip"
