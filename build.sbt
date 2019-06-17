@@ -74,7 +74,7 @@ lazy val server = project
     resolvers += Resolver.sonatypeRepo("snapshots"),
     libraryDependencies ++= List(
       "io.undertow" % "undertow-core" % "2.0.20.Final",
-      "org.slf4j" % "slf4j-api" % "1.8.0-beta4",
+      "org.slf4j" % "slf4j-api" % "2.0.0-alpha0",
       "org.jboss.xnio" % "xnio-nio" % "3.7.1.Final",
       "org.scalameta" % "interactive" % "4.1.4" cross CrossVersion.full,
       "org.scalameta" %% "mtags" % "0.4.4"
@@ -249,7 +249,7 @@ lazy val tests = project
       "org.scalatest" %% "scalatest" % "3.0.6",
       "org.scalacheck" %% "scalacheck" % "1.14.0",
       "org.seleniumhq.selenium" % "selenium-java" % "3.141.59" % IntegrationTest,
-      "org.slf4j" % "slf4j-simple" % "1.8.0-beta4"
+      "org.slf4j" % "slf4j-simple" % "2.0.0-alpha0"
     ),
     compile.in(IntegrationTest) := {
       _root_.io.github.bonigarcia.wdm.WebDriverManager.chromedriver.setup()
