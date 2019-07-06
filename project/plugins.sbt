@@ -1,5 +1,5 @@
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.13.1")
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.9")
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.10")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.9.0")
 addSbtPlugin("com.thesamet" % "sbt-protoc" % "0.99.23")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.27")
