@@ -10,7 +10,7 @@ addSbtPlugin("com.geirsson" % "sbt-ci-release" % "1.2.2")
 addSbtCoursier
 
 libraryDependencies ++= List(
-  "io.github.bonigarcia" % "webdrivermanager" % "3.6.1",
+  "io.github.bonigarcia" % "webdrivermanager" % "3.6.2",
   "com.thesamet.scalapb" %% "compilerplugin-shaded" % "0.8.4",
   "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
 )
