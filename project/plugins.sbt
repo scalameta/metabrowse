@@ -11,6 +11,6 @@ addSbtCoursier
 
 libraryDependencies ++= List(
   "io.github.bonigarcia" % "webdrivermanager" % "3.6.1",
-  "com.thesamet.scalapb" %% "compilerplugin-shaded" % "0.8.4",
+  "com.thesamet.scalapb" %% "compilerplugin-shaded" % "0.9.1",
   "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
 )
