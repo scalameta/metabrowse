@@ -75,7 +75,7 @@ lazy val server = project
     libraryDependencies ++= List(
       "io.undertow" % "undertow-core" % "2.0.26.Final",
       "org.slf4j" % "slf4j-api" % "1.8.0-beta4",
-      "org.jboss.xnio" % "xnio-nio" % "3.7.1.Final",
+      "org.jboss.xnio" % "xnio-nio" % "3.7.5.Final",
       "org.scalameta" % "interactive" % "4.1.4" cross CrossVersion.full,
       "org.scalameta" %% "mtags" % "0.4.4"
     )
