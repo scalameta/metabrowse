@@ -73,7 +73,7 @@ lazy val server = project
     resolvers += Resolver.sonatypeRepo("releases"),
     resolvers += Resolver.sonatypeRepo("snapshots"),
     libraryDependencies ++= List(
-      "io.undertow" % "undertow-core" % "2.0.27.Final",
+      "io.undertow" % "undertow-core" % "2.0.28.Final",
       "org.slf4j" % "slf4j-api" % "1.8.0-beta4",
       "org.jboss.xnio" % "xnio-nio" % "3.7.5.Final",
       "org.scalameta" % "interactive" % "4.1.4" cross CrossVersion.full,
