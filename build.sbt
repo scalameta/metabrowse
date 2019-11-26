@@ -3,9 +3,9 @@ import scalajsbundler.util.JSON._
 import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
-  def scala212 = "2.12.7"
+  def scala212 = "2.12.10"
   def scala211 = "2.11.12"
-  def scalameta = "4.1.0"
+  def scalameta = "4.2.5"
 }
 
 inThisBuild(
@@ -76,7 +76,7 @@ lazy val server = project
       "io.undertow" % "undertow-core" % "2.0.27.Final",
       "org.slf4j" % "slf4j-api" % "1.8.0-beta4",
       "org.jboss.xnio" % "xnio-nio" % "3.7.5.Final",
-      "org.scalameta" % "interactive" % "4.1.4" cross CrossVersion.full,
+      "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       "org.scalameta" %% "mtags" % "0.4.4"
     )
   )
@@ -245,7 +245,7 @@ lazy val tests = project
         .value,
     libraryDependencies ++= List(
       "org.scalameta" %% "testkit" % Version.scalameta,
-      "org.scalameta" % "interactive" % Version.scalameta cross CrossVersion.full,
+      "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       "org.scalatest" %% "scalatest" % "3.0.6",
       "org.scalacheck" %% "scalacheck" % "1.14.0",
       "org.seleniumhq.selenium" % "selenium-java" % "3.141.59" % IntegrationTest,
