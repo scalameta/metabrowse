@@ -260,7 +260,8 @@ lazy val tests = project
         classDirectory.in(example, Compile).value,
         classDirectory.in(example, Test).value
       )
-    )
+    ),
+    fork.in(Test) := true
   )
   .dependsOn(cli, server)
   .enablePlugins(BuildInfoPlugin)
