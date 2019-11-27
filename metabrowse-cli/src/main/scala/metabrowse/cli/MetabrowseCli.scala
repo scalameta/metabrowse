@@ -46,7 +46,7 @@ case class MetabrowseOptions(
     @HelpMessage(
       "The output directory to generate the metabrowse site. (required)"
     )
-    target: Option[String] = None,
+    target: String,
     @HelpMessage(
       "The SemanticDB sourceroot used to compiled sources, must match the compiler option -P:semanticdb:sourceroot:<value>. " +
         "Defaults to the working directory if empty."
@@ -68,7 +68,7 @@ case class MetabrowseOptions(
     )
     cwd: Option[String] = None
 ) {
-  def targetPath: AbsolutePath = AbsolutePath(target.get)
+  def targetPath: AbsolutePath = AbsolutePath(target)
 }
 
 case class Target(target: AbsolutePath, onClose: () => Unit)
@@ -414,10 +414,6 @@ object MetabrowseCli extends CaseApp[MetabrowseOptions] {
 
   def run(options: MetabrowseOptions, remainingArgs: RemainingArgs): Unit = {
 
-    if (options.target.isEmpty) {
-      error(caseapp.core.Error.Other("--target is required"))
-    }
-
     if (options.cleanTargetFirst) {
       import better.files._
       val file = options.targetPath.toFile.toScala
@@ -429,6 +425,6 @@ object MetabrowseCli extends CaseApp[MetabrowseOptions] {
     }
     val runner = new CliRunner(classpath, options)
     runner.run()
-    println(options.target.get)
+    println(options.target)
   }
 }

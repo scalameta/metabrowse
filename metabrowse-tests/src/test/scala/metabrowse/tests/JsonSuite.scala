@@ -53,7 +53,7 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
     val out = Files.createTempDirectory("metabrowse")
     Files.write(jsonFile, dbJson.getBytes(StandardCharsets.UTF_8))
     MetabrowseCli.run(
-      MetabrowseOptions(target = Some(out.toString)),
+      MetabrowseOptions(target = out.toString),
       RemainingArgs(jsonFile.toString :: Nil, Nil)
     )
     val symbols = FileIO

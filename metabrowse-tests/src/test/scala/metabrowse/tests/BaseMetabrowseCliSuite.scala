@@ -18,7 +18,7 @@ abstract class BaseMetabrowseCliSuite
     with DiffAssertions {
   var out: AbsolutePath = _
   def options = MetabrowseOptions(
-    Some(out.toString()),
+    out.toString(),
     cleanTargetFirst = true,
     nonInteractive = true
   )
