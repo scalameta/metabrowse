@@ -21,10 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
 import java.util.function.{Function => JFunction}
-import scala.collection.parallel.mutable.ParArray
 import scala.util.control.NonFatal
 import caseapp._
-import caseapp.core.Messages
 import java.util.zip.GZIPOutputStream
 import scalapb.json4s.JsonFormat
 import metabrowse.schema
@@ -39,6 +37,7 @@ import scala.meta.internal.io.PathIO
 import scala.meta.internal.metabrowse.ScalametaInternals
 import scala.collection.JavaConverters._
 import scala.meta.internal.semanticdb.Scala._
+import java.util.concurrent.ConcurrentLinkedQueue
 
 @AppName("metabrowse")
 @AppVersion("<version>")
@@ -47,7 +46,7 @@ case class MetabrowseOptions(
     @HelpMessage(
       "The output directory to generate the metabrowse site. (required)"
     )
-    target: Option[String] = None,
+    target: String,
     @HelpMessage(
       "The SemanticDB sourceroot used to compiled sources, must match the compiler option -P:semanticdb:sourceroot:<value>. " +
         "Defaults to the working directory if empty."
@@ -69,7 +68,7 @@ case class MetabrowseOptions(
     )
     cwd: Option[String] = None
 ) {
-  def targetPath: AbsolutePath = AbsolutePath(target.get)
+  def targetPath: AbsolutePath = AbsolutePath(target)
 }
 
 case class Target(target: AbsolutePath, onClose: () => Unit)
@@ -170,7 +169,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
 
   def scanSemanticdbs(): GenSeq[AbsolutePath] =
     phase("Scanning semanticdb files", classpath.length) { tick =>
-      val files = ParArray.newBuilder[AbsolutePath]
+      val files = new ConcurrentLinkedQueue[AbsolutePath]
       val visitor = new SimpleFileVisitor[Path] {
         override def visitFile(
             file: Path,
@@ -179,7 +178,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
           val filename = file.getFileName.toString
           if (filename.endsWith(".semanticdb") ||
             filename.endsWith(".semanticdb.json")) {
-            files += AbsolutePath(file)
+            files.add(AbsolutePath(file))
           }
           FileVisitResult.CONTINUE
         }
@@ -188,7 +187,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
         tick()
         Files.walkFileTree(path.toNIO, visitor)
       }
-      files.result()
+      files.asScala.toVector
     }
 
   private def updateText(doc: s.TextDocument): s.TextDocument = {
@@ -408,14 +407,12 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
 
 object MetabrowseCli extends CaseApp[MetabrowseOptions] {
 
-  override val messages: Messages[MetabrowseOptions] =
-    Messages[MetabrowseOptions].copy(optionsDesc = "[options] classpath")
+  override val messages: caseapp.core.help.Help[MetabrowseOptions] =
+    caseapp.core.help
+      .Help[MetabrowseOptions]
+      .copy(optionsDesc = "[options] classpath")
 
   def run(options: MetabrowseOptions, remainingArgs: RemainingArgs): Unit = {
-
-    if (options.target.isEmpty) {
-      error("--target is required")
-    }
 
     if (options.cleanTargetFirst) {
       import better.files._
@@ -423,11 +420,11 @@ object MetabrowseCli extends CaseApp[MetabrowseOptions] {
       if (file.exists) file.delete()
     }
 
-    val classpath = remainingArgs.remainingArgs.flatMap { cp =>
+    val classpath = remainingArgs.all.flatMap { cp =>
       cp.split(File.pathSeparator).map(AbsolutePath(_))
     }
     val runner = new CliRunner(classpath, options)
     runner.run()
-    println(options.target.get)
+    println(options.target)
   }
 }

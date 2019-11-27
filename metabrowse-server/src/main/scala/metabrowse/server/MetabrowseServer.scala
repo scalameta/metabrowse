@@ -221,7 +221,7 @@ class MetabrowseServer(
           .foreach(path => filenames += path.toNIO.toString.stripPrefix("/"))
       }
     }
-    Workspace(filenames.result())
+    Workspace(filenames.result().toSeq)
   }
 
   private def getSemanticdb(filename: String): TextDocuments = {

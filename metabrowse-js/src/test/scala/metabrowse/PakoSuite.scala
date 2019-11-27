@@ -2,7 +2,6 @@ package metabrowse
 
 import metabrowse.schema.Workspace
 import org.scalatest.FunSuite
-import scala.meta.internal.io.JSModules
 import scala.meta.internal.io.PathIO
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal

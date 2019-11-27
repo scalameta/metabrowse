@@ -1,5 +1,7 @@
 package metabrowse.tests
 
+import java.io.File
+import java.net.URLClassLoader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import scala.meta.internal.semanticdb._
@@ -19,7 +21,20 @@ import org.scalatest.FunSuite
 import metabrowse.tests.GeneratedSiteEnrichments._
 
 class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
-  val compiler: Global = InteractiveSemanticdb.newCompiler()
+
+  // patched version of https://github.com/scalameta/scalameta/blob/3413f84849aa5c5091d7cb2460ff36a8c20a34be/semanticdb/scalac/library/src/main/scala/scala/meta/interactive/InteractiveSemanticdb.scala#L124-L129
+  private def thisClasspath: String = this.getClass.getClassLoader match {
+    case url: URLClassLoader =>
+      url.getURLs.map(_.toURI.getPath).mkString(File.pathSeparator)
+    case cl
+        if cl.getClass.getName == "jdk.internal.loader.ClassLoaders$AppClassLoader" =>
+      // Required with JDK-11
+      sys.props.getOrElse("java.class.path", "")
+    case els =>
+      throw new IllegalStateException(s"Expected URLClassloader, got $els")
+  }
+
+  val compiler: Global = InteractiveSemanticdb.newCompiler(thisClasspath, Nil)
   override def afterAll(): Unit = compiler.askShutdown()
   test(".semanticdb.json") {
     val doc = InteractiveSemanticdb.toTextDocument(
@@ -38,7 +53,7 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
     val out = Files.createTempDirectory("metabrowse")
     Files.write(jsonFile, dbJson.getBytes(StandardCharsets.UTF_8))
     MetabrowseCli.run(
-      MetabrowseOptions(target = Some(out.toString)),
+      MetabrowseOptions(target = out.toString),
       RemainingArgs(jsonFile.toString :: Nil, Nil)
     )
     val symbols = FileIO
