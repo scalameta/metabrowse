@@ -3,6 +3,7 @@ import scalajsbundler.util.JSON._
 import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
+  def scala213 = "2.13.1"
   def scala212 = "2.12.10"
   def scala211 = "2.11.12"
   def scalameta = "4.2.5"
@@ -31,8 +32,12 @@ inThisBuild(
         url("https://github.com/jonas")
       )
     ),
-    scalaVersion := Version.scala212,
-    crossScalaVersions := Seq(Version.scala212, Version.scala211),
+    scalaVersion := Version.scala213,
+    crossScalaVersions := Seq(
+      Version.scala213,
+      Version.scala212,
+      Version.scala211
+    ),
     scalacOptions := Seq(
       "-deprecation",
       "-encoding",
@@ -210,6 +215,7 @@ val sbtPlugin = project
   .enablePlugins(BuildInfoPlugin)
   .settings(
     name := "sbt-metabrowse",
+    scalaVersion := Version.scala212,
     crossScalaVersions := Seq(Version.scala212),
     publishLocal := publishLocal
       .dependsOn(publishLocal in coreJVM)
