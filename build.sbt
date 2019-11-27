@@ -106,6 +106,16 @@ lazy val cli = project
       "com.github.alexarchambault" %% "case-app" % "2.0.0-M9",
       "com.github.pathikrit" %% "better-files" % "3.8.0"
     ),
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, major)) if major >= 13 =>
+          Seq(
+            "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0"
+          )
+        case _ =>
+          Seq()
+      }
+    },
     resourceGenerators in Compile += Def.task {
       val zip = (resourceManaged in Compile).value / "metabrowse-assets.zip"
       val _ = (webpack in (js, Compile, fullOptJS)).value

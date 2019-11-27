@@ -21,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
 import java.util.function.{Function => JFunction}
+import scala.collection.GenTraversableOnce
+import scala.collection.parallel.mutable.ParArray
 import scala.util.control.NonFatal
 import caseapp._
 import java.util.zip.GZIPOutputStream
@@ -37,7 +39,6 @@ import scala.meta.internal.io.PathIO
 import scala.meta.internal.metabrowse.ScalametaInternals
 import scala.collection.JavaConverters._
 import scala.meta.internal.semanticdb.Scala._
-import java.util.concurrent.ConcurrentLinkedQueue
 
 @AppName("metabrowse")
 @AppVersion("<version>")
@@ -167,9 +168,9 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
     result
   }
 
-  def scanSemanticdbs(): GenSeq[AbsolutePath] =
+  def scanSemanticdbs(): ParArray[AbsolutePath] =
     phase("Scanning semanticdb files", classpath.length) { tick =>
-      val files = new ConcurrentLinkedQueue[AbsolutePath]
+      val files = ParArray.newBuilder[AbsolutePath]
       val visitor = new SimpleFileVisitor[Path] {
         override def visitFile(
             file: Path,
@@ -178,7 +179,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
           val filename = file.getFileName.toString
           if (filename.endsWith(".semanticdb") ||
             filename.endsWith(".semanticdb.json")) {
-            files.add(AbsolutePath(file))
+            files += AbsolutePath(file)
           }
           FileVisitResult.CONTINUE
         }
@@ -187,7 +188,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
         tick()
         Files.walkFileTree(path.toNIO, visitor)
       }
-      files.asScala.toVector
+      files.result()
     }
 
   private def updateText(doc: s.TextDocument): s.TextDocument = {
@@ -226,8 +227,11 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
     }
   }
 
-  def buildSymbolIndex(paths: GenSeq[AbsolutePath]): Unit =
-    phase("Building symbol index", paths.length) { tick =>
+  def buildSymbolIndex(
+      paths: GenTraversableOnce[AbsolutePath],
+      len: Int
+  ): Unit =
+    phase("Building symbol index", len) { tick =>
       paths.foreach { path =>
         try {
           tick()
@@ -394,7 +398,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
       display.init()
       Files.createDirectories(target.toNIO)
       val paths = scanSemanticdbs()
-      buildSymbolIndex(paths)
+      buildSymbolIndex(paths, paths.length)
       writeSymbolIndex()
       writeAssets()
       writeWorkspace()
