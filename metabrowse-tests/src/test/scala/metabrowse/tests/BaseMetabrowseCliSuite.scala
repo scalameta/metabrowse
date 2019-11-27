@@ -18,12 +18,12 @@ abstract class BaseMetabrowseCliSuite
     with DiffAssertions {
   var out: AbsolutePath = _
   def options = MetabrowseOptions(
-    Some(out.toString()),
+    out.toString(),
     cleanTargetFirst = true,
     nonInteractive = true
   )
   def files: Seq[String] =
-    BuildInfo.exampleClassDirectory.map(_.getAbsolutePath)
+    BuildInfo.exampleClassDirectory.map(_.getAbsolutePath).toSeq
 
   def runCli(): Unit = MetabrowseCli.run(options, RemainingArgs(files, Nil))
 
@@ -41,9 +41,12 @@ abstract class BaseMetabrowseCliSuite
       val index = indexes.indexes.find(_.symbol == id).get
       // Sort ranges to ensure we assert against deterministic input.
       val indexNormalized = index.copy(
-        references = index.references.mapValues { ranges =>
-          ranges.copy(ranges = ranges.ranges.sortBy(_.startLine))
-        }
+        references = index.references
+          .mapValues { ranges =>
+            ranges.copy(ranges = ranges.ranges.sortBy(_.startLine))
+          }
+          .iterator
+          .toMap
       )
       val obtained = indexNormalized.toProtoString
       assertNoDiffOrPrintExpected(obtained, expected)
