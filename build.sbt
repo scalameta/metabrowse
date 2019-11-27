@@ -60,7 +60,7 @@ lazy val example = project
       "-Xplugin-require:semanticdb"
     ),
     libraryDependencies ++= List(
-      "org.scalatest" %% "scalatest" % "3.0.6" % Test,
+      "org.scalatest" %% "scalatest" % "3.0.8" % Test,
       "org.scalacheck" %% "scalacheck" % "1.14.0" % Test
     ),
     test := {} // no need to run paiges tests.
@@ -77,7 +77,7 @@ lazy val server = project
       "org.slf4j" % "slf4j-api" % "1.8.0-beta4",
       "org.jboss.xnio" % "xnio-nio" % "3.7.5.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      "org.scalameta" %% "mtags" % "0.4.4"
+      ("org.scalameta" %% "mtags" % "0.7.6").cross(CrossVersion.full)
     )
   )
   .dependsOn(cli)
@@ -98,8 +98,8 @@ lazy val cli = project
     },
     libraryDependencies ++= List(
       "com.thesamet.scalapb" %% "scalapb-json4s" % "0.10.0",
-      "com.github.alexarchambault" %% "case-app" % "1.2.0",
-      "com.github.pathikrit" %% "better-files" % "3.7.1"
+      "com.github.alexarchambault" %% "case-app" % "2.0.0-M9",
+      "com.github.pathikrit" %% "better-files" % "3.8.0"
     ),
     resourceGenerators in Compile += Def.task {
       val zip = (resourceManaged in Compile).value / "metabrowse-assets.zip"
@@ -141,8 +141,8 @@ lazy val js = project
     ),
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.6",
-      "org.scalatest" %%% "scalatest" % "3.0.6" % Test
+      "org.scala-js" %%% "scalajs-dom" % "0.9.7",
+      "org.scalatest" %%% "scalatest" % "3.0.8" % Test
     ),
     npmDevDependencies in Compile ++= Seq(
       "copy-webpack-plugin" -> "4.5.2",
@@ -246,7 +246,7 @@ lazy val tests = project
     libraryDependencies ++= List(
       "org.scalameta" %% "testkit" % Version.scalameta,
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      "org.scalatest" %% "scalatest" % "3.0.6",
+      "org.scalatest" %% "scalatest" % "3.0.8",
       "org.scalacheck" %% "scalacheck" % "1.14.0",
       "org.seleniumhq.selenium" % "selenium-java" % "3.141.59" % IntegrationTest,
       "org.slf4j" % "slf4j-simple" % "1.8.0-beta4"

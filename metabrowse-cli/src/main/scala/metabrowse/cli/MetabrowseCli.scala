@@ -24,7 +24,6 @@ import java.util.function.{Function => JFunction}
 import scala.collection.parallel.mutable.ParArray
 import scala.util.control.NonFatal
 import caseapp._
-import caseapp.core.Messages
 import java.util.zip.GZIPOutputStream
 import scalapb.json4s.JsonFormat
 import metabrowse.schema
@@ -408,13 +407,15 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
 
 object MetabrowseCli extends CaseApp[MetabrowseOptions] {
 
-  override val messages: Messages[MetabrowseOptions] =
-    Messages[MetabrowseOptions].copy(optionsDesc = "[options] classpath")
+  override val messages: caseapp.core.help.Help[MetabrowseOptions] =
+    caseapp.core.help
+      .Help[MetabrowseOptions]
+      .copy(optionsDesc = "[options] classpath")
 
   def run(options: MetabrowseOptions, remainingArgs: RemainingArgs): Unit = {
 
     if (options.target.isEmpty) {
-      error("--target is required")
+      error(caseapp.core.Error.Other("--target is required"))
     }
 
     if (options.cleanTargetFirst) {
@@ -423,7 +424,7 @@ object MetabrowseCli extends CaseApp[MetabrowseOptions] {
       if (file.exists) file.delete()
     }
 
-    val classpath = remainingArgs.remainingArgs.flatMap { cp =>
+    val classpath = remainingArgs.all.flatMap { cp =>
       cp.split(File.pathSeparator).map(AbsolutePath(_))
     }
     val runner = new CliRunner(classpath, options)
