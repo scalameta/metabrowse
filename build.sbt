@@ -156,7 +156,7 @@ lazy val js = project
     ),
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.7",
+      "org.scala-js" %%% "scalajs-dom" % "0.9.8",
       "org.scalatest" %%% "scalatest" % "3.0.8" % Test
     ),
     npmDevDependencies in Compile ++= Seq(
