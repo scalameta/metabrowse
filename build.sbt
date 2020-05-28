@@ -104,7 +104,7 @@ lazy val cli = project
     libraryDependencies ++= List(
       "com.thesamet.scalapb" %% "scalapb-json4s" % "0.10.0",
       "com.github.alexarchambault" %% "case-app" % "2.0.0-M9",
-      "com.github.pathikrit" %% "better-files" % "3.8.0"
+      "com.github.pathikrit" %% "better-files" % "3.9.1"
     ),
     libraryDependencies ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
