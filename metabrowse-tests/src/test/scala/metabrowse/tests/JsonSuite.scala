@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import scala.meta.internal.semanticdb._
 import scala.meta.interactive._
-import scala.meta.testkit.DiffAssertions
 import scala.tools.nsc.interactive.Global
 import caseapp.RemainingArgs
 import scalapb.json4s.JsonFormat

@@ -7,7 +7,6 @@ import metabrowse.cli.MetabrowseOptions
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 import scala.meta.io.AbsolutePath
-import scala.meta.testkit.DiffAssertions
 import metabrowse.{schema => d}
 import metabrowse.MetabrowseEnrichments._
 import GeneratedSiteEnrichments._
