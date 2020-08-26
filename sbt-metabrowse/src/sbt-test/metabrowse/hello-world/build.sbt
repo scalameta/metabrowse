@@ -2,7 +2,7 @@ name := "test"
 enablePlugins(MetabrowsePlugin)
 scalaVersion := _root_.metabrowse.sbt.BuildInfo.scalaVersion
 metabrowseSettings // enable semanticdb-scalac
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % Test
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.2" % Test
 
 def assertExists(file: File, message: String) =
   assert(file.exists, message)
