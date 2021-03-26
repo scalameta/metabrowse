@@ -23,7 +23,7 @@ jobs:
       env: TEST="sbt ci-test"
       script: sbt ci-test
     - env: TEST="sbt ci-test"
-      scala: 2.12.10
+      scala: 2.12.13
       script: sbt ci-test
     - env: TEST="sbt ci-test"
       scala: 2.11.12
