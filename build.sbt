@@ -5,7 +5,7 @@ import sbtcrossproject.{crossProject, CrossType}
 lazy val Version = new {
   def scala213 = "2.13.1"
   def scala212 = "2.12.10"
-  def scalameta = "4.3.13"
+  def scalameta = "4.3.18"
 }
 
 inThisBuild(
@@ -55,6 +55,22 @@ lazy val example = project
   .in(file("paiges") / "core")
   .settings(
     skip in publish := true,
+    unmanagedSourceDirectories.in(Compile) ++= {
+      val srcName = "main"
+      val srcBaseDir = baseDirectory.value
+      val scalaVersion0 = scalaVersion.value
+      def extraDirs(suffix: String) =
+        List(srcBaseDir / "src" / "main" / s"scala$suffix")
+      CrossVersion.partialVersion(scalaVersion0) match {
+        case Some((2, y)) if y <= 12 =>
+          extraDirs("-2.12-")
+        case Some((2, y)) if y >= 13 =>
+          extraDirs("-2.13+")
+        case Some((3, _)) =>
+          extraDirs("-2.13+")
+        case _ => Nil
+      }
+    },
     addCompilerPlugin(
       "org.scalameta" % "semanticdb-scalac" % Version.scalameta cross CrossVersion.full
     ),
@@ -63,8 +79,9 @@ lazy val example = project
       "-Xplugin-require:semanticdb"
     ),
     libraryDependencies ++= List(
-      "org.scalatest" %% "scalatest" % "3.0.8" % Test,
-      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test
+      "org.scalatest" %% "scalatest" % "3.1.2" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
+      "org.scalatestplus" %% "scalacheck-1-14" % "3.1.2.0" % Test
     ),
     test := {} // no need to run paiges tests.
   )
@@ -80,7 +97,7 @@ lazy val server = project
       "org.slf4j" % "slf4j-api" % "1.8.0-beta4",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      ("org.scalameta" %% "mtags" % "0.9.0").cross(CrossVersion.full)
+      ("org.scalameta" %% "mtags" % "0.9.1").cross(CrossVersion.full)
     )
   )
   .dependsOn(cli)
@@ -141,12 +158,10 @@ lazy val js = project
     moduleName := "metabrowse-js",
     additionalNpmConfig in Compile := Map("private" -> bool(true)),
     additionalNpmConfig in Test := additionalNpmConfig.in(Compile).value,
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     scalaJSUseMainModuleInitializer := true,
     version in webpack := "4.20.2",
-    version in startWebpackDevServer := "3.1.8",
+    version in startWebpackDevServer := "3.11.2",
     useYarn := true,
-    emitSourceMaps := false, // Disabled to reduce warnings
     webpackExtraArgs in (Compile, fullOptJS) ++= Seq(
       "-p",
       "--mode",
@@ -155,19 +170,20 @@ lazy val js = project
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.8",
-      "org.scalatest" %%% "scalatest" % "3.0.8" % Test
+      "org.scalatest" %%% "scalatest" % "3.1.2" % Test
     ),
     npmDevDependencies in Compile ++= Seq(
-      "copy-webpack-plugin" -> "4.5.2",
+      "clean-webpack-plugin" -> "3.0.0",
+      "copy-webpack-plugin" -> "4.6.0",
       "css-loader" -> "0.28.11",
       "mini-css-extract-plugin" -> "0.4.3",
       "file-loader" -> "1.1.11",
       "html-webpack-plugin" -> "3.2.0",
-      "image-webpack-loader" -> "4.3.1",
+      "image-webpack-loader" -> "4.6.0",
       "style-loader" -> "0.23.0",
       "ts-loader" -> "5.2.1",
       "typescript" -> "2.6.2",
-      "webpack-merge" -> "4.1.4"
+      "webpack-merge" -> "4.2.2"
     ),
     npmDependencies in Compile ++= Seq(
       "pako" -> "1.0.6",
@@ -260,7 +276,7 @@ lazy val tests = project
     libraryDependencies ++= List(
       "org.scalameta" %% "testkit" % Version.scalameta,
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      "org.scalatest" %% "scalatest" % "3.0.8",
+      "org.scalatest" %% "scalatest" % "3.1.2",
       "org.scalacheck" %% "scalacheck" % "1.14.0",
       "org.seleniumhq.selenium" % "selenium-java" % "3.141.59" % IntegrationTest,
       "org.slf4j" % "slf4j-simple" % "1.8.0-beta4"
