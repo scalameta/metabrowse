@@ -25,9 +25,6 @@ jobs:
     - env: TEST="sbt ci-test"
       scala: 2.12.10
       script: sbt ci-test
-    - env: TEST="sbt ci-test"
-      scala: 2.11.12
-      script: sbt ci-test
     - env: TEST="sbt scripted"
       script: sbt scripted
     - env: TEST=scalafmt
