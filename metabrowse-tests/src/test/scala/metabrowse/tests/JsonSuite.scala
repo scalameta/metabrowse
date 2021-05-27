@@ -66,8 +66,7 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
       .mkString("\n\n")
     assertNoDiff(
       index,
-      """
-        |symbol: "com/bar/Main."
+      """symbol: "com/bar/Main."
         |definition {
         |  filename: "interactive.scala"
         |  startLine: 2
@@ -107,7 +106,7 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
         |    }
         |  }
         |}
-      """.stripMargin
+        |""".stripMargin
     )
   }
 }

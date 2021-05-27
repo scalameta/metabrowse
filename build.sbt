@@ -5,7 +5,7 @@ import sbtcrossproject.{crossProject, CrossType}
 lazy val Version = new {
   def scala213 = "2.13.1"
   def scala212 = "2.12.10"
-  def scalameta = "4.3.18"
+  def scalameta = "4.4.18"
 }
 
 inThisBuild(
@@ -51,16 +51,12 @@ cancelable.in(Global) := true
 skip in publish := true
 crossScalaVersions := Nil
 
-lazy val example = project
-  .in(file("paiges") / "core")
-  .settings(
-    skip in publish := true,
-    unmanagedSourceDirectories.in(Compile) ++= {
-      val srcName = "main"
+def addPaigesLikeSourceDirs(config: Configuration, srcName: String) = Def.settings(
+  unmanagedSourceDirectories.in(config) ++= {
       val srcBaseDir = baseDirectory.value
       val scalaVersion0 = scalaVersion.value
       def extraDirs(suffix: String) =
-        List(srcBaseDir / "src" / "main" / s"scala$suffix")
+        List(srcBaseDir / "src" / srcName / s"scala$suffix")
       CrossVersion.partialVersion(scalaVersion0) match {
         case Some((2, y)) if y <= 12 =>
           extraDirs("-2.12-")
@@ -70,7 +66,14 @@ lazy val example = project
           extraDirs("-2.13+")
         case _ => Nil
       }
-    },
+    }
+)
+
+lazy val example = project
+  .in(file("paiges") / "core")
+  .settings(
+    skip in publish := true,
+    addPaigesLikeSourceDirs(Compile, "main"),
     addCompilerPlugin(
       "org.scalameta" % "semanticdb-scalac" % Version.scalameta cross CrossVersion.full
     ),
@@ -117,7 +120,7 @@ lazy val cli = project
       }
     },
     libraryDependencies ++= List(
-      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.10.0",
+      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.11.0",
       "com.github.alexarchambault" %% "case-app" % "2.0.0-M9",
       "com.github.pathikrit" %% "better-files" % "3.9.1"
     ),
@@ -156,6 +159,7 @@ lazy val js = project
   .settings(
     skip in publish := true,
     moduleName := "metabrowse-js",
+    addPaigesLikeSourceDirs(Test, "test"),
     additionalNpmConfig in Compile := Map("private" -> bool(true)),
     additionalNpmConfig in Test := additionalNpmConfig.in(Compile).value,
     scalaJSUseMainModuleInitializer := true,
@@ -198,7 +202,10 @@ lazy val js = project
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("metabrowse-core"))
-  .jsSettings(skip in publish := true)
+  .jsSettings(
+    skip in publish := true,
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule))
+  )
   .settings(
     moduleName := "metabrowse-core",
     PB.targets.in(Compile) := Seq(
@@ -212,7 +219,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     ),
     libraryDependencies ++= List(
       "org.scalameta" %%% "scalameta" % Version.scalameta,
-      "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion
+      "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion % "protobuf"
     )
   )
 lazy val coreJVM = core.jvm
