@@ -53,7 +53,7 @@ crossScalaVersions := Nil
 
 def addPaigesLikeSourceDirs(config: Configuration, srcName: String) =
   Def.settings(
-    unmanagedSourceDirectories.in(config) ++= {
+  config / unmanagedSourceDirectories ++= {
       val srcBaseDir = baseDirectory.value
       val scalaVersion0 = scalaVersion.value
       def extraDirs(suffix: String) =
@@ -73,7 +73,7 @@ def addPaigesLikeSourceDirs(config: Configuration, srcName: String) =
 lazy val example = project
   .in(file("paiges") / "core")
   .settings(
-    (publish / skip) := true,
+    publish / skip := true,
     addPaigesLikeSourceDirs(Compile, "main"),
     addCompilerPlugin(
       "org.scalameta" % "semanticdb-scalac" % Version.scalameta cross CrossVersion.full
@@ -129,7 +129,7 @@ lazy val cli = project
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, major)) if major >= 13 =>
           Seq(
-            "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0"
+            "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.2"
           )
         case _ =>
           Seq()
@@ -161,9 +161,8 @@ lazy val js = project
     (publish / skip) := true,
     moduleName := "metabrowse-js",
     addPaigesLikeSourceDirs(Test, "test"),
-    (Compile / additionalNpmConfig) := Map("private" -> bool(true)),
-    (Test / additionalNpmConfig) := (Compile / additionalNpmConfig).value,
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
+    Compile / additionalNpmConfig := Map("private" -> bool(true)),
+    Test / additionalNpmConfig := (Compile / additionalNpmConfig).value,
     scalaJSUseMainModuleInitializer := true,
     (webpack / version) := "4.20.2",
     (startWebpackDevServer / version) := "3.11.2",
