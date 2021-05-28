@@ -17,9 +17,10 @@ abstract class BaseMetabrowseCliSuite
     with DiffAssertions {
   var out: AbsolutePath = _
   def options = MetabrowseOptions(
-    out.toString(),
+    target = out.toString(),
     cleanTargetFirst = true,
-    nonInteractive = true
+    nonInteractive = true,
+    sourceroot = Some(BuildInfo.sourceroot.toString)
   )
   def files: Seq[String] =
     BuildInfo.exampleClassDirectory.map(_.getAbsolutePath).toSeq

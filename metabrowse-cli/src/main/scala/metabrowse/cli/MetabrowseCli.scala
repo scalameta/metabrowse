@@ -210,7 +210,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
         doc.withText(text)
       } else {
         System.err.println(
-          s"error: No file on disc for document ${doc.uri}"
+          s"error: No file on disc for document '${abspath}'"
         )
         doc
       }
