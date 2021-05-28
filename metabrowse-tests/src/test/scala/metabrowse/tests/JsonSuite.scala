@@ -16,10 +16,12 @@ import metabrowse.schema.SymbolIndexes
 import scala.meta.internal.io.FileIO
 import scala.meta.io.AbsolutePath
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import metabrowse.tests.GeneratedSiteEnrichments._
 
-class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
+// FIXME re-enable this test suite: https://github.com/scalameta/metabrowse/issues/272
+@org.scalatest.Ignore
+class JsonSuite extends AnyFunSuite with DiffAssertions with BeforeAndAfterAll {
 
   // patched version of https://github.com/scalameta/scalameta/blob/3413f84849aa5c5091d7cb2460ff36a8c20a34be/semanticdb/scalac/library/src/main/scala/scala/meta/interactive/InteractiveSemanticdb.scala#L124-L129
   private def thisClasspath: String = this.getClass.getClassLoader match {
@@ -52,9 +54,13 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
     val out = Files.createTempDirectory("metabrowse")
     Files.write(jsonFile, dbJson.getBytes(StandardCharsets.UTF_8))
     MetabrowseCli.run(
-      MetabrowseOptions(target = out.toString),
+      MetabrowseOptions(
+        target = out.toString,
+        sourceroot = Some(BuildInfo.sourceroot.toString)
+      ),
       RemainingArgs(jsonFile.toString :: Nil, Nil)
     )
+
     val symbols = FileIO
       .listAllFilesRecursively(AbsolutePath(out).resolve("symbol"))
       .toList
