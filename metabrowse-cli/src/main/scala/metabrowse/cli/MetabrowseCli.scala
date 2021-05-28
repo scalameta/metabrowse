@@ -112,6 +112,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
   }
 
   private def overwrite(out: Path, bytes: Array[Byte]): Unit = {
+    if (bytes.isEmpty) return
     val gzout = out.resolveSibling(out.getFileName.toString + ".gz")
     val fos = Files.newOutputStream(gzout)
     try {
