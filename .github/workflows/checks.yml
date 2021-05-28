@@ -1,0 +1,12 @@
+name: Checks
+on:
+  push:
+  pull_request:
+jobs:
+  scalafmt:
+    name: Scalafmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: olafurpg/setup-scala@v10
+      - run: ./bin/scalafmt --test
