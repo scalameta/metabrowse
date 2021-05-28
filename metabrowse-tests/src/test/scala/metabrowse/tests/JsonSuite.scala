@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import scala.meta.internal.semanticdb._
 import scala.meta.interactive._
-import scala.meta.testkit.DiffAssertions
 import scala.tools.nsc.interactive.Global
 import caseapp.RemainingArgs
 import scalapb.json4s.JsonFormat
@@ -67,8 +66,7 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
       .mkString("\n\n")
     assertNoDiff(
       index,
-      """
-        |symbol: "com/bar/Main."
+      """symbol: "com/bar/Main."
         |definition {
         |  filename: "interactive.scala"
         |  startLine: 2
@@ -108,7 +106,7 @@ class JsonSuite extends FunSuite with DiffAssertions with BeforeAndAfterAll {
         |    }
         |  }
         |}
-      """.stripMargin
+        |""".stripMargin
     )
   }
 }
