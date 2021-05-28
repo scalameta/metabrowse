@@ -186,7 +186,9 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
       }
       classpath.foreach { path =>
         tick()
-        Files.walkFileTree(path.toNIO, visitor)
+        if (Files.isDirectory(path.toNIO)) {
+          Files.walkFileTree(path.toNIO, visitor)
+        }
       }
       files.result()
     }
