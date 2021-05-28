@@ -275,6 +275,7 @@ lazy val tests = project
   .settings(
     (publish / skip) := true,
     Defaults.itSettings,
+    run / baseDirectory := (ThisBuild / baseDirectory).value,
     buildInfoPackage := "metabrowse.tests",
     (Test / compile / compileInputs) :=
       (Test / compile / compileInputs)
