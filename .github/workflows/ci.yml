@@ -12,11 +12,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scala: [2.11.12, 2.12.10]
+        scala: [2.12.10]
         os: [ubuntu-latest]
         java: [11, 8]
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
       - uses: olafurpg/setup-scala@v10
         with:
           java-version: "adopt@1.${{ matrix.java }}"

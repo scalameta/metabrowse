@@ -112,6 +112,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
   }
 
   private def overwrite(out: Path, bytes: Array[Byte]): Unit = {
+    if (bytes.isEmpty) return
     val gzout = out.resolveSibling(out.getFileName.toString + ".gz")
     val fos = Files.newOutputStream(gzout)
     try {
@@ -186,7 +187,9 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
       }
       classpath.foreach { path =>
         tick()
-        Files.walkFileTree(path.toNIO, visitor)
+        if (Files.isDirectory(path.toNIO)) {
+          Files.walkFileTree(path.toNIO, visitor)
+        }
       }
       files.result()
     }
@@ -205,7 +208,7 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
         doc.withText(text)
       } else {
         System.err.println(
-          s"error: No file on disc for document ${doc.uri}"
+          s"error: No file on disc for document '${abspath}'"
         )
         doc
       }
