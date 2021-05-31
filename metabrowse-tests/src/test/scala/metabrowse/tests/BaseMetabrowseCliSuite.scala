@@ -7,7 +7,6 @@ import metabrowse.cli.MetabrowseOptions
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FunSuite
 import scala.meta.io.AbsolutePath
-import scala.meta.testkit.DiffAssertions
 import metabrowse.{schema => d}
 import metabrowse.MetabrowseEnrichments._
 import GeneratedSiteEnrichments._
@@ -18,9 +17,10 @@ abstract class BaseMetabrowseCliSuite
     with DiffAssertions {
   var out: AbsolutePath = _
   def options = MetabrowseOptions(
-    out.toString(),
+    target = out.toString(),
     cleanTargetFirst = true,
-    nonInteractive = true
+    nonInteractive = true,
+    sourceroot = Some(BuildInfo.sourceroot.toString)
   )
   def files: Seq[String] =
     BuildInfo.exampleClassDirectory.map(_.getAbsolutePath).toSeq

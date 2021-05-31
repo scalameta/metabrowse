@@ -214,10 +214,11 @@ object MetabrowseApp {
     */
   def loadMonaco(): Future[Unit] = {
     val promise = Promise[Unit]()
-    js.Dynamic.global.require(js.Array("vs/editor/editor.main"), {
-      ctx: js.Dynamic =>
-        println("Monaco Editor loaded")
-        promise.success(())
+    val mod = "vs/editor/editor.main"
+    // call require via eval, so that webpack doesn't pick it during linking
+    js.Dynamic.global.eval("require")(js.Array(mod), { ctx: js.Dynamic =>
+      println("Monaco Editor loaded")
+      promise.success(())
     }: js.ThisFunction)
     promise.future
   }

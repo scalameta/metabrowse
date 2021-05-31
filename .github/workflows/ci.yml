@@ -1,0 +1,28 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+jobs:
+  unit:
+    name: Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        scala: [2.12.10]
+        os: [ubuntu-latest]
+        java: [11, 8]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
+      - uses: olafurpg/setup-scala@v10
+        with:
+          java-version: "adopt@1.${{ matrix.java }}"
+      - run: sbt ci-test
+        env:
+          SCALA_VERSION: ${{ matrix.scala }}
