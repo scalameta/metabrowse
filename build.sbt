@@ -4,7 +4,7 @@ import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
   def scala213 = "2.13.6"
-  def scala212 = "2.12.10"
+  def scala212 = "2.12.14"
   def scalameta = "4.4.20"
 }
 
