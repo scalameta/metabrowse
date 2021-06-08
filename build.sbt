@@ -3,9 +3,9 @@ import scalajsbundler.util.JSON._
 import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
-  def scala213 = "2.13.1"
-  def scala212 = "2.12.10"
-  def scalameta = "4.4.18"
+  def scala213 = "2.13.6"
+  def scala212 = "2.12.14"
+  def scalameta = "4.4.20"
 }
 
 inThisBuild(
@@ -101,7 +101,7 @@ lazy val server = project
       "org.slf4j" % "slf4j-api" % "1.8.0-beta4",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      ("org.scalameta" %% "mtags" % "0.9.1").cross(CrossVersion.full)
+      ("org.scalameta" %% "mtags" % "0.10.4").cross(CrossVersion.full)
     )
   )
   .dependsOn(cli)

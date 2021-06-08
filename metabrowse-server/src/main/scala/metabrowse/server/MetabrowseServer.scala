@@ -22,6 +22,7 @@ import metabrowse.{schema => d}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.collection.mutable.ArrayBuffer
+import scala.meta.Dialect
 import scala.meta.inputs.Input
 import scala.meta.interactive.InteractiveSemanticdb
 import scala.meta.internal.io.FileIO
@@ -37,6 +38,7 @@ import scala.tools.nsc.interactive.Global
 import scala.util.control.NonFatal
 
 class MetabrowseServer(
+    dialect: Dialect,
     scalacOptions: List[String] = Nil,
     host: String = "localhost",
     port: Int = 4000,
@@ -67,7 +69,7 @@ class MetabrowseServer(
         global.askShutdown()
       }
       val newState = State(
-        OnDemandSymbolIndex(),
+        OnDemandSymbolIndex.empty(),
         new URLClassLoader(sourcepath.sources.map(_.toUri.toURL).toArray),
         InteractiveSemanticdb.newCompiler(
           sourcepath.classpath.mkString(File.pathSeparator),
@@ -76,7 +78,9 @@ class MetabrowseServer(
         sourcepath
       )
       state.set(newState)
-      sourcepath.sources.foreach(jar => index.addSourceJar(AbsolutePath(jar)))
+      sourcepath.sources.foreach(
+        jar => index.addSourceJar(AbsolutePath(jar), dialect)
+      )
     }
   }
 
@@ -240,7 +244,7 @@ class MetabrowseServer(
         val timeout = TimeUnit.SECONDS.toMillis(10)
         val textDocument = if (path.endsWith(".java")) {
           val input = Input.VirtualFile(path, text)
-          Mtags.index(input)
+          Mtags.index(input, dialect)
         } else {
           InteractiveSemanticdb.toTextDocument(
             global,
@@ -272,7 +276,7 @@ class MetabrowseServer(
             None
           }
         input = defn.path.toInput
-        doc = Mtags.index(input)
+        doc = Mtags.index(input, dialect)
         occ <- doc.occurrences
           .find { occ =>
             occ.role.isDefinition &&
@@ -350,7 +354,8 @@ object MetabrowseServer {
       }
     }
     val sourcepath = Sourcepath(artifacts)
-    val server = new MetabrowseServer(scalacOptions = scalacOptions)
+    val dialect = scala.meta.dialects.Scala213
+    val server = new MetabrowseServer(dialect, scalacOptions = scalacOptions)
     val in = new Scanner(System.in)
     server.start(sourcepath)
     try {

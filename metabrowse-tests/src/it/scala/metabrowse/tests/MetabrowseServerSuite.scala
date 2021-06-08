@@ -13,7 +13,7 @@ class MetabrowseServerSuite
     extends FunSuite
     with Chrome
     with BeforeAndAfterAll {
-  val server = new MetabrowseServer()
+  val server = new MetabrowseServer(scala.meta.dialects.Scala212)
   val sourcepath = Sourcepath("org.typelevel:paiges-core_2.12:0.2.1")
   override def beforeAll(): Unit = {
     server.start(sourcepath)
