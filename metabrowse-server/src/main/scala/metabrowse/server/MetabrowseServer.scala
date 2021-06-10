@@ -198,14 +198,6 @@ class MetabrowseServer(
 
   // Static state:
   private val lock = new Object()
-  private val assets =
-    withInputStream(
-      getClass.getClassLoader.getResourceAsStream("metabrowse-assets.zip")
-    ) { in =>
-      val out = Files.createTempDirectory("metabrowse").resolve("assets.zip")
-      Files.copy(in, out)
-      FileIO.jarRootPath(AbsolutePath(out))
-    }
   private val httpHandler = new HttpHandler {
     override def handleRequest(exchange: HttpServerExchange): Unit = {
       val bytes =
@@ -256,11 +248,19 @@ class MetabrowseServer(
       Array.emptyByteArray
     } else {
       val actualPath = if (path == "/") "/index.html" else path
-      val file = assets.resolve(actualPath)
-      if (file.isFile) file.readAllBytes
-      else {
-        logger.warn(s"no such file: $file")
-        Array.emptyByteArray
+      withInputStream(
+        Thread
+          .currentThread()
+          .getContextClassLoader
+          .getResourceAsStream(
+            s"metabrowse/server/assets/${actualPath.stripPrefix("/")}"
+          )
+      ) { is =>
+        if (is == null) {
+          logger.warn(s"no such file: $path")
+          Array.emptyByteArray
+        } else
+          InputStreamIO.readBytes(is)
       }
     }
   }
