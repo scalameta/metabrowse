@@ -167,7 +167,7 @@ lazy val server = project
       updated
     }
   )
-  .dependsOn(cli)
+  .dependsOn(coreJVM)
 
 lazy val cli = project
   .in(file("metabrowse-cli"))
@@ -199,7 +199,7 @@ lazy val cli = project
       }
     }
   )
-  .dependsOn(coreJVM)
+  .dependsOn(server)
 
 lazy val js = project
   .in(file("metabrowse-js"))
