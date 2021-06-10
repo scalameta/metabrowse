@@ -358,38 +358,6 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
     }
   }
 
-  def writeAssets(): Unit = {
-    val root = target.toNIO
-    val inputStream = MetabrowseCli.getClass.getClassLoader
-      .getResourceAsStream("metabrowse-assets.zip")
-    if (inputStream == null)
-      sys.error("Failed to locate metabrowse-assets.zip on the classpath")
-    val zipStream = new ZipInputStream(inputStream)
-    val bytes = new Array[Byte](8012)
-    Stream
-      .continually(zipStream.getNextEntry)
-      .takeWhile(_ != null)
-      .filterNot(_.isDirectory)
-      .foreach { entry =>
-        val path = root.resolve(entry.getName)
-        if (Files.notExists(path))
-          Files.createDirectories(path.getParent)
-        val out = Files.newOutputStream(path, StandardOpenOption.CREATE)
-
-        def copyLoop(): Unit = {
-          val read = zipStream.read(bytes, 0, bytes.length)
-          if (read > 0) {
-            out.write(bytes, 0, read)
-            copyLoop()
-          }
-        }
-
-        copyLoop()
-        out.flush()
-        out.close()
-      }
-  }
-
   def writeWorkspace(): Unit = {
     import scala.collection.JavaConverters._
     val workspace = d.Workspace(filenames.asScala.toSeq)
@@ -403,7 +371,6 @@ class CliRunner(classpath: Seq[AbsolutePath], options: MetabrowseOptions) {
       val paths = scanSemanticdbs()
       buildSymbolIndex(paths, paths.length)
       writeSymbolIndex()
-      writeAssets()
       writeWorkspace()
     } finally {
       display.stop()

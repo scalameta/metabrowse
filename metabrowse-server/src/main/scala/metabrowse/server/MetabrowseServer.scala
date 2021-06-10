@@ -5,22 +5,29 @@ import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.Headers
 import java.io.ByteArrayOutputStream
+import java.io.Closeable
 import java.io.File
+import java.io.InputStream
 import java.net.URLClassLoader
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Scanner
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import java.util.zip.GZIPOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import metabrowse.schema.SymbolIndex
 import metabrowse.schema.SymbolIndexes
 import metabrowse.schema.Workspace
 import metabrowse.{schema => d}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.meta.Dialect
 import scala.meta.inputs.Input
@@ -55,6 +62,7 @@ class MetabrowseServer(
   def stop(): Unit = {
     server.stop()
     global.askShutdown()
+    Option(state.get()).foreach(_.close())
   }
 
   /** Updates the running server to use a new sourcepath.
@@ -65,12 +73,14 @@ class MetabrowseServer(
     */
   def replaceClasspath(sourcepath: Sourcepath): Unit = {
     lock.synchronized {
-      if (state.get() != null) {
+      val prevState = state.get()
+      if (prevState != null) {
         global.askShutdown()
+        prevState.close()
       }
       val newState = State(
         OnDemandSymbolIndex.empty(),
-        new URLClassLoader(sourcepath.sources.map(_.toUri.toURL).toArray),
+        sourcepath.sources,
         InteractiveSemanticdb.newCompiler(
           sourcepath.classpath.mkString(File.pathSeparator),
           scalacOptions
@@ -116,25 +126,78 @@ class MetabrowseServer(
   // Mutable state:
   case class State(
       index: OnDemandSymbolIndex,
-      classLoader: URLClassLoader,
+      classPath: Seq[Path],
       global: Global,
       sourcepath: Sourcepath
-  )
+  ) extends Closeable {
+    private lazy val useCl = java.lang.Boolean.getBoolean("metabrowse.ucl")
+    private lazy val classLoader = new URLClassLoader(
+      sourcepath.sources.map(_.toUri.toURL).toArray
+    )
+    private val zipFiles = new ConcurrentHashMap[Path, ZipFile]
+    private def zipFile(path: Path): ZipFile = {
+      var zf = zipFiles.get(path)
+      if (zf == null) {
+        var zf0: ZipFile = null
+        try {
+          zf0 = new ZipFile(path.toFile)
+          val prev = zipFiles.putIfAbsent(path, zf0)
+          if (prev == null) {
+            zf = zf0
+            zf0 = null
+          } else
+            zf = prev
+        } finally {
+          if (zf0 != null)
+            zf0.close()
+        }
+      }
+      zf
+    }
+    def source(name: String): Option[String] = {
+      val bytesOpt =
+        if (useCl)
+          withInputStream(classLoader.getResourceAsStream(name)) { is =>
+            if (is == null) None
+            else Some(InputStreamIO.readBytes(is))
+          } else {
+          val it =
+            for {
+              path <- classPath.iterator
+              zf = zipFile(path)
+              entry <- Option(zf.getEntry(name)).iterator
+            } yield
+              withInputStream(zf.getInputStream(entry))(
+                InputStreamIO.readBytes(_)
+              )
+          it.toStream.headOption
+        }
+      bytesOpt.map(new String(_, StandardCharsets.UTF_8))
+    }
+    def close(): Unit =
+      for (entry <- zipFiles.entrySet().asScala.toVector) {
+        entry.getValue.close()
+        zipFiles.remove(entry.getKey, entry.getValue)
+      }
+  }
   private val state = new AtomicReference[State]()
   def index = state.get().index
-  def classLoader = state.get().classLoader
   def global = state.get().global
   def sourcepath = state.get().sourcepath
 
+  private def withInputStream[T](is: => InputStream)(f: InputStream => T): T = {
+    var is0: InputStream = null
+    try {
+      is0 = is
+      f(is0)
+    } finally {
+      if (is0 != null)
+        is0.close()
+    }
+  }
+
   // Static state:
   private val lock = new Object()
-  private val assets = {
-    val in =
-      this.getClass.getClassLoader.getResourceAsStream("metabrowse-assets.zip")
-    val out = Files.createTempDirectory("metabrowse").resolve("assets.zip")
-    Files.copy(in, out)
-    FileIO.jarRootPath(AbsolutePath(out))
-  }
   private val httpHandler = new HttpHandler {
     override def handleRequest(exchange: HttpServerExchange): Unit = {
       val bytes =
@@ -185,11 +248,19 @@ class MetabrowseServer(
       Array.emptyByteArray
     } else {
       val actualPath = if (path == "/") "/index.html" else path
-      val file = assets.resolve(actualPath)
-      if (file.isFile) file.readAllBytes
-      else {
-        logger.warn(s"no such file: $file")
-        Array.emptyByteArray
+      withInputStream(
+        Thread
+          .currentThread()
+          .getContextClassLoader
+          .getResourceAsStream(
+            s"metabrowse/server/assets/${actualPath.stripPrefix("/")}"
+          )
+      ) { is =>
+        if (is == null) {
+          logger.warn(s"no such file: $path")
+          Array.emptyByteArray
+        } else
+          InputStreamIO.readBytes(is)
       }
     }
   }
@@ -235,11 +306,10 @@ class MetabrowseServer(
       .stripSuffix(".semanticdb")
     logger.info(path)
     for {
-      in <- Option(classLoader.getResourceAsStream(path)).orElse {
+      text <- state.get().source(path).orElse {
         logger.warn(s"no source file: $path")
         None
       }
-      text = new String(InputStreamIO.readBytes(in), StandardCharsets.UTF_8)
       doc <- try {
         val timeout = TimeUnit.SECONDS.toMillis(10)
         val textDocument = if (path.endsWith(".java")) {
