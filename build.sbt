@@ -85,7 +85,7 @@ lazy val example = project
     libraryDependencies ++= List(
       "org.scalatest" %% "scalatest" % "3.1.2" % Test,
       "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
-      "org.scalatestplus" %% "scalacheck-1-14" % "3.1.2.0" % Test
+      "org.scalatestplus" %% "scalacheck-1-14" % "3.1.4.0" % Test
     ),
     test := {} // no need to run paiges tests.
   )
