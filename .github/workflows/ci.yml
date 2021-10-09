@@ -6,6 +6,19 @@ on:
       - main
   pull_request:
 jobs:
+  compile:
+    name: Compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
+      - uses: olafurpg/setup-scala@v12
+        with:
+          java-version: "adopt@1.8"
+      - run: sbt +test:compile # ensuring metabrowse compiles for all Scala versions
+
   unit:
     name: Tests
     runs-on: ${{ matrix.os }}
