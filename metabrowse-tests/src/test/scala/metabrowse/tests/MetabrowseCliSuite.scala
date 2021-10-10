@@ -51,12 +51,18 @@ class MetabrowseCliSuite extends BaseMetabrowseCliSuite {
       }
       .sorted
       .mkString("\n")
-    val extra =
+    val extraLazyListStuff =
       if (is212)
         """org/typelevel/paiges/ScalaVersionCompat.LazyList#
           |org/typelevel/paiges/ScalaVersionCompat.LazyList.
           |""".stripMargin
       else ""
+    val extraPi213Stuff =
+      if (is212) ""
+      else
+        """org/typelevel/paiges/ColorTest#TwoPi.
+          |org/typelevel/paiges/ColorTest#TwoThirdsPi.
+          |""".stripMargin
     val expected =
       s"""|org/typelevel/paiges/Chunk.
           |org/typelevel/paiges/Chunk.best().
@@ -66,7 +72,7 @@ class MetabrowseCliSuite extends BaseMetabrowseCliSuite {
           |org/typelevel/paiges/Chunk.makeIndentStr().
           |org/typelevel/paiges/ColorTest#
           |org/typelevel/paiges/ColorTest#Quote.
-          |org/typelevel/paiges/ColorTest#`<init>`().
+          |${extraPi213Stuff}org/typelevel/paiges/ColorTest#`<init>`().
           |org/typelevel/paiges/ColorTest#bg().
           |org/typelevel/paiges/ColorTest#fg().
           |org/typelevel/paiges/ColorTest#fromAngle().
@@ -317,7 +323,7 @@ class MetabrowseCliSuite extends BaseMetabrowseCliSuite {
           |org/typelevel/paiges/PaigesTest.slowRenderTrim().
           |org/typelevel/paiges/PaigesTest.twoRightAssociated().
           |org/typelevel/paiges/ScalaVersionCompat.
-          |${extra}org/typelevel/paiges/ScalaVersionCompat.lazyListFromIterator().
+          |${extraLazyListStuff}org/typelevel/paiges/ScalaVersionCompat.lazyListFromIterator().
           |org/typelevel/paiges/Style#
           |org/typelevel/paiges/Style#`++`().
           |org/typelevel/paiges/Style#`<init>`().

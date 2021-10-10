@@ -3,8 +3,10 @@ import scalajsbundler.util.JSON._
 import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
-  def scala213 = "2.13.6"
-  def scala212 = "2.12.15"
+  val scala213Versions = (0 to 6).map(p => s"2.13.$p")
+  val scala212Versions = (8 to 15).map(p => s"2.12.$p")
+  def scala213 = scala213Versions.last
+  def scala212 = scala212Versions.last
   def scalameta = "4.4.28"
 }
 
@@ -51,6 +53,11 @@ inThisBuild(
 (publish / skip) := true
 crossScalaVersions := Nil
 
+lazy val fullCrossVersionSettings = Def.settings(
+  crossVersion := CrossVersion.full,
+  crossScalaVersions := Version.scala213Versions ++ Version.scala212Versions
+)
+
 def addPaigesLikeSourceDirs(config: Configuration, srcName: String) =
   Def.settings(
     config / unmanagedSourceDirectories ++= {
@@ -94,6 +101,7 @@ lazy val server = project
   .in(file("metabrowse-server"))
   .settings(
     moduleName := "metabrowse-server",
+    fullCrossVersionSettings,
     resolvers += Resolver.sonatypeRepo("releases"),
     resolvers += Resolver.sonatypeRepo("snapshots"),
     libraryDependencies ++= List(
@@ -173,6 +181,7 @@ lazy val cli = project
   .in(file("metabrowse-cli"))
   .settings(
     moduleName := "metabrowse-cli",
+    fullCrossVersionSettings,
     (assembly / mainClass) := Some("metabrowse.cli.MetabrowseCli"),
     (assembly / assemblyJarName) := "metabrowse.jar",
     scalacOptions ++= {
@@ -317,6 +326,7 @@ lazy val tests = project
   .in(file("metabrowse-tests"))
   .configs(IntegrationTest)
   .settings(
+    fullCrossVersionSettings,
     (publish / skip) := true,
     Defaults.itSettings,
     run / baseDirectory := (ThisBuild / baseDirectory).value,
