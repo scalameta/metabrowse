@@ -109,7 +109,7 @@ lazy val server = project
       "org.slf4j" % "slf4j-api" % "1.8.0-beta4",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      ("org.scalameta" %% "mtags" % "0.10.7").cross(CrossVersion.full)
+      ("org.scalameta" %% "mtags" % "0.10.9").cross(CrossVersion.full)
     ),
     (Compile / packageBin) := {
       import java.io.FileOutputStream
@@ -118,7 +118,8 @@ lazy val server = project
       import java.util.zip._
       import scala.collection.JavaConverters._
       val base = (Compile / packageBin).value
-      val updated = base.getParentFile / s"${base.getName.stripSuffix(".jar")}-with-resources.jar"
+      val updated =
+        base.getParentFile / s"${base.getName.stripSuffix(".jar")}-with-resources.jar"
 
       val fos = new FileOutputStream(updated)
       val zos = new ZipOutputStream(fos)
