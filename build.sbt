@@ -7,7 +7,7 @@ lazy val Version = new {
   val scala212Versions = (8 to 15).map(p => s"2.12.$p")
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
-  def scalameta = "4.4.28"
+  def scalameta = "4.4.30"
 }
 
 inThisBuild(
@@ -118,7 +118,8 @@ lazy val server = project
       import java.util.zip._
       import scala.collection.JavaConverters._
       val base = (Compile / packageBin).value
-      val updated = base.getParentFile / s"${base.getName.stripSuffix(".jar")}-with-resources.jar"
+      val updated =
+        base.getParentFile / s"${base.getName.stripSuffix(".jar")}-with-resources.jar"
 
       val fos = new FileOutputStream(updated)
       val zos = new ZipOutputStream(fos)
