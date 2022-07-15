@@ -257,9 +257,8 @@ lazy val js = project
   .dependsOn(coreJS)
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
 
-lazy val core = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Pure)
-  .in(file("metabrowse-core"))
+lazy val core = (file("metabrowse-core") / crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure))
   .jsSettings(
     (publish / skip) := true,
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule))
