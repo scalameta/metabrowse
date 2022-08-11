@@ -7,7 +7,7 @@ lazy val Version = new {
   val scala212Versions = (8 to 15).map(p => s"2.12.$p")
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
-  def scalameta = "4.4.33"
+  def scalameta = "4.4.35"
 }
 
 inThisBuild(
@@ -202,7 +202,7 @@ lazy val cli = project
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, major)) if major >= 13 =>
           Seq(
-            "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.3"
+            "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4"
           )
         case _ =>
           Seq()
@@ -344,7 +344,7 @@ lazy val tests = project
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       "org.scalatest" %% "scalatest" % "3.2.13",
       "org.scalacheck" %% "scalacheck" % "1.14.0",
-      "org.seleniumhq.selenium" % "selenium-java" % "3.141.59" % IntegrationTest,
+      "org.seleniumhq.selenium" % "selenium-java" % "4.3.0" % IntegrationTest,
       "org.slf4j" % "slf4j-simple" % "1.8.0-beta4"
     ),
     (IntegrationTest / compile) := {
