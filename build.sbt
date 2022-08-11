@@ -102,8 +102,8 @@ lazy val server = project
   .settings(
     moduleName := "metabrowse-server",
     fullCrossVersionSettings,
-    resolvers += Resolver.sonatypeRepo("releases"),
-    resolvers += Resolver.sonatypeRepo("snapshots"),
+    resolvers ++= Resolver.sonatypeOssRepos("releases"),
+    resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
     libraryDependencies ++= List(
       "io.undertow" % "undertow-core" % "2.0.30.Final",
       "org.slf4j" % "slf4j-api" % "1.8.0-beta4",
@@ -257,8 +257,9 @@ lazy val js = project
   .dependsOn(coreJS)
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
 
-lazy val core = (file("metabrowse-core") / crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Pure))
+lazy val core = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("metabrowse-core"))
   .jsSettings(
     (publish / skip) := true,
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule))
