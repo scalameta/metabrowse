@@ -3,11 +3,11 @@ import scalajsbundler.util.JSON._
 import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
-  val scala213Versions = (0 to 6).map(p => s"2.13.$p")
+  val scala213Versions = (1 to 6).map(p => s"2.13.$p")
   val scala212Versions = (8 to 15).map(p => s"2.12.$p")
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
-  def scalameta = "4.4.33"
+  def scalameta = "4.5.12"
 }
 
 inThisBuild(
@@ -91,7 +91,7 @@ lazy val example = project
     ),
     libraryDependencies ++= List(
       "org.scalatest" %% "scalatest" % "3.1.4" % Test,
-      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
       "org.scalatestplus" %% "scalacheck-1-14" % "3.2.2.0" % Test
     ),
     test := {} // no need to run paiges tests.
@@ -109,7 +109,7 @@ lazy val server = project
       "org.slf4j" % "slf4j-api" % "1.8.0-beta4",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      ("org.scalameta" %% "mtags" % "0.10.9").cross(CrossVersion.full)
+      ("org.scalameta" %% "mtags" % "0.11.8").cross(CrossVersion.full)
     ),
     (Compile / packageBin) := {
       import java.io.FileOutputStream
@@ -195,14 +195,14 @@ lazy val cli = project
     },
     libraryDependencies ++= List(
       "com.thesamet.scalapb" %% "scalapb-json4s" % "0.12.0",
-      "com.github.alexarchambault" %% "case-app" % "2.0.0-M9",
+      "com.github.alexarchambault" %% "case-app" % "2.0.6",
       "com.github.pathikrit" %% "better-files" % "3.9.1"
     ),
     libraryDependencies ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, major)) if major >= 13 =>
           Seq(
-            "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.3"
+            "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4"
           )
         case _ =>
           Seq()
@@ -343,8 +343,8 @@ lazy val tests = project
       "org.scalameta" %% "testkit" % Version.scalameta,
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       "org.scalatest" %% "scalatest" % "3.1.4",
-      "org.scalacheck" %% "scalacheck" % "1.14.0",
-      "org.seleniumhq.selenium" % "selenium-java" % "3.141.59" % IntegrationTest,
+      "org.scalacheck" %% "scalacheck" % "1.14.3",
+      "org.seleniumhq.selenium" % "selenium-java" % "4.3.0" % IntegrationTest,
       "org.slf4j" % "slf4j-simple" % "1.8.0-beta4"
     ),
     (IntegrationTest / compile) := {
