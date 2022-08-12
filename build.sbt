@@ -215,6 +215,7 @@ lazy val js = project
   .in(file("metabrowse-js"))
   .settings(
     (publish / skip) := true,
+    crossScalaVersions := Version.scala213Versions ++ Version.scala212Versions,
     moduleName := "metabrowse-js",
     addPaigesLikeSourceDirs(Test, "test"),
     Compile / additionalNpmConfig := Map("private" -> bool(true)),
@@ -264,7 +265,14 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     (publish / skip) := true,
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule))
   )
+  .jvmSettings(
+    (publish / skip) := {
+      val sv = scalaVersion.value
+      sv != Version.scala213 && sv != Version.scala212
+    }
+  )
   .settings(
+    crossScalaVersions := Version.scala213Versions ++ Version.scala212Versions,
     moduleName := "metabrowse-core",
     (Compile / PB.targets) := Seq(
       scalapb.gen(
