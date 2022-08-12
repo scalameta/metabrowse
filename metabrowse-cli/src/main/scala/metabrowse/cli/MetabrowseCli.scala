@@ -384,7 +384,7 @@ object MetabrowseCli extends CaseApp[MetabrowseOptions] {
   override val messages: caseapp.core.help.Help[MetabrowseOptions] =
     caseapp.core.help
       .Help[MetabrowseOptions]
-      .copy(optionsDesc = "[options] classpath")
+      .withOptionsDesc("[options] classpath")
 
   def run(options: MetabrowseOptions, remainingArgs: RemainingArgs): Unit = {
 
