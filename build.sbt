@@ -7,7 +7,7 @@ lazy val Version = new {
   val scala212Versions = (8 to 16).map(p => s"2.12.$p")
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
-  def scalameta = "4.5.12"
+  def scalameta = "4.5.13"
 }
 
 inThisBuild(
