@@ -3,8 +3,27 @@ import scalajsbundler.util.JSON._
 import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
-  val scala213Versions = (1 to 8).map(p => s"2.13.$p")
-  val scala212Versions = (9 to 17).map(p => s"2.12.$p")
+  val scala213Versions = Seq(
+    "2.13.1",
+    "2.13.2",
+    "2.13.3",
+    "2.13.4",
+    "2.13.5",
+    "2.13.6",
+    "2.13.7",
+    "2.13.8"
+  )
+  val scala212Versions = Seq(
+    "2.12.9",
+    "2.12.10",
+    "2.12.11",
+    "2.12.12",
+    "2.12.13",
+    "2.12.14",
+    "2.12.15",
+    "2.12.16",
+    "2.12.17"
+  )
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
   def scalameta = "4.6.0"
