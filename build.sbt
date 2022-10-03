@@ -3,11 +3,30 @@ import scalajsbundler.util.JSON._
 import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
-  val scala213Versions = (1 to 8).map(p => s"2.13.$p")
-  val scala212Versions = (8 to 16).map(p => s"2.12.$p")
+  val scala213Versions = Seq(
+    "2.13.1",
+    "2.13.2",
+    "2.13.3",
+    "2.13.4",
+    "2.13.5",
+    "2.13.6",
+    "2.13.7",
+    "2.13.8"
+  )
+  val scala212Versions = Seq(
+    "2.12.9",
+    "2.12.10",
+    "2.12.11",
+    "2.12.12",
+    "2.12.13",
+    "2.12.14",
+    "2.12.15",
+    "2.12.16",
+    "2.12.17"
+  )
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
-  def scalameta = "4.5.13"
+  def scalameta = "4.6.0"
 }
 
 inThisBuild(
@@ -106,7 +125,7 @@ lazy val server = project
     resolvers += Resolver.sonatypeRepo("snapshots"),
     libraryDependencies ++= List(
       "io.undertow" % "undertow-core" % "2.0.30.Final",
-      "org.slf4j" % "slf4j-api" % "2.0.1",
+      "org.slf4j" % "slf4j-api" % "2.0.3",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       ("org.scalameta" %% "mtags" % "0.11.8").cross(CrossVersion.full)
@@ -345,7 +364,7 @@ lazy val tests = project
       "org.scalatest" %% "scalatest" % "3.1.4",
       "org.scalacheck" %% "scalacheck" % "1.17.0",
       "org.seleniumhq.selenium" % "selenium-java" % "4.4.0" % IntegrationTest,
-      "org.slf4j" % "slf4j-simple" % "2.0.1"
+      "org.slf4j" % "slf4j-simple" % "2.0.3"
     ),
     (IntegrationTest / compile) := {
       _root_.io.github.bonigarcia.wdm.WebDriverManager.chromedriver.setup()
