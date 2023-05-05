@@ -215,7 +215,7 @@ lazy val cli = project
       }
     },
     libraryDependencies ++= List(
-      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.12.0",
+      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.12.1",
       "com.github.alexarchambault" %% "case-app" % "2.0.6",
       "com.github.pathikrit" %% "better-files" % "3.9.1"
     ),
