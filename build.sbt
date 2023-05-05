@@ -215,7 +215,7 @@ lazy val cli = project
       }
     },
     libraryDependencies ++= List(
-      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.12.0",
+      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.12.1",
       "com.github.alexarchambault" %% "case-app" % "2.0.6",
       "com.github.pathikrit" %% "better-files" % "3.9.1"
     ),
@@ -365,7 +365,7 @@ lazy val tests = project
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       "org.scalatest" %% "scalatest" % "3.1.4",
       "org.scalacheck" %% "scalacheck" % "1.17.0",
-      "org.seleniumhq.selenium" % "selenium-java" % "4.6.0" % IntegrationTest,
+      "org.seleniumhq.selenium" % "selenium-java" % "4.8.0" % IntegrationTest,
       "org.slf4j" % "slf4j-simple" % "2.0.6"
     ),
     (IntegrationTest / compile) := {
