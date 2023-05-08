@@ -130,7 +130,7 @@ lazy val server = project
       "org.slf4j" % "slf4j-api" % "2.0.3",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      ("org.scalameta" %% "mtags" % "0.11.9").cross(CrossVersion.full)
+      ("org.scalameta" %% "mtags" % "0.11.10").cross(CrossVersion.full)
     ),
     (Compile / packageBin) := {
       import java.io.FileOutputStream
@@ -215,9 +215,9 @@ lazy val cli = project
       }
     },
     libraryDependencies ++= List(
-      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.12.0",
+      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.12.1",
       "com.github.alexarchambault" %% "case-app" % "2.0.6",
-      "com.github.pathikrit" %% "better-files" % "3.9.1"
+      "com.github.pathikrit" %% "better-files" % "3.9.2"
     ),
     libraryDependencies ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -365,7 +365,7 @@ lazy val tests = project
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       "org.scalatest" %% "scalatest" % "3.1.4",
       "org.scalacheck" %% "scalacheck" % "1.17.0",
-      "org.seleniumhq.selenium" % "selenium-java" % "4.6.0" % IntegrationTest,
+      "org.seleniumhq.selenium" % "selenium-java" % "4.8.0" % IntegrationTest,
       "org.slf4j" % "slf4j-simple" % "2.0.3"
     ),
     (IntegrationTest / compile) := {
