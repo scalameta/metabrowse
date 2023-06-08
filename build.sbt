@@ -4,8 +4,6 @@ import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
   val scala213Versions = Seq(
-    "2.13.1",
-    "2.13.2",
     "2.13.3",
     "2.13.4",
     "2.13.5",
@@ -13,10 +11,10 @@ lazy val Version = new {
     "2.13.7",
     "2.13.8",
     "2.13.9",
-    "2.13.10"
+    "2.13.10",
+    "2.13.11"
   )
   val scala212Versions = Seq(
-    "2.12.9",
     "2.12.10",
     "2.12.11",
     "2.12.12",
@@ -24,11 +22,12 @@ lazy val Version = new {
     "2.12.14",
     "2.12.15",
     "2.12.16",
-    "2.12.17"
+    "2.12.17",
+    "2.12.18"
   )
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
-  def scalameta = "4.6.0"
+  def scalameta = "4.7.8"
 }
 
 inThisBuild(
@@ -130,7 +129,7 @@ lazy val server = project
       "org.slf4j" % "slf4j-api" % "2.0.3",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      ("org.scalameta" %% "mtags" % "0.11.9").cross(CrossVersion.full)
+      ("org.scalameta" %% "mtags" % "0.11.12").cross(CrossVersion.full)
     ),
     (Compile / packageBin) := {
       import java.io.FileOutputStream
@@ -215,9 +214,9 @@ lazy val cli = project
       }
     },
     libraryDependencies ++= List(
-      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.12.0",
+      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.12.1",
       "com.github.alexarchambault" %% "case-app" % "2.0.6",
-      "com.github.pathikrit" %% "better-files" % "3.9.1"
+      "com.github.pathikrit" %% "better-files" % "3.9.2"
     ),
     libraryDependencies ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
