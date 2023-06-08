@@ -22,3 +22,7 @@ project/plugins/project/
 # ENSIME specific
 .ensime_cache/
 .ensime
+
+# Metals specific
+.metals/
+.vscode/

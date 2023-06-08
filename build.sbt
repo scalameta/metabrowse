@@ -3,11 +3,31 @@ import scalajsbundler.util.JSON._
 import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
-  val scala213Versions = (0 to 6).map(p => s"2.13.$p")
-  val scala212Versions = (8 to 15).map(p => s"2.12.$p")
+  val scala213Versions = Seq(
+    "2.13.3",
+    "2.13.4",
+    "2.13.5",
+    "2.13.6",
+    "2.13.7",
+    "2.13.8",
+    "2.13.9",
+    "2.13.10",
+    "2.13.11"
+  )
+  val scala212Versions = Seq(
+    "2.12.10",
+    "2.12.11",
+    "2.12.12",
+    "2.12.13",
+    "2.12.14",
+    "2.12.15",
+    "2.12.16",
+    "2.12.17",
+    "2.12.18"
+  )
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
-  def scalameta = "4.4.35"
+  def scalameta = "4.7.8"
 }
 
 inThisBuild(
@@ -91,7 +111,7 @@ lazy val example = project
     ),
     libraryDependencies ++= List(
       "org.scalatest" %% "scalatest" % "3.1.4" % Test,
-      "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.17.0" % Test,
       "org.scalatestplus" %% "scalacheck-1-14" % "3.2.2.0" % Test
     ),
     test := {} // no need to run paiges tests.
@@ -106,10 +126,10 @@ lazy val server = project
     resolvers += Resolver.sonatypeRepo("snapshots"),
     libraryDependencies ++= List(
       "io.undertow" % "undertow-core" % "2.0.30.Final",
-      "org.slf4j" % "slf4j-api" % "1.8.0-beta4",
+      "org.slf4j" % "slf4j-api" % "2.0.3",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      ("org.scalameta" %% "mtags" % "0.10.9").cross(CrossVersion.full)
+      ("org.scalameta" %% "mtags" % "0.11.12").cross(CrossVersion.full)
     ),
     (Compile / packageBin) := {
       import java.io.FileOutputStream
@@ -194,9 +214,9 @@ lazy val cli = project
       }
     },
     libraryDependencies ++= List(
-      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.12.0",
-      "com.github.alexarchambault" %% "case-app" % "2.0.0-M9",
-      "com.github.pathikrit" %% "better-files" % "3.9.1"
+      "com.thesamet.scalapb" %% "scalapb-json4s" % "0.12.1",
+      "com.github.alexarchambault" %% "case-app" % "2.0.6",
+      "com.github.pathikrit" %% "better-files" % "3.9.2"
     ),
     libraryDependencies ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -343,9 +363,9 @@ lazy val tests = project
       "org.scalameta" %% "testkit" % Version.scalameta,
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       "org.scalatest" %% "scalatest" % "3.1.4",
-      "org.scalacheck" %% "scalacheck" % "1.14.3",
-      "org.seleniumhq.selenium" % "selenium-java" % "4.3.0" % IntegrationTest,
-      "org.slf4j" % "slf4j-simple" % "1.8.0-beta4"
+      "org.scalacheck" %% "scalacheck" % "1.17.0",
+      "org.seleniumhq.selenium" % "selenium-java" % "4.8.0" % IntegrationTest,
+      "org.slf4j" % "slf4j-simple" % "2.0.3"
     ),
     (IntegrationTest / compile) := {
       _root_.io.github.bonigarcia.wdm.WebDriverManager.chromedriver.setup()

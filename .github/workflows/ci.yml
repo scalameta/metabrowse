@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scala: [2.12.15, 2.13.6]
+        scala: [2.12.18, 2.13.11]
         os: [ubuntu-latest]
         java: [11, 8]
     steps:
@@ -39,3 +39,5 @@ jobs:
       - run: sbt ci-test
         env:
           SCALA_VERSION: ${{ matrix.scala }}
+          # See https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported/69699772#69699772
+          NODE_OPTIONS: "--openssl-legacy-provider"

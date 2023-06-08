@@ -1,13 +1,13 @@
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.20.0")
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.10")
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "2.1.1")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.11.0")
 addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.6")
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.7.0")
-addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.2.0")
-addSbtPlugin("com.geirsson" % "sbt-ci-release" % "1.5.7")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.13.1")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.1")
+addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.11")
 
 libraryDependencies ++= List(
-  "io.github.bonigarcia" % "webdrivermanager" % "3.6.2",
-  "com.thesamet.scalapb" %% "compilerplugin" % "0.11.3",
+  "io.github.bonigarcia" % "webdrivermanager" % "5.3.2",
+  "com.thesamet.scalapb" %% "compilerplugin" % "0.11.11",
   "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
 )
