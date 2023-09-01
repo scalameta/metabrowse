@@ -27,7 +27,7 @@ lazy val Version = new {
   )
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
-  def scalameta = "4.7.8"
+  def scalameta = "4.8.10"
 }
 
 inThisBuild(
