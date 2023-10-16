@@ -6,7 +6,8 @@ lazy val Version = new {
   val scala213Versions = Seq(
     "2.13.9",
     "2.13.10",
-    "2.13.11"
+    "2.13.11",
+    "2.13.12"
   )
   val scala212Versions = Seq(
     "2.12.15",
@@ -118,7 +119,7 @@ lazy val server = project
       "org.slf4j" % "slf4j-api" % "2.0.9",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      ("org.scalameta" %% "mtags" % "0.11.12").cross(CrossVersion.full)
+      ("org.scalameta" %% "mtags" % "1.0.1").cross(CrossVersion.full)
     ),
     (Compile / packageBin) := {
       import java.io.FileOutputStream

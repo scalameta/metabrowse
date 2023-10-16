@@ -79,7 +79,9 @@ class MetabrowseServer(
         prevState.close()
       }
       val newState = State(
-        OnDemandSymbolIndex.empty(),
+        OnDemandSymbolIndex.empty()(
+          scala.meta.internal.metals.EmptyReportContext
+        ),
         sourcepath.sources,
         InteractiveSemanticdb.newCompiler(
           sourcepath.classpath.mkString(File.pathSeparator),
