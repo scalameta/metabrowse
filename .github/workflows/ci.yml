@@ -14,9 +14,10 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
-      - uses: olafurpg/setup-scala@v12
+      - uses: actions/setup-java@v3
         with:
-          java-version: "adopt@1.8"
+          java-version: 8
+          distribution: adopt
       - run: sbt +test:compile # ensuring metabrowse compiles for all Scala versions
 
   unit:
@@ -33,9 +34,10 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
-      - uses: olafurpg/setup-scala@v12
+      - uses: actions/setup-java@v3
         with:
-          java-version: "adopt@1.${{ matrix.java }}"
+          java-version: "${{ matrix.java }}"
+          distribution: adopt
       - run: sbt ci-test
         env:
           SCALA_VERSION: ${{ matrix.scala }}
