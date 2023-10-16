@@ -6,7 +6,8 @@ lazy val Version = new {
   val scala213Versions = Seq(
     "2.13.9",
     "2.13.10",
-    "2.13.11"
+    "2.13.11",
+    "2.13.12"
   )
   val scala212Versions = Seq(
     "2.12.15",
