@@ -5,9 +5,9 @@ import java.io.File
 import org.scalactic.source.Position
 import org.scalatest.exceptions.StackDepthException
 import org.scalatest.exceptions.TestFailedException
-import org.scalatest.FunSuiteLike
+import org.scalatest.funsuite.AnyFunSuiteLike
 
-trait DiffAssertions extends FunSuiteLike {
+trait DiffAssertions extends AnyFunSuiteLike {
 
   // import LoggerOps._
   def header[T](t: T): String = {

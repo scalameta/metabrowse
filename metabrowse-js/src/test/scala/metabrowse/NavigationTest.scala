@@ -1,9 +1,9 @@
 package metabrowse
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import monaco.Range
 
-class NavigationTest extends FunSuite {
+class NavigationTest extends AnyFunSuite {
   test("Navigation.parseState") {
     val state = Navigation.parseState("/path")
     assert(state.isDefined)

@@ -5,12 +5,12 @@ import java.util.concurrent.TimeUnit
 import metabrowse.server.MetabrowseServer
 import metabrowse.server.Sourcepath
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.selenium.Chrome
 import scala.meta.interactive.InteractiveSemanticdb
 
 class MetabrowseServerSuite
-    extends FunSuite
+    extends AnyFunSuite
     with Chrome
     with BeforeAndAfterAll {
   val server = new MetabrowseServer(scala.meta.dialects.Scala212)

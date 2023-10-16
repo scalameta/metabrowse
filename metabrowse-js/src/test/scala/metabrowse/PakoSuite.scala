@@ -1,7 +1,7 @@
 package metabrowse
 
 import metabrowse.schema.Workspace
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import scala.meta.internal.io.PathIO
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
@@ -10,7 +10,7 @@ import scala.scalajs.js.typedarray.ArrayBuffer
 import scala.scalajs.js.typedarray.TypedArrayBuffer
 import scala.scalajs.js.typedarray.Uint8Array
 
-class PakoSuite extends FunSuite {
+class PakoSuite extends AnyFunSuite {
   test("deflate") {
     val path = PathIO.workingDirectory
       .resolve("target")
