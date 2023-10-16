@@ -5,14 +5,14 @@ import java.nio.file.Files
 import metabrowse.cli.MetabrowseCli
 import metabrowse.cli.MetabrowseOptions
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import scala.meta.io.AbsolutePath
 import metabrowse.{schema => d}
 import metabrowse.MetabrowseEnrichments._
 import GeneratedSiteEnrichments._
 
 abstract class BaseMetabrowseCliSuite
-    extends FunSuite
+    extends AnyFunSuite
     with BeforeAndAfterAll
     with DiffAssertions {
   var out: AbsolutePath = _
