@@ -112,7 +112,7 @@ lazy val example = project
     libraryDependencies ++= List(
       "org.scalatest" %% "scalatest" % "3.1.4" % Test,
       "org.scalacheck" %% "scalacheck" % "1.17.0" % Test,
-      "org.scalatestplus" %% "scalacheck-1-14" % "3.2.2.0" % Test
+      "org.scalatestplus" %% "scalacheck-1-15" % "3.2.11.0" % Test
     ),
     test := {} // no need to run paiges tests.
   )
@@ -126,7 +126,7 @@ lazy val server = project
     resolvers += Resolver.sonatypeRepo("snapshots"),
     libraryDependencies ++= List(
       "io.undertow" % "undertow-core" % "2.0.30.Final",
-      "org.slf4j" % "slf4j-api" % "2.0.7",
+      "org.slf4j" % "slf4j-api" % "2.0.9",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       ("org.scalameta" %% "mtags" % "0.11.12").cross(CrossVersion.full)
@@ -365,7 +365,7 @@ lazy val tests = project
       "org.scalatest" %% "scalatest" % "3.1.4",
       "org.scalacheck" %% "scalacheck" % "1.17.0",
       "org.seleniumhq.selenium" % "selenium-java" % "4.9.0" % IntegrationTest,
-      "org.slf4j" % "slf4j-simple" % "2.0.7"
+      "org.slf4j" % "slf4j-simple" % "2.0.9"
     ),
     (IntegrationTest / compile) := {
       _root_.io.github.bonigarcia.wdm.WebDriverManager.chromedriver.setup()
