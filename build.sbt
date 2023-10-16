@@ -118,7 +118,7 @@ lazy val server = project
       "org.slf4j" % "slf4j-api" % "2.0.9",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      ("org.scalameta" %% "mtags" % "0.11.12").cross(CrossVersion.full)
+      ("org.scalameta" %% "mtags" % "1.0.1").cross(CrossVersion.full)
     ),
     (Compile / packageBin) := {
       import java.io.FileOutputStream
