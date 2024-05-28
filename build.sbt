@@ -7,13 +7,16 @@ lazy val Version = new {
     "2.13.9",
     "2.13.10",
     "2.13.11",
-    "2.13.12"
+    "2.13.12",
+    "2.13.13",
+    "2.13.14"
   )
   val scala212Versions = Seq(
     "2.12.15",
     "2.12.16",
     "2.12.17",
-    "2.12.18"
+    "2.12.18",
+    "2.12.19"
   )
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
