@@ -316,7 +316,7 @@ class MetabrowseServer(
         val timeout = TimeUnit.SECONDS.toMillis(10)
         val textDocument = if (path.endsWith(".java")) {
           val input = Input.VirtualFile(path, text)
-          Mtags.index(input, dialect)
+          t.JavaMtags.index(input, includeMembers = true).index()
         } else {
           InteractiveSemanticdb.toTextDocument(
             global,
@@ -348,7 +348,10 @@ class MetabrowseServer(
             None
           }
         input = defn.path.toInput
-        doc = Mtags.index(input, dialect)
+        doc = if (input.path.endsWith(".java"))
+          t.JavaMtags.index(input, includeMembers = true).index()
+        else
+          t.ScalaMtags.index(input, dialect).index()
         occ <- doc.occurrences
           .find { occ =>
             occ.role.isDefinition &&
