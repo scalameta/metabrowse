@@ -8,6 +8,6 @@ addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.12")
 
 libraryDependencies ++= List(
   "io.github.bonigarcia" % "webdrivermanager" % "5.8.0",
-  "com.thesamet.scalapb" %% "compilerplugin" % "0.11.13",
+  "com.thesamet.scalapb" %% "compilerplugin" % "0.11.15",
   "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
 )
