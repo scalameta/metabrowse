@@ -4,7 +4,6 @@ import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
   val scala213Versions = Seq(
-    "2.13.9",
     "2.13.10",
     "2.13.11",
     "2.13.12",
@@ -12,7 +11,6 @@ lazy val Version = new {
     "2.13.14"
   )
   val scala212Versions = Seq(
-    "2.12.15",
     "2.12.16",
     "2.12.17",
     "2.12.18",
@@ -24,7 +22,7 @@ lazy val Version = new {
   // Important: this should be the exact same version as the one mtags pulls, as mtags uses some scalameta internal APIs,
   // and binary compatibility of these APIs isn't guaranteed.
   // Get this version with a command like 'cs resolve org.scalameta:mtags_2.13.12:1.0.1 | grep org.scalameta:scalameta'
-  def scalameta = "4.8.15"
+  def scalameta = "4.9.3"
 }
 
 inThisBuild(
