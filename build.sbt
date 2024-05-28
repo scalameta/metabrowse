@@ -21,7 +21,7 @@ lazy val Version = new {
   // Important: this should be the exact same version as the one mtags pulls, as mtags uses some scalameta internal APIs,
   // and binary compatibility of these APIs isn't guaranteed.
   // Get this version with a command like 'cs resolve org.scalameta:mtags_2.13.12:1.0.1 | grep org.scalameta:scalameta'
-  def scalameta = "4.8.3"
+  def scalameta = "4.8.15"
 }
 
 inThisBuild(
@@ -104,9 +104,9 @@ lazy val example = project
       "-Xplugin-require:semanticdb"
     ),
     libraryDependencies ++= List(
-      "org.scalatest" %% "scalatest" % "3.2.7" % Test,
+      "org.scalatest" %% "scalatest" % "3.2.18" % Test,
       "org.scalacheck" %% "scalacheck" % "1.17.0" % Test,
-      "org.scalatestplus" %% "scalacheck-1-17" % "3.2.17.0" % Test
+      "org.scalatestplus" %% "scalacheck-1-17" % "3.2.18.0" % Test
     ),
     test := {} // no need to run paiges tests.
   )
@@ -120,7 +120,7 @@ lazy val server = project
     resolvers += Resolver.sonatypeRepo("snapshots"),
     libraryDependencies ++= List(
       "io.undertow" % "undertow-core" % "2.0.30.Final",
-      "org.slf4j" % "slf4j-api" % "2.0.9",
+      "org.slf4j" % "slf4j-api" % "2.0.13",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       ("org.scalameta" %% "mtags" % "1.0.1").cross(CrossVersion.full)
@@ -246,7 +246,7 @@ lazy val js = project
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.8",
-      "org.scalatest" %%% "scalatest" % "3.2.7" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.18" % Test
     ),
     (Compile / npmDevDependencies) ++= Seq(
       "clean-webpack-plugin" -> "3.0.0",
@@ -356,10 +356,10 @@ lazy val tests = project
     libraryDependencies ++= List(
       "org.scalameta" %% "testkit" % Version.scalameta,
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      "org.scalatest" %% "scalatest" % "3.2.7",
+      "org.scalatest" %% "scalatest" % "3.2.18",
       "org.scalacheck" %% "scalacheck" % "1.17.0",
-      "org.seleniumhq.selenium" % "selenium-java" % "4.9.1" % IntegrationTest,
-      "org.slf4j" % "slf4j-simple" % "2.0.9"
+      "org.seleniumhq.selenium" % "selenium-java" % "4.21.0" % IntegrationTest,
+      "org.slf4j" % "slf4j-simple" % "2.0.13"
     ),
     (IntegrationTest / compile) := {
       _root_.io.github.bonigarcia.wdm.WebDriverManager.chromedriver.setup()
