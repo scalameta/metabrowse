@@ -26,9 +26,9 @@ import metabrowse.schema.Workspace
 import metabrowse.{schema => d}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.jdk.CollectionConverters._
 import scala.meta.Dialect
 import scala.meta.inputs.Input
 import scala.meta.interactive.InteractiveSemanticdb
@@ -172,7 +172,7 @@ class MetabrowseServer(
               withInputStream(zf.getInputStream(entry))(
                 InputStreamIO.readBytes(_)
               )
-          it.toStream.headOption
+          it.find(_ => true)
         }
       bytesOpt.map(new String(_, StandardCharsets.UTF_8))
     }
