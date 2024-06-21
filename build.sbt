@@ -359,7 +359,7 @@ lazy val tests = project
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       "org.scalatest" %% "scalatest" % "3.2.18",
       "org.scalacheck" %% "scalacheck" % "1.17.1",
-      "org.seleniumhq.selenium" % "selenium-java" % "4.21.0" % IntegrationTest,
+      "org.seleniumhq.selenium" % "selenium-java" % "4.22.0" % IntegrationTest,
       "org.slf4j" % "slf4j-simple" % "2.0.13"
     ),
     (IntegrationTest / compile) := {
