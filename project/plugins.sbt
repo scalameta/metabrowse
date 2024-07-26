@@ -7,7 +7,7 @@ addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.2")
 addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.12")
 
 libraryDependencies ++= List(
-  "io.github.bonigarcia" % "webdrivermanager" % "5.8.0",
+  "io.github.bonigarcia" % "webdrivermanager" % "5.9.2",
   "com.thesamet.scalapb" %% "compilerplugin" % "0.11.15",
   "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
 )
