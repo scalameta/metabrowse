@@ -106,7 +106,7 @@ lazy val example = project
     ),
     libraryDependencies ++= List(
       "org.scalatest" %% "scalatest" % "3.2.19" % Test,
-      "org.scalacheck" %% "scalacheck" % "1.17.1" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.18.0" % Test,
       "org.scalatestplus" %% "scalacheck-1-17" % "3.2.18.0" % Test
     ),
     test := {} // no need to run paiges tests.
@@ -358,7 +358,7 @@ lazy val tests = project
       "org.scalameta" %% "testkit" % Version.scalameta,
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       "org.scalatest" %% "scalatest" % "3.2.19",
-      "org.scalacheck" %% "scalacheck" % "1.17.1",
+      "org.scalacheck" %% "scalacheck" % "1.18.0",
       "org.seleniumhq.selenium" % "selenium-java" % "4.21.0" % IntegrationTest,
       "org.slf4j" % "slf4j-simple" % "2.0.13"
     ),
