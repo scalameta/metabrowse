@@ -21,7 +21,7 @@ lazy val Version = new {
   def mtags = "1.3.5"
   // Important: this should be the exact same version as the one mtags pulls, as mtags uses some scalameta internal APIs,
   // and binary compatibility of these APIs isn't guaranteed.
-  // Get this version with a command like 'cs resolve org.scalameta:mtags_2.13.14:1.3.1 | grep org.scalameta:scalameta'
+  // Get this version with a command like 'cs resolve org.scalameta:mtags_2.13.15:1.3.1 | grep org.scalameta:scalameta'
   def scalameta = "4.9.6"
 }
 
