@@ -232,10 +232,10 @@ class MetabrowseServer(
     .build()
 
   private def getBytes(exchange: HttpServerExchange): Array[Byte] = {
-    val path = exchange.getRequestPath.stripSuffix(".gz")
-    if (path.endsWith("index.workspace")) {
+    val path = os.SubPath("." + exchange.getRequestPath.stripSuffix(".gz"))
+    if (path.lastOpt.exists(_.endsWith("index.workspace"))) {
       getWorkspace.toByteArray
-    } else if (path.endsWith(".symbolindexes")) {
+    } else if (path.lastOpt.exists(_.endsWith(".symbolindexes"))) {
       val header = exchange.getRequestHeaders.get("Metabrowse-Symbol")
       if (header.isEmpty) {
         logger.error(s"no Metabrowse-Symbol header: $exchange")
@@ -243,19 +243,19 @@ class MetabrowseServer(
       } else {
         getSymbol(header.getFirst).toByteArray
       }
-    } else if (path.endsWith(".semanticdb")) {
+    } else if (path.lastOpt.exists(_.endsWith(".semanticdb"))) {
       getSemanticdb(path).toByteArray
-    } else if (path.endsWith(".map")) {
+    } else if (path.lastOpt.exists(_.endsWith(".map"))) {
       // Ignore requests for sourcemaps.
       Array.emptyByteArray
     } else {
-      val actualPath = if (path == "/") "/index.html" else path
+      val actualPath = if (path == os.sub) os.sub / "index.html" else path
       withInputStream(
         Thread
           .currentThread()
           .getContextClassLoader
           .getResourceAsStream(
-            s"metabrowse/server/assets/${actualPath.stripPrefix("/")}"
+            (os.sub / "metabrowse" / "server" / "assets" / actualPath).toString
           )
       ) { is =>
         if (is == null) {
@@ -301,27 +301,35 @@ class MetabrowseServer(
     Workspace(filenames.result().toSeq)
   }
 
-  private def getSemanticdb(filename: String): TextDocuments = {
-    val path = filename
-      .stripPrefix("/semanticdb/")
-      .stripPrefix("/") // optional '/'
-      .stripSuffix(".semanticdb")
-    logger.info(path)
+  private def getSemanticdb(subPath: os.SubPath): TextDocuments = {
+    val path = {
+      val subPath0 =
+        if (subPath.startsWith(os.sub / "semanticdb"))
+          subPath.relativeTo(os.sub / "semanticdb").asSubPath
+        else
+          subPath
+      subPath0.lastOpt match {
+        case Some(name) if name.endsWith(".semanticdb") =>
+          subPath0 / os.up / name.stripSuffix(".semanticdb")
+        case _ => subPath0
+      }
+    }
+    logger.info(path.toString)
     for {
-      text <- state.get().source(path).orElse {
+      text <- state.get().source(path.toString).orElse {
         logger.warn(s"no source file: $path")
         None
       }
       doc <- try {
         val timeout = TimeUnit.SECONDS.toMillis(10)
-        val textDocument = if (path.endsWith(".java")) {
-          val input = Input.VirtualFile(path, text)
+        val textDocument = if (path.lastOpt.exists(_.endsWith(".java"))) {
+          val input = Input.VirtualFile(path.toString, text)
           t.JavaMtags.index(input, includeMembers = true).index()
         } else {
           InteractiveSemanticdb.toTextDocument(
             global,
             text,
-            filename,
+            subPath.toString,
             timeout,
             List(
               "-P:semanticdb:synthetics:on",
@@ -332,7 +340,7 @@ class MetabrowseServer(
         Some(textDocument)
       } catch {
         case NonFatal(e) =>
-          logger.error(s"compile error: $filename", e)
+          logger.error(s"compile error: $subPath", e)
           None
       }
     } yield TextDocuments(List(doc.withText(text)))
