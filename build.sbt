@@ -13,7 +13,8 @@ lazy val Version = new {
     "2.12.16",
     "2.12.17",
     "2.12.18",
-    "2.12.19"
+    "2.12.19",
+    "2.12.20"
   )
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
