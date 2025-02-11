@@ -12,4 +12,5 @@ jobs:
         with:
           java-version: 8
           distribution: adopt
+      - uses: sbt/setup-sbt@v1
       - run: ./bin/scalafmt --test
