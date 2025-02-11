@@ -18,6 +18,8 @@ jobs:
         with:
           java-version: 8
           distribution: adopt
+          cache: 'sbt'
+      - uses: sbt/setup-sbt@v1
       - run: sbt +test:compile # ensuring metabrowse compiles for all Scala versions
 
   unit:
@@ -38,6 +40,8 @@ jobs:
         with:
           java-version: "${{ matrix.java }}"
           distribution: adopt
+          cache: 'sbt'
+      - uses: sbt/setup-sbt@v1
       - run: sbt ci-test
         env:
           SCALA_VERSION: ${{ matrix.scala }}
