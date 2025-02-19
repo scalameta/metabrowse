@@ -90,13 +90,15 @@ class MetabrowseServer(
         sourcepath
       )
       state.set(newState)
-      sourcepath.sources.foreach(
-        jar => index.addSourceJar(AbsolutePath(jar), dialect)
+      sourcepath.sources.foreach(jar =>
+        index.addSourceJar(AbsolutePath(jar), dialect)
       )
     }
   }
 
-  /** Returns the URL path pointing to the definition location of the given symbol */
+  /** Returns the URL path pointing to the definition location of the given
+    * symbol
+    */
   def urlForSymbol(
       compiler: Global
   )(symbol: compiler.Symbol): Option[String] = {
@@ -162,16 +164,16 @@ class MetabrowseServer(
           withInputStream(classLoader.getResourceAsStream(name)) { is =>
             if (is == null) None
             else Some(InputStreamIO.readBytes(is))
-          } else {
+          }
+        else {
           val it =
             for {
               path <- classPath.iterator
               zf = zipFile(path)
               entry <- Option(zf.getEntry(name)).iterator
-            } yield
-              withInputStream(zf.getInputStream(entry))(
-                InputStreamIO.readBytes(_)
-              )
+            } yield withInputStream(zf.getInputStream(entry))(
+              InputStreamIO.readBytes(_)
+            )
           it.find(_ => true)
         }
       bytesOpt.map(new String(_, StandardCharsets.UTF_8))
@@ -320,29 +322,30 @@ class MetabrowseServer(
         logger.warn(s"no source file: $path")
         None
       }
-      doc <- try {
-        val timeout = TimeUnit.SECONDS.toMillis(10)
-        val textDocument = if (path.lastOpt.exists(_.endsWith(".java"))) {
-          val input = Input.VirtualFile(path.toString, text)
-          t.JavaMtags.index(input, includeMembers = true).index()
-        } else {
-          InteractiveSemanticdb.toTextDocument(
-            global,
-            text,
-            subPath.toString,
-            timeout,
-            List(
-              "-P:semanticdb:synthetics:on",
-              "-P:semanticdb:symbols:none"
+      doc <-
+        try {
+          val timeout = TimeUnit.SECONDS.toMillis(10)
+          val textDocument = if (path.lastOpt.exists(_.endsWith(".java"))) {
+            val input = Input.VirtualFile(path.toString, text)
+            t.JavaMtags.index(input, includeMembers = true).index()
+          } else {
+            InteractiveSemanticdb.toTextDocument(
+              global,
+              text,
+              subPath.toString,
+              timeout,
+              List(
+                "-P:semanticdb:synthetics:on",
+                "-P:semanticdb:symbols:none"
+              )
             )
-          )
+          }
+          Some(textDocument)
+        } catch {
+          case NonFatal(e) =>
+            logger.error(s"compile error: $subPath", e)
+            None
         }
-        Some(textDocument)
-      } catch {
-        case NonFatal(e) =>
-          logger.error(s"compile error: $subPath", e)
-          None
-      }
     } yield TextDocuments(List(doc.withText(text)))
   }.getOrElse(TextDocuments())
 
@@ -356,10 +359,11 @@ class MetabrowseServer(
             None
           }
         input = defn.path.toInput
-        doc = if (input.path.endsWith(".java"))
-          t.JavaMtags.index(input, includeMembers = true).index()
-        else
-          t.ScalaMtags.index(input, dialect).index()
+        doc =
+          if (input.path.endsWith(".java"))
+            t.JavaMtags.index(input, includeMembers = true).index()
+          else
+            t.ScalaMtags.index(input, dialect).index()
         occ <- doc.occurrences
           .find { occ =>
             occ.role.isDefinition &&
@@ -403,24 +407,24 @@ class MetabrowseServer(
 
 object MetabrowseServer {
 
-  /**
-    * Basic command-line interface to start metabrowse-server.
+  /** Basic command-line interface to start metabrowse-server.
     *
     * Examples: {{{
     *
-    *   // browse multiple artifacts with no custom compiler flags
-    *   metabrowse-server org.scalameta:scalameta_2.12:4.0.0 org.typelevel:paiges_2.12:0.2.1
+    * // browse multiple artifacts with no custom compiler flags
+    * metabrowse-server org.scalameta:scalameta_2.12:4.0.0
+    * org.typelevel:paiges_2.12:0.2.1
     *
-    *   // browse artifact with custom compiler flags
-    *   metabrowse-server -Yrangepos -Xfatal-warning -- org.scalameta:scalameta_2.12:4.0.0
+    * // browse artifact with custom compiler flags metabrowse-server -Yrangepos
+    * -Xfatal-warning -- org.scalameta:scalameta_2.12:4.0.0
     *
-    *   // browse artifact with macroparadise and kind-project plugins enabled
-    *   metabrowse-server macroparadise -- org.scalameta:scalameta_2.12:4.0.0
+    * // browse artifact with macroparadise and kind-project plugins enabled
+    * metabrowse-server macroparadise -- org.scalameta:scalameta_2.12:4.0.0
     *
     * }}}
     *
-    * This basic interface exists primarily for local testing purposes, it's probably best
-    * to use a proper command-line parsing library down the road,
+    * This basic interface exists primarily for local testing purposes, it's
+    * probably best to use a proper command-line parsing library down the road,
     */
   def main(arrayArgs: Array[String]): Unit = {
     val args = arrayArgs.iterator.map {

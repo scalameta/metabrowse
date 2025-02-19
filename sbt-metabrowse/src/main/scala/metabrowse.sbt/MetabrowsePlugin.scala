@@ -3,21 +3,21 @@ package metabrowse.sbt
 import sbt._
 import sbt.Keys._
 
-/**
-  * Generate a staic Metabrowse site.
+/** Generate a staic Metabrowse site.
   *
-  * == Usage ==
+  * ==Usage==
   *
   * This plugin must be explicitly enabled in the project that generates the
-  * static metabrowse site. To enable it add the following line
-  * to your `.sbt` file:
+  * static metabrowse site. To enable it add the following line to your `.sbt`
+  * file:
   * {{{
   * enablePlugins(MetabrowsePlugin)
   * }}}
   *
-  * The static site includes sources for projects that enable the semanticdb-scalac
-  * compiler plugin, see http://scalameta.org/tutorial/#semanticdb-scalac.
-  * To enable the compiler plugin, add the following to your projects settings
+  * The static site includes sources for projects that enable the
+  * semanticdb-scalac compiler plugin, see
+  * http://scalameta.org/tutorial/#semanticdb-scalac. To enable the compiler
+  * plugin, add the following to your projects settings
   *
   * {{{
   *   lazy val projectToIncludeSourcesForMetabrowseSite = project.settings(
