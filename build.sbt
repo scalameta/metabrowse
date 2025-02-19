@@ -4,7 +4,6 @@ import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
   val scala213Versions = Seq(
-    "2.13.11",
     "2.13.12",
     "2.13.13",
     "2.13.14",
@@ -12,7 +11,6 @@ lazy val Version = new {
     "2.13.16"
   )
   val scala212Versions = Seq(
-    "2.12.16",
     "2.12.17",
     "2.12.18",
     "2.12.19",
