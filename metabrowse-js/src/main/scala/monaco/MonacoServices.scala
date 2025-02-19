@@ -4,19 +4,20 @@ import scala.scalajs.js
 import monaco.editor.{IEditor, IEditorOptions, ITextModel}
 import monaco.editor.Editor.IEditorViewState
 
-/**
-  * Service declarations to hook into the Monaco Editor.
+/** Service declarations to hook into the Monaco Editor.
   *
   * Out of the box the Monaco Editor uses a simple set of
   * [[services https://github.com/Microsoft/vscode/blob/a460624f88b4dd3a03d9633e0860c0078c00462f/src/vs/editor/standalone/browser/simpleServices.ts]]
   * which do not provide the ability out of the box to load content dynamically.
   *
-  * The default services can be overridden using [[monaco.editor.IEditorOverrideServices]].
-  * The API in inside this package contains the definitions for these services.
+  * The default services can be overridden using
+  * [[monaco.editor.IEditorOverrideServices]]. The API in inside this package
+  * contains the definitions for these services.
   *
   * Based on declarations defined in
   * [[editor.ts https://github.com/Microsoft/vscode/blob/c67ef57cda90b5f28499646f7cc94e8dcc5b0586/src/vs/platform/editor/common/editor.ts]]
-  * and [[resolverService.ts https://github.com/Microsoft/vscode/blob/337ded059ae5140b86caf07e67ce92a41a8e6581/src/vs/editor/common/services/resolverService.ts]].
+  * and
+  * [[resolverService.ts https://github.com/Microsoft/vscode/blob/337ded059ae5140b86caf07e67ce92a41a8e6581/src/vs/editor/common/services/resolverService.ts]].
   */
 package services {
 
@@ -79,8 +80,7 @@ package services {
     ): Promise[IEditor]
   }
 
-  /**
-    * Service to dynamically load models.
+  /** Service to dynamically load models.
     */
   trait ITextModelService extends js.Object {
     def createModelReference(
