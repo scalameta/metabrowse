@@ -4,7 +4,6 @@ import sbtcrossproject.{crossProject, CrossType}
 
 lazy val Version = new {
   val scala213Versions = Seq(
-    "2.13.11",
     "2.13.12",
     "2.13.13",
     "2.13.14",
@@ -12,7 +11,6 @@ lazy val Version = new {
     "2.13.16"
   )
   val scala212Versions = Seq(
-    "2.12.16",
     "2.12.17",
     "2.12.18",
     "2.12.19",
@@ -21,11 +19,11 @@ lazy val Version = new {
   def scala213 = scala213Versions.last
   def scala212 = scala212Versions.last
 
-  def mtags = "1.3.5"
+  def mtags = "1.5.1"
   // Important: this should be the exact same version as the one mtags pulls, as mtags uses some scalameta internal APIs,
   // and binary compatibility of these APIs isn't guaranteed.
   // Get this version with a command like 'cs resolve org.scalameta:mtags_2.13.14:1.3.1 | grep org.scalameta:scalameta'
-  def scalameta = "4.9.6"
+  def scalameta = "4.12.3"
 }
 
 inThisBuild(
@@ -295,7 +293,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       baseDirectory.value./("../src/main/protobuf")
     ),
     libraryDependencies ++= List(
-      "org.scalameta" %%% "scalameta" % Version.scalameta,
+      "org.scalameta" %% "semanticdb-shared" % Version.scalameta,
       "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion % "protobuf"
     )
   )
