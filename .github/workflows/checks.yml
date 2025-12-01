@@ -13,7 +13,7 @@ jobs:
           java-version: 11
           distribution: adopt
       - uses: sbt/setup-sbt@v1
-      - uses: coursier/setup-action@v1
+      - uses: coursier/setup-action@v2
         with:
           apps: scalafmt
       - run: scalafmt --test
