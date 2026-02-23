@@ -128,7 +128,7 @@ lazy val server = project
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       ("org.scalameta" %% "mtags" % Version.mtags).cross(CrossVersion.full),
-      "com.lihaoyi" %% "os-lib" % "0.11.5"
+      "com.lihaoyi" %% "os-lib" % "0.11.8"
     ),
     (Compile / packageBin) := {
       import java.io.FileOutputStream
@@ -363,7 +363,7 @@ lazy val tests = project
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
       "org.scalatest" %% "scalatest" % "3.2.19",
       "org.scalacheck" %% "scalacheck" % "1.19.0",
-      "org.seleniumhq.selenium" % "selenium-java" % "4.33.0" % IntegrationTest,
+      "org.seleniumhq.selenium" % "selenium-java" % "4.41.0" % IntegrationTest,
       "org.slf4j" % "slf4j-simple" % "2.0.17"
     ),
     (IntegrationTest / compile) := {
