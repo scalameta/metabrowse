@@ -108,7 +108,7 @@ lazy val example = project
       "-Xplugin-require:semanticdb"
     ),
     libraryDependencies ++= List(
-      "org.scalatest" %% "scalatest" % "3.2.19" % Test,
+      "org.scalatest" %% "scalatest" % "3.2.20" % Test,
       "org.scalacheck" %% "scalacheck" % "1.18.1" % Test,
       "org.scalatestplus" %% "scalacheck-1-17" % "3.2.18.0" % Test
     ),
@@ -251,7 +251,7 @@ lazy val js = project
     webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.8",
-      "org.scalatest" %%% "scalatest" % "3.2.19" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.20" % Test
     ),
     (Compile / npmDevDependencies) ++= Seq(
       "clean-webpack-plugin" -> "3.0.0",
@@ -361,7 +361,7 @@ lazy val tests = project
     libraryDependencies ++= List(
       "org.scalameta" %% "testkit" % Version.scalameta,
       "org.scalameta" % "semanticdb-scalac-core" % Version.scalameta cross CrossVersion.full,
-      "org.scalatest" %% "scalatest" % "3.2.19",
+      "org.scalatest" %% "scalatest" % "3.2.20",
       "org.scalacheck" %% "scalacheck" % "1.18.1",
       "org.seleniumhq.selenium" % "selenium-java" % "4.41.0" % IntegrationTest,
       "org.slf4j" % "slf4j-simple" % "2.0.17"
